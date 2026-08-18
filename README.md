@@ -5,7 +5,7 @@
 ## 安装（每台设备一次）
 
 ```
-/plugin marketplace add <owner>/longdev-plugin
+/plugin marketplace add xicun/longdev-plugin
 /plugin install longdev@zzm-plugins
 ```
 
