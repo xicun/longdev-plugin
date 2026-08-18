@@ -48,7 +48,7 @@ description: 长程开发编排。把一个跨越多个会话的大任务（新�
 
 1. **派 `longdev-implementer` 执行本阶段。** prompt 只需要给：项目根目录、PLAN.md 路径、阶段号。不要复述计划内容——它自己读 PLAN.md，复述反而会引入和落盘状态不一致的二手信息。implementer 会实现、跑验证、并把决策/坑/下一阶段入口更新进 PLAN.md。
 2. **收到回传后先看「遗留/上报」**。有方案级问题上报的，停下来问用户，拿到决策后写进 PLAN.md，再用 `SendMessage` 让同一个 implementer 继续（它的 context 还在，不要重开）。
-3. **派 `longdev-reviewer` 独立审查。** 它在干净 context 里自己读 diff。
+3. **派 `longdev-reviewer` 独立审查。** 它在干净 context 里做两个维度：自己核对 diff 与 PLAN.md 阶段目标/决策的一致性，并调用 `/code-review` skill 做代码正确性审查，合并回传。主会话不要替它再跑一遍 review。
 4. **有阻塞问题** → 用 `SendMessage` 把问题清单发回给同一个 implementer 修，修完再让 reviewer 复查（也用 `SendMessage` 续同一个 reviewer）。两轮修复后仍有阻塞，停下来向用户汇报，不要无限循环。
 5. **主会话抽查 PLAN.md**：本阶段勾掉了、下一阶段入口更新了、没有"见上文"式引用。这是唯一需要主会话亲自核对的落盘物。
 6. 向用户简短汇报本阶段结果（做了什么、验证输出、review 结论），然后**直接进入下一阶段**——不需要 `/clear`，主会话每阶段只积累这几段摘要。
