@@ -1,0 +1,16 @@
+{
+  "name": "zzm-plugins",
+  "owner": {
+    "name": "zzm.ploretoy"
+  },
+  "metadata": {
+    "description": "zzm 的个人 Claude Code plugin 集"
+  },
+  "plugins": [
+    {
+      "name": "longdev",
+      "source": "./",
+      "description": "长程开发编排：把大任务拆阶段，scout 调研、implementer 干净 context 实现、reviewer 独立审查，状态落盘 PLAN.md"
+    }
+  ]
+}
