@@ -90,7 +90,7 @@ description: 长程开发编排。把一个跨越多个会话的大任务（新�
 
 - **立项/拆解**：最强模型（Fable 5）。一次性成本，但影响所有后续阶段。
 - **implementer**：默认不传 `model`（继承主会话模型）。基本是照方案敲代码的机械阶段，派活时传 `model: "sonnet"` 省成本；最难的核心阶段可传 `model: "opus"` 或由 Fable 会话直接派（继承 Fable）。
-- **scout / reviewer / final-reviewer**：已在 agent 定义里固定为 `haiku` / `sonnet` / `sonnet`，不要在调用时覆盖。
+- **scout / reviewer / final-reviewer**：已在 agent 定义里固定为 `sonnet`，不要在调用时覆盖。scout 曾用 haiku，实测不遵守输出长度约束（40 行上限回了 ~1000 行），已弃用。
 
 ## 几条硬规矩
 

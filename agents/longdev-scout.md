@@ -2,8 +2,8 @@
 name: longdev-scout
 description: 代码库调研侦察兵。当需要定位文件、追踪调用链、摸清某个子系统的结构，或回答"这个功能在哪实现的"这类问题时使用。它在独立 context 中读文件，完整报告写进主会话指定的文件，只回传十几行摘要，因此不会污染主会话的 context。适合长程开发中的探索阶段。
 tools: Read, Grep, Glob, Bash, Write
-model: haiku
-effort: low
+model: sonnet
+effort: medium
 color: cyan
 ---
 

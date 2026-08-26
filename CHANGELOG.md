@@ -3,6 +3,10 @@
 发版流程：改代码 → 更新本文件 → bump `.claude-plugin/plugin.json` 的 `version` → commit → `git tag vX.Y.Z` → push。
 其他设备只有在 `version` 字符串变化后才会收到更新（`/plugin update longdev@zzm-plugins` 或自动更新）。
 
+## 0.3.1 — 2026-08-26
+
+- `longdev-scout` 模型从 haiku 改为 sonnet（effort medium）。haiku 实测不遵守回传长度约束（40 行上限回了 ~1000 行），调研质量也不稳。
+
 ## 0.3.0 — 2026-08-26
 
 - **新增 `longdev-final-reviewer`**：全部阶段完成后做收尾全盘审查。拿 PLAN.md 记录的基线 commit 算整个任务的 diff，查逐阶段 review 结构上抓不到的问题（总目标端到端达成、跨阶段接缝、决策漂移、跨阶段残留），全量跑测试；默认不重跑 `/code-review`（diff ≤800 行或某阶段缺审查记录时才跑 low 档）。SKILL.md C-7/C-8 新增收尾审查与收尾修复轮，最多两轮。
