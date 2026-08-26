@@ -3,7 +3,7 @@ name: longdev
 description: 长程开发编排：大任务拆阶段，subagent 逐阶段实现+审查+收尾全盘审查，状态落盘在结构化的 PLAN.md 索引 + stages 文档，主会话不积 context。用于新功能/重构/迁移等跨会话任务；用户说"长程开发""分阶段做""接着上次继续"时触发。
 ---
 
-# longdev v0.5.0
+# longdev v0.5.1
 
 **开工第一句话报版本**：`longdev v0.5.0`。用户据此判断是否已更新（最新版见 GitHub `xicun/longdev-plugin` 的 CHANGELOG 顶部；不一致就 `/plugin update longdev@zzm-plugins`）。
 
@@ -63,13 +63,14 @@ Agent tool，`subagent_type` 填 `longdev-scout` / `longdev-planner` / `longdev-
 
 1. **派 implementer**：prompt 只给项目根目录、**任务目录**、阶段号。不复述计划。它读索引+本阶段入口+上一阶段交接，实现、补测试、跑验证、写 `stages/N.md` 完成记录、精修 `stages/N+1.md` 入口、只改 PLAN.md 的状态和提升项。
 2. **先看回传的「遗留/上报」**：有方案级问题或**阶段尺寸超标**（>8 文件 / >400 行）就停下来问用户——尺寸超标通常该拆阶段，拿到决策后写进 stages 文件，`SendMessage` 让同一个 implementer 继续。
-3. **派 reviewer**：prompt 给项目根目录、任务目录、阶段号、报告路径 `<任务目录>/reviews/stage-<N>.md`。它核对 diff 与 stages/N.md 完成标准、PLAN.md 全局决策、测试要求的一致性，并调 `/code-review`；报告写文件，回 ≤10 行。主会话不重跑 review，不读报告。
+3. **派 reviewer**：prompt 给项目根目录、任务目录、阶段号、报告路径 `<任务目录>/reviews/stage-<N>.md`。它核对 diff 与 stages/N.md 完成标准、PLAN.md 全局决策、测试要求的一致性，并调 `/code-review`；报告写文件，回 ≤12 行。主会话不重跑 review，不读报告。
 4. **有阻塞** → `SendMessage` 给同一个 implementer："读 `<任务目录>/reviews/stage-<N>.md`，修阻塞问题，重跑验证"，不粘清单。修完 `SendMessage` 让同一个 reviewer 复查。两轮仍阻塞就停下汇报。
-5. **抽查**：只跑 `grep -n "^| [0-9]" <任务目录>/PLAN.md` 确认本阶段状态变 `✅`、下一阶段变 `▶`。内容属实性 reviewer 已核。
-6. 简短汇报本阶段（做了什么、验证输出、review 结论），直接进入下一阶段。
-7. **全部完成 → 派 final-reviewer**：prompt 给项目根目录、任务目录、报告路径 `<任务目录>/reviews/final.md`。它读 PLAN.md + 全部 stages + 按基线 commit 算全量 diff，查总目标端到端达成、跨阶段接缝、决策漂移、跨阶段残留，全量跑测试；不重跑全量 `/code-review`。
-8. **收尾有阻塞** → 派新 implementer 做「收尾修复轮」（prompt 给项目根目录、任务目录、报告路径，说明是收尾修复不是某阶段），修完 `SendMessage` 同一个 final-reviewer 复查。最多两轮。
-9. 通过 → `sed` 在 PLAN.md 标题下加 `**状态：已完成**`，按 `references/show-file.md` 展示 `reviews/final.md`，做总结（含收尾结论和全量测试结果）。
+5. **回传里有「方案级决策待确认」** → 这类**不发给 implementer**，直接问用户：按 reviewer 摘要里的一行标题逐条念，用户要细节就按 `references/show-file.md` 打开报告。用户认可 → 一句话 `SendMessage` 让 implementer 把该决策按用户口径写实（跨阶段的提升到 PLAN.md「全局决策」并标「阶段 N 提升」）；用户否决 → 当阻塞问题走第 4 步发回 implementer 改。用户说"你定"就当认可，不反复问。
+6. **抽查**：只跑 `grep -n "^| [0-9]" <任务目录>/PLAN.md` 确认本阶段状态变 `✅`、下一阶段变 `▶`。内容属实性 reviewer 已核。
+7. 简短汇报本阶段（做了什么、验证输出、review 结论），直接进入下一阶段。
+8. **全部完成 → 派 final-reviewer**：prompt 给项目根目录、任务目录、报告路径 `<任务目录>/reviews/final.md`。它读 PLAN.md + 全部 stages + 按基线 commit 算全量 diff，查总目标端到端达成、跨阶段接缝、决策漂移、跨阶段残留，全量跑测试；不重跑全量 `/code-review`。
+9. **收尾有阻塞** → 派新 implementer 做「收尾修复轮」（prompt 给项目根目录、任务目录、报告路径，说明是收尾修复不是某阶段），修完 `SendMessage` 同一个 final-reviewer 复查。最多两轮。
+10. 通过 → `sed` 在 PLAN.md 标题下加 `**状态：已完成**`，按 `references/show-file.md` 展示 `reviews/final.md`，做总结（含收尾结论和全量测试结果）。
 
 ## D. 主会话亲自执行（例外）
 
@@ -97,6 +98,7 @@ Agent tool，`subagent_type` 填 `longdev-scout` / `longdev-planner` / `longdev-
 - 主会话不复述 subagent 产出：修复轮传路径，汇报只写结论。
 - 调研只派 scout，拆解只派 planner，不进 plan mode。
 - 阶段尺寸超标（>8 文件 / >400 行）当拆阶段处理，不要放行。
+- implementer 自己新立的方案级决策要过用户，reviewer 只负责揪出来，主会话不代拍。
 - 不合并阶段，不跳过逐阶段 review 或收尾审查。
 - 新增行为不带测试的阶段不算完成，除非 PLAN.md 决策明确该项目不引入测试。
 - 验证失败如实报输出，不说"基本通过"。
