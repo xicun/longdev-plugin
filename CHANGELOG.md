@@ -1,9 +1,16 @@
 # Changelog
 
-发版流程：改代码 → 更新本文件 → bump `.claude-plugin/plugin.json` 的 `version` → commit → `git tag vX.Y.Z` → push。
+发版流程：改代码 → 更新本文件 → bump `.claude-plugin/plugin.json` 的 `version` **和** `skills/longdev/SKILL.md` 第一行标题里的版本号（两处必须一致，SKILL.md 的那个是用户在会话里看到的）→ commit → `git tag vX.Y.Z` → push。
 其他设备只有在 `version` 字符串变化后才会收到更新（`/plugin update longdev@zzm-plugins` 或自动更新）。
 
-## 0.3.1 — 2026-08-26
+## 0.4.0 — 2026-08-26
+
+- **立项编排化，不再进 plan mode**：新增 `longdev-planner` agent（继承主会话模型）。主会话派 scout 落文件 → 派 planner 读 scout 报告、按模板写 `PLAN.draft.md`、回传 ≤30 行摘要（阶段清单 / 关键决策 / 待用户拍板 / 风险）→ 主会话把草稿文件展示给用户确认 → 修改意见 `SendMessage` 给同一 planner 迭代 → 确认后 `mv` 转正为 PLAN.md。立项期间主会话只积累摘要，**删除了 v0.3.0 的"立项后建议 /clear"**；全流程唯一需要 `/clear` 的场景只剩 D（主会话亲自执行的阶段）。
+- **按客户端选择文件展示方式**：新增 `references/show-file.md`。用 `CLAUDE_CODE_ENTRYPOINT` 判定：CLI 下有 `code`/`cursor` 就 `--reuse-window --goto` 在用户编辑器里打开；裸终端回显绝对路径；非 CLI（桌面 App / 网页）用 `SendUserFile` 推侧栏。立项草稿和收尾 `reviews/final.md` 都走这个机制，主会话自己不读文件。
+- **SKILL.md 精简并加版本号**：第一行 `# longdev vX.Y.Z`，主会话开工第一句报版本，用户据此判断是否已更新。删掉解释性的"context 预算"段和历史备注（保留在本文件里），只留操作规则；从 ~140 行压到 ~85 行。
+- 状态判定新增"只有 PLAN.draft.md"分支（上次立项没确认完）。
+
+ — 2026-08-26
 
 - `longdev-scout` 模型从 haiku 改为 sonnet（effort medium）。haiku 实测不遵守回传长度约束（40 行上限回了 ~1000 行），调研质量也不稳。
 

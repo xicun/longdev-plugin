@@ -10,7 +10,7 @@
     {
       "name": "longdev",
       "source": "./",
-      "description": "长程开发编排：把大任务拆阶段，scout 调研、implementer 干净 context 实现、reviewer 独立审查，final-reviewer 收尾全盘审查，状态落盘 PLAN.md"
+      "description": "长程开发编排：把大任务拆阶段，scout 调研、planner 拆解、implementer 干净 context 实现、reviewer 独立审查，final-reviewer 收尾全盘审查，状态落盘 PLAN.md"
     }
   ]
 }

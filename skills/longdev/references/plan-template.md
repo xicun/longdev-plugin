@@ -1,6 +1,6 @@
 # PLAN.md 模板
 
-创建 `.claude/longdev/PLAN.md` 时按此结构填写。写给「一个没有任何本次会话 context 的人」看。
+planner 立项时按此结构写 `.claude/longdev/PLAN.draft.md`，用户确认后由主会话改名为 `PLAN.md`。写给「一个没有任何本次会话 context 的人」看。
 
 ```markdown
 # <任务名>
