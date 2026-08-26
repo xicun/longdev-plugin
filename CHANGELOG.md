@@ -3,6 +3,20 @@
 发版流程：改代码 → 更新本文件 → bump `.claude-plugin/plugin.json` 的 `version` **和** `skills/longdev/SKILL.md` 第一行标题里的版本号（两处必须一致，SKILL.md 的那个是用户在会话里看到的）→ commit → `git tag vX.Y.Z` → push。
 其他设备只有在 `version` 字符串变化后才会收到更新（`/plugin update longdev@zzm-plugins` 或自动更新）。
 
+## 0.5.0 — 2026-08-26
+
+计划文件结构化 + 全角色读写卫生。起因是实测：一个 5 阶段任务里 7 个 implementer 子会话的 context 冲到 200k–600k 字符（60–180k token，最大的已贴近上限会触发压缩），而那份 PLAN.md 长到 65k 字符 / 291 行，其中 ~85% 是阶段局部信息却让每个 implementer 全读。诊断结论是**该拆的是阶段和文档，不是 implementer 的角色**——把实现和测试拆成两个 agent 只会让第二个重读一遍所有文件。
+
+- **一个任务一个目录**：`.claude/longdev/<任务名>/`，含 `PLAN.md`（索引，≤120 行）、`stages/<N>.md`（每阶段入口 + 完成记录，≤80 行）、`notes/<主题>.md`（跨阶段契约类参考物）、`scout/`、`reviews/`。多任务共存不再靠手动改名。
+- **PLAN.md 降级为索引**：只放每个阶段都用得上的（目标、基线 commit、阶段表、**全局**决策、**全局**坑、入口级关键文件 ≤15 行、参考物索引、调研指针、验证方式）。阶段局部的决策/坑/文件清单一律留在 `stages/N.md`；只有 implementer 判断跨阶段的才提升到 PLAN.md 并标 `（阶段 N 提升）`。中途冒出的契约类内容进 `notes/`，禁止在 PLAN.md 新开节。
+- **各角色只读自己那一份**：implementer N 读 `PLAN.md` + `stages/N.md` + `stages/N-1.md` 的「交接」小节（`sed` 只读该节）+ 入口点名的 notes——从 65k 降到 ~10k；reviewer 读索引 + 本阶段文档 + diff；final-reviewer 读索引 + 全部 stages + 全量 diff（决策漂移检查反而更容易，每阶段决策天然带出处）；主会话只 `grep` 阶段表。
+- **阶段尺寸硬约束**：planner 拆解时每阶段 ≤8 个文件 / ≤400 行，超了必须拆成两个。implementer 开工发现超标要先上报，主会话按"拆阶段"处理而不是放行。
+- **读写卫生写进全部五个 agent**：>200 行的文件按段读（先 `grep -n` 定位）、禁止 `cat` 整个目录、改文件用 Edit 不用 Write（同一文件 Write 两次以上就是信号）、测试输出走静默 reporter 或 `tail`、**禁止读 `~/.claude/` 下的会话记录/transcript/plans**（实测有 implementer 因入口信息不足去"考古"主会话 transcript，一次吃掉 28k+22k+18k 字符）、同一文件不读第二次。final-reviewer 额外要求按文件读 diff 而不是一把梭。
+- **stages 文档两段式**：「入口」由 planner 写、上一阶段 implementer 精修，写完冻结；「完成记录」由本阶段 implementer 追加，含「给下一阶段的交接」——收尾审查靠比对这两段判断阶段是否达成目标。新增 `references/stage-template.md`。
+- **旧版计划迁移**（流程 E）：检测到 `.claude/longdev/PLAN.md` 没有配套 `stages/` 目录时，派 planner 走「迁移轮」拆分（只搬运，不重新规划阶段），旧文件留作 `PLAN.legacy.md`。
+- 状态判定重写：扫 `.claude/longdev/*/`，多个未完成任务时列出来问用户，不擅自挑。
+- reviewer 维度一新增一条：报告「该下沉的内容被塞进 PLAN.md」和文件超行数上限。
+
 ## 0.4.1 — 2026-08-26
 
 - SKILL.md 的 description 缩短并前置"做什么"：`/` 命令菜单只显示开头一截，原 150+ 字的描述被截断到看不出用途。触发词保留在句尾。

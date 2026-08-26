@@ -2,8 +2,8 @@
 
 主会话在两个时点要让用户看一份完整文件，但**自己不读它**（读了就进 context）：
 
-- 立项：planner 交出 `.claude/longdev/PLAN.draft.md`（每轮迭代后再展示一次）
-- 收尾：final-reviewer 交出 `.claude/longdev/reviews/final.md`
+- 立项：planner 交出 `<任务目录>/PLAN.draft.md`（每轮迭代后再展示一次）
+- 收尾：final-reviewer 交出 `<任务目录>/reviews/final.md`
 
 展示方式按用户当前客户端决定。用一次 Bash 调用探测并执行（`<abs>` 换成文件的绝对路径）：
 
