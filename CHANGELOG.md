@@ -1,7 +1,11 @@
 # Changelog
 
-发版流程：改代码 → 更新本文件 → bump `.claude-plugin/plugin.json` 的 `version` **和** `skills/longdev/SKILL.md` 第一行标题里的版本号（两处必须一致，SKILL.md 的那个是用户在会话里看到的）→ commit → `git tag vX.Y.Z` → push。
+发版流程：改代码 → 更新本文件 → bump `.claude-plugin/plugin.json` 的 `version`（**唯一**要改的版本号，SKILL.md 开工时直接读它）→ commit → `git tag vX.Y.Z` → push。
 其他设备只有在 `version` 字符串变化后才会收到更新（`/plugin update longdev@zzm-plugins` 或自动更新）。
+
+## 0.5.3 — 2026-08-26
+- SKILL.md 不再手写版本号：开工报的版本改成运行时读 `.claude-plugin/plugin.json` 的 `version`，plugin.json 成为唯一真源。修之前的漂移：标题写 v0.5.2、正文却让报 `longdev v0.5.0`（0.5.1 / 0.5.2 两次发版都漏改正文那句，实际报出来的是错版本）。
+- 发版流程相应简化为只 bump plugin.json 一处。
 
 ## 0.5.2 — 2026-08-26
 

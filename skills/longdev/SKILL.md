@@ -3,9 +3,9 @@ name: longdev
 description: 长程开发编排：大任务拆阶段，subagent 逐阶段实现+审查+收尾全盘审查，状态落盘在结构化的 PLAN.md 索引 + stages 文档，主会话不积 context。用于新功能/重构/迁移等跨会话任务；用户说"长程开发""分阶段做""接着上次继续"时触发。
 ---
 
-# longdev v0.5.2
+# longdev
 
-**开工第一句话报版本**：`longdev v0.5.0`。用户据此判断是否已更新（最新版见 GitHub `xicun/longdev-plugin` 的 CHANGELOG 顶部；不一致就 `/plugin update longdev@zzm-plugins`）。
+**开工第一句话报版本**：读本 plugin 根目录的 `.claude-plugin/plugin.json`（相对本文件是 `../../.claude-plugin/plugin.json`），把它的 `version` 报成 `longdev vX.Y.Z`。**不要凭记忆或从别处猜版本号**——plugin.json 是唯一真源。用户据此判断是否已更新（最新版见 GitHub `xicun/longdev-plugin` 的 CHANGELOG 顶部；不一致就 `/plugin update longdev@zzm-plugins`）。
 
 原则：**状态落盘，重活全在 subagent 里**。调研、拆解、实现、审查都由干净 context 的 subagent 完成，交接物是文件。主会话只收摘要，subagent 只读自己那一份。
 

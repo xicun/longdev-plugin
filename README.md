@@ -13,11 +13,11 @@
 
 ## 我用的是最新版吗
 
-skill 开工第一句会报 `longdev vX.Y.Z`（来自 SKILL.md 第一行）。和本仓库 CHANGELOG.md 顶部的版本比对；落后就 `/plugin update longdev@zzm-plugins`。本机已安装的版本也可以看 `~/.claude/plugins/cache/zzm-plugins/longdev/` 下的目录名。
+skill 开工第一句会报 `longdev vX.Y.Z`（运行时读 `.claude-plugin/plugin.json` 的 `version`）。和本仓库 CHANGELOG.md 顶部的版本比对；落后就 `/plugin update longdev@zzm-plugins`。本机已安装的版本也可以看 `~/.claude/plugins/cache/zzm-plugins/longdev/` 下的目录名。
 
 ## 更新
 
-发布者：改代码 → 更新 CHANGELOG.md → bump `.claude-plugin/plugin.json` 的 `version` 和 `skills/longdev/SKILL.md` 第一行的版本号（两处一致）→ commit + `git tag vX.Y.Z` → push。**不改 version 只推代码不会触发任何设备更新。**
+发布者：改代码 → 更新 CHANGELOG.md → bump `.claude-plugin/plugin.json` 的 `version`（唯一一处版本号）→ commit + `git tag vX.Y.Z` → push。**不改 version 只推代码不会触发任何设备更新。**
 
 其他设备：`/plugin update longdev@zzm-plugins`；或在 `/plugin` 界面 → Marketplaces 中对 zzm-plugins 开启 auto-update。
 
