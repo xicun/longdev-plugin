@@ -3,6 +3,10 @@
 发版流程：改代码 → 更新本文件 → bump `.claude-plugin/plugin.json` 的 `version` **和** `skills/longdev/SKILL.md` 第一行标题里的版本号（两处必须一致，SKILL.md 的那个是用户在会话里看到的）→ commit → `git tag vX.Y.Z` → push。
 其他设备只有在 `version` 字符串变化后才会收到更新（`/plugin update longdev@zzm-plugins` 或自动更新）。
 
+## 0.4.1 — 2026-08-26
+
+- SKILL.md 的 description 缩短并前置"做什么"：`/` 命令菜单只显示开头一截，原 150+ 字的描述被截断到看不出用途。触发词保留在句尾。
+
 ## 0.4.0 — 2026-08-26
 
 - **立项编排化，不再进 plan mode**：新增 `longdev-planner` agent（继承主会话模型）。主会话派 scout 落文件 → 派 planner 读 scout 报告、按模板写 `PLAN.draft.md`、回传 ≤30 行摘要（阶段清单 / 关键决策 / 待用户拍板 / 风险）→ 主会话把草稿文件展示给用户确认 → 修改意见 `SendMessage` 给同一 planner 迭代 → 确认后 `mv` 转正为 PLAN.md。立项期间主会话只积累摘要，**删除了 v0.3.0 的"立项后建议 /clear"**；全流程唯一需要 `/clear` 的场景只剩 D（主会话亲自执行的阶段）。

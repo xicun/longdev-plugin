@@ -1,11 +1,11 @@
 ---
 name: longdev
-description: 长程开发编排。把跨多个会话的大任务（新功能、重构、迁移）拆成阶段，主会话只做编排和决策：调研派 scout，拆解派 planner，每阶段实现派干净 context 的 implementer，审查派 reviewer，全部完成后派 final-reviewer 收尾全盘审查，状态落盘在 PLAN.md。主会话只沉淀摘要，可一口气跑完所有阶段，不需要 /clear。当用户要开始或继续一个大型开发任务，或提到"长程开发""分阶段做""接着上次继续"时使用。
+description: 长程开发编排：大任务拆阶段，subagent 逐阶段实现+审查+收尾全盘审查，状态落盘 PLAN.md，主会话不积 context。用于新功能/重构/迁移等跨会话任务；用户说"长程开发""分阶段做""接着上次继续"时触发。
 ---
 
-# longdev v0.4.0
+# longdev v0.4.1
 
-**开工第一句话报版本**：`longdev v0.4.0`。用户据此判断是否已更新（最新版见 GitHub `xicun/longdev-plugin` 的 CHANGELOG 顶部；不一致就 `/plugin update longdev@zzm-plugins`）。
+**开工第一句话报版本**：`longdev v0.4.1`。用户据此判断是否已更新（最新版见 GitHub `xicun/longdev-plugin` 的 CHANGELOG 顶部；不一致就 `/plugin update longdev@zzm-plugins`）。
 
 原则：**状态落盘，重活全在 subagent 里**。调研、拆解、实现、审查都由干净 context 的 subagent 完成，交接物是文件，主会话只收每次几十行的摘要。
 
