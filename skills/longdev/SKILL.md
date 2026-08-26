@@ -3,7 +3,7 @@ name: longdev
 description: 长程开发编排：大任务拆阶段，subagent 逐阶段实现+审查+收尾全盘审查，状态落盘在结构化的 PLAN.md 索引 + stages 文档，主会话不积 context。用于新功能/重构/迁移等跨会话任务；用户说"长程开发""分阶段做""接着上次继续"时触发。
 ---
 
-# longdev v0.5.1
+# longdev v0.5.2
 
 **开工第一句话报版本**：`longdev v0.5.0`。用户据此判断是否已更新（最新版见 GitHub `xicun/longdev-plugin` 的 CHANGELOG 顶部；不一致就 `/plugin update longdev@zzm-plugins`）。
 
@@ -62,7 +62,7 @@ Agent tool，`subagent_type` 填 `longdev-scout` / `longdev-planner` / `longdev-
 阶段串行；除非计划明确标注两阶段完全不相交且各用 `isolation: "worktree"`。
 
 1. **派 implementer**：prompt 只给项目根目录、**任务目录**、阶段号。不复述计划。它读索引+本阶段入口+上一阶段交接，实现、补测试、跑验证、写 `stages/N.md` 完成记录、精修 `stages/N+1.md` 入口、只改 PLAN.md 的状态和提升项。
-2. **先看回传的「遗留/上报」**：有方案级问题或**阶段尺寸超标**（>8 文件 / >400 行）就停下来问用户——尺寸超标通常该拆阶段，拿到决策后写进 stages 文件，`SendMessage` 让同一个 implementer 继续。
+2. **先看回传的「遗留/上报」**：有上报项（返工不可逆的分叉、前置条件不成立）或**阶段尺寸超标**（>8 文件 / >400 行）就停下来问用户——尺寸超标通常该拆阶段，拿到决策后写进 stages 文件，`SendMessage` 让同一个 implementer 继续。
 3. **派 reviewer**：prompt 给项目根目录、任务目录、阶段号、报告路径 `<任务目录>/reviews/stage-<N>.md`。它核对 diff 与 stages/N.md 完成标准、PLAN.md 全局决策、测试要求的一致性，并调 `/code-review`；报告写文件，回 ≤12 行。主会话不重跑 review，不读报告。
 4. **有阻塞** → `SendMessage` 给同一个 implementer："读 `<任务目录>/reviews/stage-<N>.md`，修阻塞问题，重跑验证"，不粘清单。修完 `SendMessage` 让同一个 reviewer 复查。两轮仍阻塞就停下汇报。
 5. **回传里有「方案级决策待确认」** → 这类**不发给 implementer**，直接问用户：按 reviewer 摘要里的一行标题逐条念，用户要细节就按 `references/show-file.md` 打开报告。用户认可 → 一句话 `SendMessage` 让 implementer 把该决策按用户口径写实（跨阶段的提升到 PLAN.md「全局决策」并标「阶段 N 提升」）；用户否决 → 当阻塞问题走第 4 步发回 implementer 改。用户说"你定"就当认可，不反复问。
