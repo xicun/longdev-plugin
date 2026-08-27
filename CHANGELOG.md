@@ -3,6 +3,9 @@
 发版流程：改代码 → 更新本文件 → bump `.claude-plugin/plugin.json` 的 `version`（**唯一**要改的版本号，SKILL.md 开工时直接读它）→ commit → `git tag vX.Y.Z` → push。
 其他设备只有在 `version` 字符串变化后才会收到更新（`/plugin update longdev@zzm-plugins` 或自动更新）。
 
+## 0.7.1 — 2026-08-27
+- 把 0.7.0 的降档规则从「主会话是 Fable 时」改成「**继承到比 `opus` 高的模型时**」。今天两者等价（Fable 是唯一在 Opus 之上的档），但按能力档位判定而不是枚举具体型号，以后再出更高档的模型这条规则不用跟着改。
+
 ## 0.7.0 — 2026-08-27
 - **主会话是 Fable 时，implementer 降一档以 `opus` 派出。** 此前 A.0 建议用 Fable 会话立项、A.6 又明说立项后不用 `/clear`，于是那个 Fable 会话一路带到每一个 implementer——全流程 token 基数最大的角色，跑在最贵的模型上，每个阶段都跑。
 - 这不算覆盖用户的会话选择：Fable 会话是**为立项**选的，不是「所有阶段都要 Fable」的声明，是会话自己滑过来的。降档是还原意图。主会话会明说一句，想让某个阶段用 Fable 跑说一声即可。
