@@ -3,6 +3,12 @@
 发版流程：改代码 → 更新本文件 → bump `.claude-plugin/plugin.json` 的 `version`（**唯一**要改的版本号，SKILL.md 开工时直接读它）→ commit → `git tag vX.Y.Z` → push。
 其他设备只有在 `version` 字符串变化后才会收到更新（`/plugin update longdev@zzm-plugins` 或自动更新）。
 
+## 0.7.0 — 2026-08-27
+- **主会话是 Fable 时，implementer 降一档以 `opus` 派出。** 此前 A.0 建议用 Fable 会话立项、A.6 又明说立项后不用 `/clear`，于是那个 Fable 会话一路带到每一个 implementer——全流程 token 基数最大的角色，跑在最贵的模型上，每个阶段都跑。
+- 这不算覆盖用户的会话选择：Fable 会话是**为立项**选的，不是「所有阶段都要 Fable」的声明，是会话自己滑过来的。降档是还原意图。主会话会明说一句，想让某个阶段用 Fable 跑说一声即可。
+- planner / decider / final-reviewer **不降**：低频、高判断、基数小。只有 implementer 满足「每阶段都跑 + token 基数最大 + 执行的是已写好的规格」。
+- 立下一条规矩：**阶段级 override 只向下，不向上。** 向上靠你在什么会话里跑，向下靠规则——这样永远不会撞上「没有该模型权限」。
+
 ## 0.6.2 — 2026-08-27
 - **final-reviewer 不再写死 `sonnet`，改为继承主会话。** 按「跑几次 × 判断难度」这个尺度看，它是全流程里定档最不合理的一个：一次任务只跑一次（成本基数小），干的是跨阶段接缝、决策漂移、端到端目标达成这类**综合判断**而不是逐行找 bug，而且它**明确不重跑 `/code-review`**——没有更强的子工具兜底，它就是交付前的最后一道网。
 - scout / reviewer 保持 `sonnet`：都是每阶段都跑的高频角色，且 reviewer 把正确性硬活委托给 `/code-review` skill，自己只做清单式一致性核对。

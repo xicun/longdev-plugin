@@ -63,6 +63,9 @@ Agent tool，`subagent_type` 填 `longdev-scout` / `longdev-planner` / `longdev-
 阶段串行；除非计划明确标注两阶段完全不相交且各用 `isolation: "worktree"`。
 
 1. **派 implementer**：prompt 只给项目根目录、**任务目录**、阶段号。不复述计划。它读索引+本阶段入口+上一阶段交接，实现、补测试、跑验证、写 `stages/N.md` 完成记录、精修 `stages/N+1.md` 入口、只改 PLAN.md 的状态和提升项。
+   - **主会话是 Fable 时降一档派**：传 `model: "opus"`，并说明一句「本阶段以 opus 派 implementer——立项用的 Fable 会话不带到执行；某个阶段想用 Fable 跑就说一声」。A.0 让你用 Fable **是为了立项**，A.6 又说不用 `/clear`，那个会话是自己滑过来的，降档是还原意图不是覆盖它。
+   - planner / decider / final-reviewer **不降**——它们都是低频高判断、基数小。只有 implementer 是每阶段都跑且 token 基数最大的。
+   - **降级只向下，不向上**：向上靠你在什么会话里跑，向下靠这条规则。机械阶段仍可手动传 `sonnet`。
 2. **先看回传的「遗留/上报」**：前置条件不成立、验证反复失败、**阶段尺寸超标**（>8 文件 / >400 行，通常该拆阶段）→ 直接停下来问用户。**只是「判不准是否不可逆」的分叉** → 派 decider 判一次（见第 5 步），判定可逆就地定夺、判定不可逆则升级。拿到决策后写进 stages 文件，`SendMessage` 让同一个 implementer 继续。
 3. **派 reviewer**：prompt 给项目根目录、任务目录、阶段号、报告路径 `<任务目录>/reviews/stage-<N>.md`。它核对 diff 与 stages/N.md 完成标准、PLAN.md 全局决策、测试要求的一致性，并调 `/code-review`；报告写文件，回 ≤12 行。主会话不重跑 review，不读报告。
 4. **有阻塞** → `SendMessage` 给同一个 implementer："读 `<任务目录>/reviews/stage-<N>.md`，修阻塞问题，重跑验证"，不粘清单。修完 `SendMessage` 让同一个 reviewer 复查。两轮仍阻塞就停下汇报。
@@ -93,7 +96,7 @@ Agent tool，`subagent_type` 填 `longdev-scout` / `longdev-planner` / `longdev-
 ## 模型分层
 
 - **planner**：继承主会话 → 立项在 Fable 5 会话里做。
-- **implementer**：默认继承；机械阶段可传 `model: "sonnet"`，核心阶段传 `"opus"` 或由 Fable 会话派。
+- **implementer**：默认继承，但**主会话是 Fable 时降一档传 `opus`**（见 C.1）——它是全流程 token 基数最大的角色，执行的又是 planner 已写好的规格，Fable 的边际收益撑不起两倍单价。机械阶段仍可手动传 `sonnet`。
 - **scout / reviewer**：agent 定义里固定 `sonnet`，不覆盖。都是每阶段都跑的高频角色，且 reviewer 把正确性硬活委托给 `/code-review`，自己只做清单式核对。
 - **final-reviewer**：**不写死，继承主会话**。一次任务只跑一次，做的是跨阶段接缝、决策漂移、端到端达成这类综合判断（不是逐行找 bug），且明确不重跑 `/code-review`——没有更强的子工具兜底，它就是交付前最后一道网。
 - **decider**：**不写死，继承主会话**。写死具体模型会让没有该模型权限的人（如 standard team seat 没有 Fable 5）直接用不了，也躲不开额度限制。当前会话不是最强模型时改用「保守档」派，见 C.5。
