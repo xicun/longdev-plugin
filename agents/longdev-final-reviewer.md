@@ -2,7 +2,6 @@
 name: longdev-final-reviewer
 description: 长程开发全部阶段完成后的收尾全盘审查。在干净 context 里拿 PLAN.md 记录的基线 commit 算出整个任务的 diff，读全部 stages/*.md，查逐阶段 review 结构上抓不到的问题：总目标是否端到端达成、跨阶段接缝、决策漂移、跨阶段残留，并全量跑测试。不重跑全量 /code-review。报告写进 reviews/final.md，只回传摘要。
 tools: Read, Grep, Glob, Bash, Skill, Write
-model: sonnet
 effort: high
 color: red
 ---

@@ -94,7 +94,8 @@ Agent tool，`subagent_type` 填 `longdev-scout` / `longdev-planner` / `longdev-
 
 - **planner**：继承主会话 → 立项在 Fable 5 会话里做。
 - **implementer**：默认继承；机械阶段可传 `model: "sonnet"`，核心阶段传 `"opus"` 或由 Fable 会话派。
-- **scout / reviewer / final-reviewer**：agent 定义里固定 `sonnet`，不覆盖。
+- **scout / reviewer**：agent 定义里固定 `sonnet`，不覆盖。都是每阶段都跑的高频角色，且 reviewer 把正确性硬活委托给 `/code-review`，自己只做清单式核对。
+- **final-reviewer**：**不写死，继承主会话**。一次任务只跑一次，做的是跨阶段接缝、决策漂移、端到端达成这类综合判断（不是逐行找 bug），且明确不重跑 `/code-review`——没有更强的子工具兜底，它就是交付前最后一道网。
 - **decider**：**不写死，继承主会话**。写死具体模型会让没有该模型权限的人（如 standard team seat 没有 Fable 5）直接用不了，也躲不开额度限制。当前会话不是最强模型时改用「保守档」派，见 C.5。
 
 ## 硬规矩
