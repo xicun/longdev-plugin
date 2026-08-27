@@ -20,6 +20,7 @@ description: 长程开发编排：大任务拆阶段，subagent 逐阶段实现+
 | `notes/<主题>.md` | planner / implementer | 跨阶段参考物：API 契约、字段映射、状态机、错误码表 | — |
 | `scout/<主题>.md` | scout / planner | 调研完整报告 | — |
 | `reviews/stage-<N>.md`、`reviews/final.md` | reviewer / final-reviewer | 审查完整报告 | — |
+| `decisions/agent-<N>-<slug>.md` | decider | 代你拍板的一条决策：问题、依据、选项、结论、影响面、回滚方式。用户复核后主会话 `mv` 进 `decisions/reviewed/` | 40 行 |
 
 **分工的意义**：PLAN.md 每个 implementer 都全读，所以只放「每个阶段都用得上」的东西；阶段局部的一切留在 `stages/N.md`。PLAN.md 每胖一行，后面每个阶段的固定成本都涨一行。
 
@@ -27,7 +28,7 @@ description: 长程开发编排：大任务拆阶段，subagent 逐阶段实现+
 
 ## 派活
 
-Agent tool，`subagent_type` 填 `longdev-scout` / `longdev-planner` / `longdev-implementer` / `longdev-reviewer` / `longdev-final-reviewer`。每个 prompt 都要给**任务目录的路径**。互不依赖的调研放同一条消息并发派出。**不用 `Plan` / `Explore` / `general-purpose` 等通用 agent**——它们没有输出长度约束。
+Agent tool，`subagent_type` 填 `longdev-scout` / `longdev-planner` / `longdev-implementer` / `longdev-reviewer` / `longdev-decider` / `longdev-final-reviewer`。每个 prompt 都要给**任务目录的路径**。互不依赖的调研放同一条消息并发派出。**不用 `Plan` / `Explore` / `general-purpose` 等通用 agent**——它们没有输出长度约束。
 
 ## 第一步：判定状态
 
@@ -44,7 +45,7 @@ Agent tool，`subagent_type` 填 `longdev-scout` / `longdev-planner` / `longdev-
 ## A. 立项
 
 0. planner 继承主会话模型。当前不是最强模型（Fable 5）的话提醒一句可 `/clear` 后 `claude --model fable` 重开做立项；说完继续，不等确认。
-1. **建目录**：`mkdir -p .claude/longdev/<任务名>/{stages,notes,scout,reviews}`。
+1. **建目录**：`mkdir -p .claude/longdev/<任务名>/{stages,notes,scout,reviews,decisions}`。
 2. **派 scout**：按子系统拆几个互不依赖的主题并发派出。prompt 给项目根目录、要查什么、输出路径 `<任务目录>/scout/<主题>.md`。它写文件，回 ≤15 行。**不进 plan mode，不自己读文件。**
 3. **派 planner**：prompt 给项目根目录、**任务目录**、用户目标描述原话、scout 文件清单、两份模板的绝对路径（本 skill 目录下 `references/plan-template.md` 和 `references/stage-template.md`）。它写 `PLAN.draft.md` + 全部 `stages/N.md` 入口，回 ≤30 行：草稿路径、阶段清单（含预计文件数）、关键决策、**待用户拍板**、风险。
 4. **展示草稿**：按 `references/show-file.md` 打开 `PLAN.draft.md`，回显 planner 摘要，重点列「待用户拍板」及推荐。等用户表态。这是**唯一必经的 HIL 点**。
@@ -62,10 +63,12 @@ Agent tool，`subagent_type` 填 `longdev-scout` / `longdev-planner` / `longdev-
 阶段串行；除非计划明确标注两阶段完全不相交且各用 `isolation: "worktree"`。
 
 1. **派 implementer**：prompt 只给项目根目录、**任务目录**、阶段号。不复述计划。它读索引+本阶段入口+上一阶段交接，实现、补测试、跑验证、写 `stages/N.md` 完成记录、精修 `stages/N+1.md` 入口、只改 PLAN.md 的状态和提升项。
-2. **先看回传的「遗留/上报」**：有上报项（返工不可逆的分叉、前置条件不成立）或**阶段尺寸超标**（>8 文件 / >400 行）就停下来问用户——尺寸超标通常该拆阶段，拿到决策后写进 stages 文件，`SendMessage` 让同一个 implementer 继续。
+2. **先看回传的「遗留/上报」**：前置条件不成立、验证反复失败、**阶段尺寸超标**（>8 文件 / >400 行，通常该拆阶段）→ 直接停下来问用户。**只是「判不准是否不可逆」的分叉** → 派 decider 判一次（见第 5 步），判定可逆就地定夺、判定不可逆则升级。拿到决策后写进 stages 文件，`SendMessage` 让同一个 implementer 继续。
 3. **派 reviewer**：prompt 给项目根目录、任务目录、阶段号、报告路径 `<任务目录>/reviews/stage-<N>.md`。它核对 diff 与 stages/N.md 完成标准、PLAN.md 全局决策、测试要求的一致性，并调 `/code-review`；报告写文件，回 ≤12 行。主会话不重跑 review，不读报告。
 4. **有阻塞** → `SendMessage` 给同一个 implementer："读 `<任务目录>/reviews/stage-<N>.md`，修阻塞问题，重跑验证"，不粘清单。修完 `SendMessage` 让同一个 reviewer 复查。两轮仍阻塞就停下汇报。
-5. **回传里有「方案级决策待确认」** → 这类**不发给 implementer**，直接问用户：按 reviewer 摘要里的一行标题逐条念，用户要细节就按 `references/show-file.md` 打开报告。用户认可 → 一句话 `SendMessage` 让 implementer 把该决策按用户口径写实（跨阶段的提升到 PLAN.md「全局决策」并标「阶段 N 提升」）；用户否决 → 当阻塞问题走第 4 步发回 implementer 改。用户说"你定"就当认可，不反复问。
+5. **回传里有「方案级决策待确认」** → **先派 `longdev-decider`**（prompt 给项目根目录、任务目录、阶段号、reviewer 报告路径）。它逐条判类型：只用 PLAN.md 目标+全局决策+代码事实推得出来的自己定夺并写 `decisions/`，需要用户意图、后果不可逆、依据不足、或要改 PLAN.md 全局决策的标「需用户」。回 ≤12 行，末行是**未复核代理决策累计数**。
+   - **全部已决且累计 <3** → 一句话 `SendMessage` 让 implementer 按 decider 口径写实（跨阶段的提升到 PLAN.md「全局决策」并标「阶段 N 提升」）；汇报时每条念一行「已代你决定：X，因为 Y」，直接进入下一阶段，不等确认。
+   - **有「需用户」或累计 ≥3** → 停下来问用户，逐条念一行标题，要细节就按 `references/show-file.md` 打开 `decisions/` 下对应文件。用户复核后 `mkdir -p <任务目录>/decisions/reviewed && mv <任务目录>/decisions/agent-*.md <任务目录>/decisions/reviewed/` 清零计数。否决某条 → 当阻塞问题走第 4 步发回 implementer 改。用户说“你定”就当认可，不反复问。
 6. **抽查**：只跑 `grep -n "^| [0-9]" <任务目录>/PLAN.md` 确认本阶段状态变 `✅`、下一阶段变 `▶`。内容属实性 reviewer 已核。
 7. 简短汇报本阶段（做了什么、验证输出、review 结论），直接进入下一阶段。
 8. **全部完成 → 派 final-reviewer**：prompt 给项目根目录、任务目录、报告路径 `<任务目录>/reviews/final.md`。它读 PLAN.md + 全部 stages + 按基线 commit 算全量 diff，查总目标端到端达成、跨阶段接缝、决策漂移、跨阶段残留，全量跑测试；不重跑全量 `/code-review`。
@@ -81,7 +84,7 @@ Agent tool，`subagent_type` 填 `longdev-scout` / `longdev-planner` / `longdev-
 发现 `.claude/longdev/PLAN.md` 没有配套 `stages/` 目录（v0.4 及以前立项的）：
 
 1. 告知用户："检测到旧版单文件计划，先迁移成索引+阶段结构再继续，不影响已完成的阶段。"
-2. `mkdir -p .claude/longdev/<任务名>/{stages,notes,scout,reviews}`，把旧 `PLAN.md` 和已有的 `scout/`、`reviews/` 移进去。
+2. `mkdir -p .claude/longdev/<任务名>/{stages,notes,scout,reviews,decisions}`，把旧 `PLAN.md` 和已有的 `scout/`、`reviews/` 移进去。
 3. 派 `longdev-planner`，prompt 说明这是**迁移轮**：给任务目录、旧文件路径、两份模板路径。它把阶段局部内容下沉到 `stages/N.md`、契约类内容进 `notes/`、跨阶段的留在 PLAN.md，保留原有阶段状态和基线 commit，旧文件改名 `PLAN.legacy.md`。回 ≤20 行。
 4. 汇报"PLAN.md 从 X 行降到 Y 行，拆出 N 个阶段文档"，然后走 B 续接。
 
@@ -90,6 +93,7 @@ Agent tool，`subagent_type` 填 `longdev-scout` / `longdev-planner` / `longdev-
 - **planner**：继承主会话 → 立项在 Fable 5 会话里做。
 - **implementer**：默认继承；机械阶段可传 `model: "sonnet"`，核心阶段传 `"opus"` 或由 Fable 会话派。
 - **scout / reviewer / final-reviewer**：agent 定义里固定 `sonnet`，不覆盖。
+- **decider**：agent 定义里固定 `opus`。决策质量直接决定返工量，这里不省。
 
 ## 硬规矩
 
@@ -98,7 +102,7 @@ Agent tool，`subagent_type` 填 `longdev-scout` / `longdev-planner` / `longdev-
 - 主会话不复述 subagent 产出：修复轮传路径，汇报只写结论。
 - 调研只派 scout，拆解只派 planner，不进 plan mode。
 - 阶段尺寸超标（>8 文件 / >400 行）当拆阶段处理，不要放行。
-- implementer 自己新立的方案级决策要过用户，reviewer 只负责揪出来，主会话不代拍。
+- implementer 自己新立的方案级决策由 **decider** 在「PLAN 目标 + 代码事实」范围内代拍，越界的（要用户意图、不可逆、依据不足、动全局决策）必须升级给用户。reviewer 只负责揪出来，**主会话永远不代拍**。
 - 不合并阶段，不跳过逐阶段 review 或收尾审查。
 - 新增行为不带测试的阶段不算完成，除非 PLAN.md 决策明确该项目不引入测试。
 - 验证失败如实报输出，不说"基本通过"。
