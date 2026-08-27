@@ -69,6 +69,8 @@ Agent tool，`subagent_type` 填 `longdev-scout` / `longdev-planner` / `longdev-
 5. **回传里有「方案级决策待确认」** → **先派 `longdev-decider`**（prompt 给项目根目录、任务目录、阶段号、reviewer 报告路径）。它逐条判类型：只用 PLAN.md 目标+全局决策+代码事实推得出来的自己定夺并写 `decisions/`，需要用户意图、后果不可逆、依据不足、或要改 PLAN.md 全局决策的标「需用户」。回 ≤12 行，末行是**未复核代理决策累计数**。
    - **全部已决且累计 <3** → 一句话 `SendMessage` 让 implementer 按 decider 口径写实（跨阶段的提升到 PLAN.md「全局决策」并标「阶段 N 提升」）；汇报时每条念一行「已代你决定：X，因为 Y」，直接进入下一阶段，不等确认。
    - **有「需用户」或累计 ≥3** → 停下来问用户，逐条念一行标题，要细节就按 `references/show-file.md` 打开 `decisions/` 下对应文件。用户复核后 `mkdir -p <任务目录>/decisions/reviewed && mv <任务目录>/decisions/agent-*.md <任务目录>/decisions/reviewed/` 清零计数。否决某条 → 当阻塞问题走第 4 步发回 implementer 改。用户说“你定”就当认可，不反复问。
+   - **派它之前先看当前会话的模型**：不是最强模型（Fable 5 / Opus）时，prompt 里加一句「本次以**保守档**运行：拿不准的一律标『需用户』」，并对用户提醒一句「decider 会以 <当前模型> 运行，想要更强的代拍质量可 `/clear` 后换模型重开」——说完继续，不等确认（同 A.0）。
+   - **软失败**：decider 派不出来或回传异常（无该模型权限、撞额度、超时）→ **绝不卡住**，退回 v0.5.x 的行为直接问用户，并说明一句「decider 本轮不可用，这几条由你拍板」。降级的是自动化程度，不是正确性。
 6. **抽查**：只跑 `grep -n "^| [0-9]" <任务目录>/PLAN.md` 确认本阶段状态变 `✅`、下一阶段变 `▶`。内容属实性 reviewer 已核。
 7. 简短汇报本阶段（做了什么、验证输出、review 结论），直接进入下一阶段。
 8. **全部完成 → 派 final-reviewer**：prompt 给项目根目录、任务目录、报告路径 `<任务目录>/reviews/final.md`。它读 PLAN.md + 全部 stages + 按基线 commit 算全量 diff，查总目标端到端达成、跨阶段接缝、决策漂移、跨阶段残留，全量跑测试；不重跑全量 `/code-review`。
@@ -93,7 +95,7 @@ Agent tool，`subagent_type` 填 `longdev-scout` / `longdev-planner` / `longdev-
 - **planner**：继承主会话 → 立项在 Fable 5 会话里做。
 - **implementer**：默认继承；机械阶段可传 `model: "sonnet"`，核心阶段传 `"opus"` 或由 Fable 会话派。
 - **scout / reviewer / final-reviewer**：agent 定义里固定 `sonnet`，不覆盖。
-- **decider**：agent 定义里固定 `opus`。决策质量直接决定返工量，这里不省。
+- **decider**：**不写死，继承主会话**。写死具体模型会让没有该模型权限的人（如 standard team seat 没有 Fable 5）直接用不了，也躲不开额度限制。当前会话不是最强模型时改用「保守档」派，见 C.5。
 
 ## 硬规矩
 
