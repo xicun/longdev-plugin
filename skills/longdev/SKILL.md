@@ -63,26 +63,56 @@ Agent tool，`subagent_type` 填 `longdev-scout` / `longdev-planner` / `longdev-
 阶段串行；除非计划明确标注两阶段完全不相交且各用 `isolation: "worktree"`。
 
 1. **派 implementer**：prompt 只给项目根目录、**任务目录**、阶段号。不复述计划。它读索引+本阶段入口+上一阶段交接，实现、补测试、跑验证、写 `stages/N.md` 完成记录、精修 `stages/N+1.md` 入口、只改 PLAN.md 的状态和提升项。
+   - **派之前先打阶段起点快照**：跑一条命令，记住输出的那行 SHA——本阶段的 gate（C.6）和 reviewer（C.3）都用它。
+
+     ```
+     S=$(git stash create 2>/dev/null); echo "SNAP=${S:-$(git rev-parse HEAD)}"
+     ```
+
+     `git stash create` 不改动工作区、不产生 stash 条目，只把当前状态（含已 staged）写成一个游离 commit 对象；工作区干净时输出空，退回 `HEAD`。有了它，`git diff <SNAP>` 算出来的**恰好是本阶段的改动**，不掺前面阶段的。非 git 仓库跳过，gate 的尺寸项记「无快照」。
    - **继承到比 `opus` 高的模型就降到 `opus`**：传 `model: "opus"`，并说明一句「本阶段以 opus 派 implementer——立项用的高档会话不带到执行；某个阶段想用主会话的模型跑就说一声」。A.0 让你用最强模型**是为了立项**，A.6 又说不用 `/clear`，那个会话是自己滑过来的，降档是还原意图不是覆盖它。**按「比 `opus` 高」判定，不枚举具体型号**——以后再出更高档的模型，这条不用改。
    - planner / decider / final-reviewer **不降**——它们都是低频高判断、基数小。只有 implementer 是每阶段都跑且 token 基数最大的。
    - **降级只向下，不向上**：向上靠你在什么会话里跑，向下靠这条规则。机械阶段仍可手动传 `sonnet`。
-2. **先看回传的「遗留/上报」**：前置条件不成立、验证反复失败、**阶段尺寸超标**（>8 文件 / >400 行，通常该拆阶段）→ 直接停下来问用户。**只是「判不准是否不可逆」的分叉** → 派 decider 判一次（见第 5 步），判定可逆就地定夺、判定不可逆则升级。拿到决策后写进 stages 文件，`SendMessage` 让同一个 implementer 继续。
-3. **派 reviewer**：prompt 给项目根目录、任务目录、阶段号、报告路径 `<任务目录>/reviews/stage-<N>.md`。它核对 diff 与 stages/N.md 完成标准、PLAN.md 全局决策、测试要求的一致性，并调 `/code-review`；报告写文件，回 ≤12 行。主会话不重跑 review，不读报告。
-4. **有阻塞** → `SendMessage` 给同一个 implementer："读 `<任务目录>/reviews/stage-<N>.md`，修阻塞问题，重跑验证"，不粘清单。修完 `SendMessage` 让同一个 reviewer 复查。两轮仍阻塞就停下汇报。
+2. **先看回传的「遗留/上报」**：前置条件不成立、验证反复失败、**阶段尺寸超标**（>8 文件 / >400 行，通常该拆阶段；这条**不只信自报**，C.6 的 gate 会用真实 diff 复核）→ 直接停下来问用户。**只是「判不准是否不可逆」的分叉** → 派 decider 判一次（见第 5 步），判定可逆就地定夺、判定不可逆则升级。拿到决策后写进 stages 文件，`SendMessage` 让同一个 implementer 继续。
+3. **派 reviewer**：prompt 给项目根目录、任务目录、阶段号、**阶段起点快照 SHA**（C.1 记下的那行，它据此算出的 diff 恰好是本阶段）、报告路径 `<任务目录>/reviews/stage-<N>.md`。它核对 diff 与 stages/N.md 完成标准、PLAN.md 全局决策、测试要求的一致性，并调 `/code-review`；报告写文件，回 ≤12 行。主会话不重跑 review，不读报告。
+4. **有阻塞** → `SendMessage` 给同一个 implementer："读 `<任务目录>/reviews/stage-<N>.md`，修阻塞问题，重跑验证"，不粘清单。修完 `SendMessage` 让同一个 reviewer 复查，复查通过后**回到第 6 步重跑 gate**——修复轮最容易把绿改回红。两轮仍阻塞就停下汇报。
 5. **回传里有「方案级决策待确认」** → **先派 `longdev-decider`**（prompt 给项目根目录、任务目录、阶段号、reviewer 报告路径）。它逐条判类型：只用 PLAN.md 目标+全局决策+代码事实推得出来的自己定夺并写 `decisions/`，需要用户意图、后果不可逆、依据不足、或要改 PLAN.md 全局决策的标「需用户」。回 ≤12 行，末行是**未复核代理决策累计数**。
    - **全部已决且累计 <3** → 一句话 `SendMessage` 让 implementer 按 decider 口径写实（跨阶段的提升到 PLAN.md「全局决策」并标「阶段 N 提升」）；汇报时每条念一行「已代你决定：X，因为 Y」，直接进入下一阶段，不等确认。
    - **有「需用户」或累计 ≥3** → 停下来问用户，逐条念一行标题，要细节就按 `references/show-file.md` 打开 `decisions/` 下对应文件。用户复核后 `mkdir -p <任务目录>/decisions/reviewed && mv <任务目录>/decisions/agent-*.md <任务目录>/decisions/reviewed/` 清零计数。否决某条 → 当阻塞问题走第 4 步发回 implementer 改。用户说“你定”就当认可，不反复问。
    - **派它之前先看当前会话的模型**：不是最强模型（Fable 5 / Opus）时，prompt 里加一句「本次以**保守档**运行：拿不准的一律标『需用户』」，并对用户提醒一句「decider 会以 <当前模型> 运行，想要更强的代拍质量可 `/clear` 后换模型重开」——说完继续，不等确认（同 A.0）。
    - **软失败**：decider 派不出来或回传异常（无该模型权限、撞额度、超时）→ **绝不卡住**，退回 v0.5.x 的行为直接问用户，并说明一句「decider 本轮不可用，这几条由你拍板」。降级的是自动化程度，不是正确性。
-6. **抽查**：只跑 `grep -n "^| [0-9]" <任务目录>/PLAN.md` 确认本阶段状态变 `✅`、下一阶段变 `▶`。内容属实性 reviewer 已核。
-7. 简短汇报本阶段（做了什么、验证输出、review 结论），直接进入下一阶段。
+6. **Gate：主会话亲自跑这几条命令**。不要抽查落盘文件——`PLAN.md` 的状态行是 implementer 自己写的字，核对它等于零信息。**只有主会话自己的工具输出是不经转述的**，这是整套验收唯一不可伪造的一环。
+
+   ```
+   # a. 拿到权威验收命令（唯一允许 grep 任务文件正文的地方，≈5 行）
+   grep -A4 -m1 '运行命令' <任务目录>/PLAN.md
+   # b. 真实退出码。pipefail 必须加——否则 $? 是 tail 的退出码，永远是 0（假绿）
+   set -o pipefail; <验收命令> 2>&1 | tail -5; echo "exit=$?"
+   # c. 本阶段真实尺寸（对 8 文件 / 400 行的闸，并和 implementer 自报的改动清单比）
+   git diff --stat <SNAP> 2>/dev/null | tail -3
+   git status --porcelain 2>/dev/null | grep '^??' | grep -vc '\.claude/longdev/'
+   # d. 测试里有没有被糊过去的痕迹（只看新增行）
+   git diff <SNAP> 2>/dev/null -- <测试目录> | grep '^+' | grep -nE 'skip|xfail|@Ignore|todo!|expect\(true\)|assert\(true\)'
+   # e. 证据块存在性：没有 exit= 行 = 这个阶段没被验证过
+   grep -cE '^[[:space:]]*exit=' <任务目录>/stages/N.md
+   ```
+
+   PowerShell 下用 Bash tool 跑，或把 `tail -5` 换成 `Select-Object -Last 5`、`$?` 换成 `$LASTEXITCODE`。`2>/dev/null` 不能省——Windows 仓库会先吐一屏 `LF will be replaced by CRLF`，比正文还长。
+
+   - **b 非 0 / d 有命中 / e 为 0** → 当阻塞问题走第 4 步发回 implementer。**不诊断**（见「Gate 纪律」）。
+   - **c 超 8 文件 / 400 行** → 停下来问用户（同第 2 步的尺寸超标）。
+   - **数字交叉核对**：implementer 回传的框架统计行 和 reviewer 独立跑出来的统计行，两个数对不上 → 有人在编，当阻塞问题发回。
+   - 全绿才认这个阶段完成。落盘内容的属实性由 reviewer 核，gate 只管机器能判真假的部分。
+   - b 和 e 也可以在第 2 步 implementer 刚回传时就跑一次：不过就不必再浪费一次 reviewer 派发。
+
+7. 简短汇报本阶段（做了什么、**gate 的退出码和统计行原样**、review 结论），直接进入下一阶段。原样念出来，用户就看到了一个机器判过的数字，而不是一句「验证通过」。
 8. **全部完成 → 派 final-reviewer**：prompt 给项目根目录、任务目录、报告路径 `<任务目录>/reviews/final.md`。它读 PLAN.md + 全部 stages + 按基线 commit 算全量 diff，查总目标端到端达成、跨阶段接缝、决策漂移、跨阶段残留，全量跑测试；不重跑全量 `/code-review`。
 9. **收尾有阻塞** → 派新 implementer 做「收尾修复轮」（prompt 给项目根目录、任务目录、报告路径，说明是收尾修复不是某阶段），修完 `SendMessage` 同一个 final-reviewer 复查。最多两轮。
 10. 通过 → `sed` 在 PLAN.md 标题下加 `**状态：已完成**`，按 `references/show-file.md` 展示 `reviews/final.md`，做总结（含收尾结论和全量测试结果）。
 
 ## D. 主会话亲自执行（例外）
 
-仅用于标了**【主会话】**的阶段或用户明确要求参与实现时。实现 + 验证后照常派 reviewer，照常写 `stages/N.md` 完成记录。因为实现细节进了主会话，收尾时**提示用户 `/clear` 后 `/longdev` 续接**——这是全流程唯一需要 `/clear` 的场景。
+仅用于标了**【主会话】**的阶段或用户明确要求参与实现时。实现 + 验证后照常派 reviewer，照常写 `stages/N.md` 完成记录。**注意 D 阶段的 gate 退化成自查**（写代码和跑 gate 是同一个 context），所以这种阶段以 reviewer 独立跑出来的证据块为准，主会话自己的退出码只作参考。因为实现细节进了主会话，收尾时**提示用户 `/clear` 后 `/longdev` 续接**——这是全流程唯一需要 `/clear` 的场景。
 
 ## E. 迁移旧版单文件计划
 
@@ -104,12 +134,25 @@ Agent tool，`subagent_type` 填 `longdev-scout` / `longdev-planner` / `longdev-
 ## 硬规矩
 
 - 落盘文件里绝不写"见上文"——每个读者都只读自己那一份。
-- 主会话不读源码，不 `cat`/`head` 任何 `.claude/longdev/` 下的文件。给用户看就用 `references/show-file.md`，要改就发回给写它的 subagent。
+- 主会话不读源码，不 `cat`/`head` 任何 `.claude/longdev/` 下的文件。给用户看就用 `references/show-file.md`，要改就发回给写它的 subagent。**唯一例外是 C.6 gate 里那两条定向 `grep`**（拿权威验收命令、数 `exit=` 行），合计约 6 行——gate 需要一个不经 subagent 转述的命令来源。
 - 主会话不复述 subagent 产出：修复轮传路径，汇报只写结论。
 - 调研只派 scout，拆解只派 planner，不进 plan mode。
 - 阶段尺寸超标（>8 文件 / >400 行）当拆阶段处理，不要放行。
 - implementer 自己新立的方案级决策由 **decider** 在「PLAN 目标 + 代码事实」范围内代拍，越界的（要用户意图、不可逆、依据不足、动全局决策）必须升级给用户。reviewer 只负责揪出来，**主会话永远不代拍**。
 - 不合并阶段，不跳过逐阶段 review 或收尾审查。
 - 新增行为不带测试的阶段不算完成，除非 PLAN.md 决策明确该项目不引入测试。
-- 验证失败如实报输出，不说"基本通过"。
+- 验证失败如实报输出，不含糊。**验证段必须是固定证据块**：命令原文一行、真实输出末几行、`exit=<码>` 结尾；测试框架的统计行原样贴，不改写成自己的话。没有 `exit=` 行 = 未验证 = 阻塞。「如实上报」在这里是**格式要求**，不是道德要求。
 - 用户只是提问或讨论时，不动代码。
+
+## Gate 纪律
+
+主会话亲自跑 gate 是整套验收的地基：**subagent 的一切回传都是叙述，只有主会话自己的工具输出是原始的、用户直接看得见的**。实测成本约 330 token/阶段（`--stat` 8 文件 ≈ 120，验收命令 `tail -5` ≈ 90，其余 ≈ 120），对得起它买到的东西。
+
+会暴增的从来不是字节，是 `exit≠0` 那一刻想去看看为什么的冲动——一次 `cat` 就是 5–10k，角色也从编排者滑成实现者。所以：
+
+- gate 的命令**固定就是 C.6 那几条，不许即兴加**。「多看一眼」是滑坡的起点。
+- 主会话里**裸 `git diff` 是禁令**，只用 `--stat` / `--numstat` / `--name-only`；每条命令都带输出上限（`tail -5`）；stderr 一律 `2>/dev/null`。
+- **`exit≠0` 时不诊断、不读文件、不改命令重试**：把命令原文和退出码发回 implementer，它自己去看。**gate 的产出是一个布尔值，不是一个任务。**
+- gate 不过**不重跑变体**，一次就走修复轮（C.4）。
+- 跑的是完成标准点名的**验收命令**（窄）。全量套件只在 final-reviewer 跑一次。
+- **不要把 gate 委托给小 subagent「省 context」**——那等于把唯一不可伪造的一环换回叙述，地基就没了。
