@@ -10,7 +10,7 @@
     {
       "name": "longdev",
       "source": "./",
-      "description": "长程开发编排：把大任务拆阶段，scout 调研、planner 拆解、implementer 干净 context 实现、reviewer 独立审查，final-reviewer 收尾全盘审查，状态落盘 PLAN.md 索引 + stages 阶段文档"
+      "description": "长程开发编排：手动挡 longdev 把大任务拆阶段逐阶段实现+审查+机器 gate 验收；自动挡 autopilot 给一个产品目标、问卷式宪章确认一次后自主迭代到收官"
     }
   ]
 }
