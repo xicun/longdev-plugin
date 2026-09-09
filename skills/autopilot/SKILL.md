@@ -21,6 +21,7 @@ autopilot 是 longdev 的自动挡：上层多一个「宪章 → backlog → �
 | `BACKLOG.md` | product-owner 独占 | 功能候选表（每条必须引用宪章条款编号）+ 观察区 | 60 行 |
 | `iterations/<N>.md` | PO 写「入场」；主会话追加「收尾」（≤12 行机器数字与指针） | 本轮选题与理由；gate 数字、验收计数、隔离清单 | 40 行 |
 | `acceptance/<N>.md`、`acceptance/final.md` | acceptance | 逐条核宪章验收清单的报告 + 观察 | — |
+| `design/<功能ID>.md` | product-owner（规划轮） | 本轮选中功能的设计层调研：主流做法、必须覆盖的边界情况、明确不学的做法 | 30 行 |
 | `scout-repo.md` | scout | 立宪时的 repo 现状调研（绿地项目没有） | — |
 
 ## 派活
@@ -40,7 +41,7 @@ autopilot 是 longdev 的自动挡：上层多一个「宪章 → backlog → �
 
 ## A. 立宪（唯一必经的 HIL）
 
-1. `mkdir -p .claude/autopilot/<产品名>/{iterations,acceptance}`。
+1. `mkdir -p .claude/autopilot/<产品名>/{iterations,acceptance,design}`。
 2. **有现成代码就派 scout**：摸清 repo 现状，输出 `<产品目录>/scout-repo.md`。绿地项目跳过。
 3. **派 product-owner（立宪轮）**：prompt 给项目根目录、产品目录、用户目标原话、宪章模板绝对路径（本 skill 目录下 `references/charter-template.md`）、问卷规则绝对路径（`references/charter-interview.md`）。它做主流形态调研（WebSearch）、写 `CHARTER.draft.md`、回传 ≤30 行：草稿路径 + 问卷题目。
 4. **问卷**：把 PO 回传的题目转成 **AskUserQuestion** 提问，转换规则见 `references/charter-interview.md`——每批 ≤4 题、推荐项排第一并标「（推荐）」、范围/授权类用 multiSelect、用户全选推荐也能开工。**这是本模式减输入负担的核心**：用户点选择题，不写需求文档。
@@ -50,8 +51,8 @@ autopilot 是 longdev 的自动挡：上层多一个「宪章 → backlog → �
 
 ## B. 迭代循环（第 N 轮）
 
-1. **派 product-owner（规划轮）**：prompt 给产品目录、轮次 N。它读宪章+backlog+上轮入场收尾+上轮验收报告，更新评分（含减法项、搬运观察），选出本轮 ▶ 功能（≤宪章每轮上限），写 `iterations/<N>.md`「入场」，回 ≤12 行。它回「全部候选低于阈值」→ 直接进 C 收官。
-2. **迭代内跑 longdev A+C 全流程**：任务目录 `.claude/longdev/<产品名>-i<N>/`，立项的"用户目标原话" = iterations/N.md 的**本轮目标一句话**。按下表替换分支，**其余一字不差地遵守**（含快照、gate、修复轮、证据块）：
+1. **派 product-owner（规划轮）**：prompt 给产品目录、轮次 N。它读宪章+backlog+上轮入场收尾+上轮验收报告，更新评分（含减法项、搬运观察），选出本轮 ▶ 功能（≤宪章每轮上限），**对每个选中功能做设计层调研**（≤3 次搜索/功能，产出 `design/<功能ID>.md`——搜的是"这个功能主流产品怎么做"，不是"还能做什么"），写 `iterations/<N>.md`「入场」，回 ≤12 行。它回「全部候选低于阈值」→ 直接进 C 收官。
+2. **迭代内跑 longdev A+C 全流程**：任务目录 `.claude/longdev/<产品名>-i<N>/`，立项的"用户目标原话" = iterations/N.md 的**本轮目标一句话**；派 planner 时把入场「设计参考」点名的 `design/<功能ID>.md` 和 scout 文件一起列进 prompt。按下表替换分支，**其余一字不差地遵守**（含快照、gate、修复轮、证据块）：
 
    | longdev 的分支 | autopilot 替换成 |
    |---|---|
@@ -107,6 +108,7 @@ autopilot 是 longdev 的自动挡：上层多一个「宪章 → backlog → �
 - 宪章确认后冻结；**引用不到宪章条款编号的功能不入 backlog**——这是防功能爆炸的主闸，比任何措辞约束都硬；每轮 ▶ ≤ 宪章的每轮上限。
 - acceptance 只对宪章负责，不提新需求；引不到条款的想法只进「观察」，**永不自动转功能**，收官时呈给用户。
 - 同一功能 🚫 后永不静默重试；解禁唯一途径是修宪（HIL）。
+- web search 分层：范围层（要不要做什么功能）只在立宪用；迭代中只允许设计层（已选中的功能怎么做才像主流产品）；技术层不搜，归 planner/implementer 按代码事实。设计调研里冒出的新范围想法只进观察区，永不入 backlog。
 - 主会话不读 acceptance / reviews / iterations / BACKLOG 正文，只按第一步和 B.5 的定向 grep 取机器可判的行；写入仅限 B.6 的「收尾」追加和 C.2 的一行 sed。
 - longdev 的全部硬规矩和 Gate 纪律在迭代内原样适用；迭代 gate 的产出同样是布尔值，不是任务。
 - 无人在场不是降低标准的理由，是提高标准的理由：所有自主决策必须落盘可审计（decisions/、iterations/、BACKLOG 状态列），停机报告和收官报告必须让用户能顺着指针查到每一步的原始证据。
