@@ -1,39 +1,10 @@
-# 把落盘文件展示给用户
+# 展示任务文件
 
-主会话在两个时点要让用户看一份完整文件，但**自己不读它**（读了就进 context）：
+立项与交付时给用户具体文件链接/绝对路径及简短摘要，包含需要决定的事项、检查证据和剩余限制。主会话可以为核实事实读取必要正文；展示文件不能替代自己检查。
 
-- 立项：planner 交出 `<任务目录>/PLAN.draft.md`（每轮迭代后再展示一次）
-- 收尾：final-reviewer 交出 `<任务目录>/reviews/final.md`
+- 客户端支持可点击本地文件链接时直接提供链接。
+- 用户在 CLI 并希望打开编辑器时，可使用已安装的 `code --reuse-window --goto <绝对路径>:1` 或 Cursor 对应命令；先检查工具存在，正确引用含空格路径，并核实执行结果。
+- 若当前环境提供且支持 `SendUserFile`，按工具实际文档展示；不能假设所有客户端有该工具。
+- 没有可用展示接口时给出绝对路径和必要内容摘要，如实说明未自动打开。
 
-展示方式按用户当前客户端决定。用一次 Bash 调用探测并执行（`<abs>` 换成文件的绝对路径）：
-
-```bash
-f="<abs>"
-if [ "${CLAUDE_CODE_ENTRYPOINT:-}" = "cli" ]; then
-  if command -v code >/dev/null 2>&1; then
-    code --reuse-window --goto "$f:1" && echo "OPENED code"
-  elif command -v cursor >/dev/null 2>&1; then
-    cursor --reuse-window --goto "$f:1" && echo "OPENED cursor"
-  else
-    echo "NOEDITOR"
-  fi
-else
-  echo "NOTCLI"
-fi
-```
-
-按输出决定下一步：
-
-| 输出 | 含义 | 做什么 |
-|---|---|---|
-| `OPENED code` / `OPENED cursor` | 终端 CLI，文件已在用户的编辑器窗口打开（`--reuse-window` 不新开窗口；已打开同一文件时只是刷新） | 回显里再附一次绝对路径即可 |
-| `NOEDITOR` | 裸终端，没有可调的编辑器 | 回显绝对路径，告诉用户自己打开 |
-| `NOTCLI` | 桌面 App / 网页版 / 其他非终端入口 | 有 `SendUserFile` tool 就用它（`display: "render"`）推到侧栏；没有就回显绝对路径 |
-
-注意：
-
-- `CLAUDE_CODE_ENTRYPOINT=cli` 是实机验证过的值；其他客户端的取值未验证，所以规则只区分"是 cli / 不是 cli"，不依赖具体值。
-- 不要用 `start`/`open`/`xdg-open` 开 `.md`——系统没有关联时会弹"选择打开方式"。
-- `SendUserFile` 在 CLI 里也存在但只显示一张不可点的卡片，所以 CLI 分支不要调它。
-- 每次要展示时现跑探测，不缓存——同一个项目用户可能换客户端接着做。
-- 无论哪个分支，回显里都要写文件的绝对路径，这是最后的兜底。
+不因一次环境探测就断言其他客户端的行为。不要无依据使用系统文件关联打开 Markdown；需要展示的内容仍应在最终答复中自足。
