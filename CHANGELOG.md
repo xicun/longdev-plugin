@@ -3,6 +3,13 @@
 发版流程：改代码 → 更新本文件 → bump `.claude-plugin/plugin.json` 的 `version`（**唯一**要改的版本号，SKILL.md 开工时直接读它）→ commit → `git tag vX.Y.Z` → push。
 其他设备只有在 `version` 字符串变化后才会收到更新（`/plugin update longdev@zzm-plugins` 或自动更新）。
 
+## 0.10.1 — 2026-09-21
+
+- 针对用户反馈的 DeepSeek v4 私有化图片输入限制，主会话保持纯文字，图片通过独立视觉服务或隔离临时会话处理；限制随模型配置生效，不限客户端。
+- 明确历史图片累计计数、目标多模态能力检查及含图历史恢复规则，不向不支持的目标发图，不以子 agent 默认具备隔离能力。
+- longdev / autopilot 共享视觉证据和纯文字交接规则；独立审查、阶段及最终 gate 保留视觉验收要求，不以 OCR 替代版式检查。
+- 文档、技能格式和静态场景检查通过；尚未在该私有化部署实测规则效果。
+
 ## 0.10.0 — 2026-09-21
 
 - longdev 与 autopilot 共用 execution-protocol：稳定需求/验收 ID、状态责任、包含未跟踪文件的基线、对应产物状态的证据及原始日志。
