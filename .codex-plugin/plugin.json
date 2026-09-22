@@ -1,0 +1,32 @@
+{
+  "name": "longdev",
+  "version": "0.12.0",
+  "description": "长程开发编排：阶段实现、独立审查、主会话 gate、跨客户端交接和验收",
+  "author": {
+    "name": "zzm.ploretoy"
+  },
+  "repository": "https://gitee.com/xicun/longdev-plugin",
+  "keywords": [
+    "longdev",
+    "workflow",
+    "handoff",
+    "review",
+    "acceptance"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Longdev",
+    "shortDescription": "可跨会话、跨客户端的长程开发流程",
+    "longDescription": "按阶段实施、独立审查、主会话 gate，并通过磁盘任务记录在 Claude Code、Codex CLI 和 dsh 之间交接。",
+    "developerName": "zzm.ploretoy",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Write"
+    ],
+    "defaultPrompt": [
+      "按 longdev 流程启动这个开发任务",
+      "从当前交接包恢复 longdev 任务",
+      "检查当前阶段并执行 gate"
+    ]
+  }
+}

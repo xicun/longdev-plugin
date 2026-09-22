@@ -1,7 +1,7 @@
 {
   "name": "longdev",
   "description": "长程开发编排：手动挡 longdev 把大任务拆阶段逐阶段实现+审查+机器 gate 验收；自动挡 autopilot 给一个产品目标、问卷式宪章确认一次后自主迭代到收官——product-owner 在宪章边界内维护 backlog，每轮迭代跑一遍 longdev 全流程，acceptance 代行用户验收，失败功能回滚隔离",
-  "version": "0.10.1",
+  "version": "0.12.0",
   "author": {
     "name": "zzm.ploretoy"
   }

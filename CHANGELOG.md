@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.12.0 — 2026-09-22
+
+- 增加 Codex 插件清单，复用 `skills/` 作为跨客户端共享底层。
+- 增加三端共享安装器：保存完整 skills/agents/版本 bundle，生成项目薄入口，校验内容指纹并保护既有文件；dsh PowerShell 只包装同一实现。
+- 保持 Claude、Codex、dsh 的运行时入口独立，任务状态和 longdev 协议只有一份。
+- 角色调度使用可用客户端工具；缺独立审查能力保持待检查，不以同会话角色切换降级。
+- 新增 URL 安装代理指南、安装/升级/冲突行为测试；模型继承 default/强档，私有化视觉每张图片独立会话。
+
+## 0.11.0 — 2026-09-22
+
+- 增加跨会话运行时适配，支持 Claude Code CLI、Codex CLI 和 dsh 的新会话/恢复能力边界。
+- 增加 `context/current.md` 交接契约、会话切换状态机和运行器职责边界。
+- 明确客户端 resume、fork、退出码不能替代 longdev 的实际产物核对、review、gate 和验收。
+
 发版流程：改代码 → 更新本文件 → bump `.claude-plugin/plugin.json` 的 `version`（**唯一**要改的版本号，SKILL.md 开工时直接读它）→ commit → `git tag vX.Y.Z` → push。
 其他设备只有在 `version` 字符串变化后才会收到更新（`/plugin update longdev@zzm-plugins` 或自动更新）。
 
