@@ -43,7 +43,7 @@
 | 阶段 | R / V | 依赖 | 状态 | 入口 / review / gate / 提交 |
 |---|---|---|---|---|
 | 1 实现、独立检查与阶段提交 | R01–R08 / V01–V07,V09 | 无 | 检查通过，待提交 | stages/1.md；reviews/stage-1.md；gates/stage-1.md；限定提交 |
-| 2 本机安装、发布与交付 | R07 / V08 | 阶段1检查与提交 | 待执行 | stages/2.md；reviews/stage-2.md；gates/stage-2.md；待 gate |
+| 2 本机安装、发布与交付 | R07 / V08 | 阶段1检查与提交 | 检查通过，待发布 | stages/2.md；reviews/stage-2.md；gates/stage-2.md；限定提交 |
 
 ## 决策与安全回退
 
