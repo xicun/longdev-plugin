@@ -42,8 +42,8 @@
 
 | 阶段 | R / V | 依赖 | 状态 | 入口 / review / gate / 提交 |
 |---|---|---|---|---|
-| 1 实现、独立检查与阶段提交 | R01–R08 / V01–V07,V09 | 无 | 检查通过，待提交 | stages/1.md；reviews/stage-1.md；gates/stage-1.md；限定提交 |
-| 2 本机安装、发布与交付 | R07 / V08 | 阶段1检查与提交 | 检查通过，待发布 | stages/2.md；reviews/stage-2.md；gates/stage-2.md；限定提交 |
+| 1 实现、独立检查与阶段提交 | R01–R08 / V01–V07,V09 | 无 | 检查通过 | stages/1.md；reviews/stage-1.md；gates/stage-1.md；`720ed54` |
+| 2 本机安装、发布与交付 | R07 / V08 | 阶段1检查与提交 | 检查通过 | stages/2.md；reviews/stage-2.md；gates/stage-2.md；`1154a66`；Gitee `v0.14.0` |
 
 ## 决策与安全回退
 
@@ -62,6 +62,6 @@
 
 ## 当前交接
 
-- PLAN已转正，阶段1执行中；R08/V09追加已纳入，尚未验证。
+- R01–R08、V01–V09均已完成独立检查与主会话 gate；整体报告 `reviews/final.md` 通过，成果待用户验收。Windows 真机、新会话长期遵循和父仓库全量环境仍未验证。
 - 原始基线.work/longdev/history-convergence/baselines/task-start.json，TASK_DIR由主会话传入插件项目docs/longdev/history-convergence的绝对路径。
 - 下一步：实施迁移/归档/guard/dry-run完整链条，自检后独立review及主gate；无关键待用户决定项。
