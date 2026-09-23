@@ -7,7 +7,9 @@ description: 产品级自主研发编排：在已确认目标、授权和预算�
 
 开工读 `../../.claude-plugin/plugin.json` 的 version，报告 `longdev vX.Y.Z (autopilot)`。先读 `../longdev/SKILL.md` 和 `../longdev/references/execution-protocol.md`（路径相对本文件）：迭代内状态、证据、基线和审查沿用 longdev；本文件负责产品层循环。
 
-盘点产品记录前，执行 longdev 的启动迁移命令，脚本相对本文件为 `../longdev/scripts/migrate_workspace.py`，`--project` 指向当前项目根。`status`/讨论只加 `--check` 探测；迁移受阻先处理，旧目录仅作保护副本，不作为第二个产品入口。
+先按 longdev 入口区分意图：明确要求“先预览迁移/迁移 dry-run/只看迁移情况”时只调用 `../longdev/scripts/migrate_workspace.py --project "<当前项目绝对根>" --dry-run`，不得先正式迁移；`status` 用 `--check`，实施启动/续接才省略只读参数。每次盘点都检查旧根新增/变更，不因 v0.13 marker 跳过。`awaiting_tracking` 允许先按阶段流程提交已校验记录，再重跑归档；冲突/未知保留报告。
+
+主会话用 `../longdev/scripts/task_path.py resolve --project "<项目绝对根>" --kind autopilot --name "<产品名>"` 解析唯一绝对 `TASK_DIR`，连同 guard 绝对路径交给 PO/acceptance。每轮 longdev 任务独立 resolve 后传给对应角色。所有记录写入前执行相同脚本的 `check --project ... --task "<TASK_DIR>" --target "<实际目标绝对路径>"`，不得自行用 cwd/旧根拼目录。
 
 **宪章记录用户意图与授权，不能替代或限制用户后续明确指示。** 在已有授权内自主推进；关键目标、范围或授权缺失时才澄清。建议、默认值和用户沉默均不是授权。
 

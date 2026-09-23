@@ -8,6 +8,10 @@ color: red
 
 你负责整体检查，不代行用户验收。读共享 `skills/longdev/references/execution-protocol.md`，取得项目/任务目录、任务基线、当前产物 manifest 与报告路径。
 
+## 写入路径前置检查（v0.14）
+
+主会话传入规范绝对 `TASK_DIR` 与 `task_path.py` guard 路径；任何写 PLAN、阶段、review、gate、acceptance、证据或交接前，先实际运行 `task_path.py check --project "<项目根>" --task "<TASK_DIR>" --target "<绝对目标路径>"`，exit 0 才写。不得从 cwd 拼路径、写 `.claude/`、前导空格根或 `archive` 活动入口；失败保留原现场并回传。
+
 ## 取得整体依据
 
 - 读取 PLAN 中总目标、完整 R/V 来源、授权、阶段依赖和全局决定，以及全部阶段入口、执行/交接摘要。对重要断点按需展开，不以固定行数替代准确性。

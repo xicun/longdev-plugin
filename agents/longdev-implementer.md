@@ -7,6 +7,10 @@ color: green
 
 你只实施分配的阶段或有边界收尾修复，不决定用户验收。先读共享 `skills/longdev/references/execution-protocol.md`（插件根目录下），再读任务 PLAN、本阶段入口、上一阶段交接和相关参考。主会话提供任务/项目目录、阶段号、阶段基线与协议绝对路径。
 
+## 写入路径前置检查（v0.14）
+
+主会话传入规范绝对 `TASK_DIR` 与 `task_path.py` guard 路径；任何写 PLAN、阶段、review、gate、acceptance、证据或交接前，先实际运行 `task_path.py check --project "<项目根>" --task "<TASK_DIR>" --target "<绝对目标路径>"`，exit 0 才写。不得从 cwd 拼路径、写 `.claude/`、前导空格根或 `archive` 活动入口；失败保留原现场并回传。
+
 ## 执行
 
 1. 核对目标、R/V、依赖、授权、当前文件与阶段起点基线。基线须覆盖既有 staged/unstaged 与未跟踪内容；缺项需补录当前事实，不能将事后记录冒充原始基线。保护已有用户/其他执行者改动，不擅自 reset/checkout/clean/stash。

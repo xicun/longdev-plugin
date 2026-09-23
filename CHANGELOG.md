@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.14.0 — 2026-09-23
+
+- 持续盘点标准/前导空格 `.claude` 与 `.longdev` 候选，按内容、状态、引用闭包和证据保守分类；活动任务进入 `docs/`，可靠结束历史进入 `docs/<kind>/archive/`，未知/冲突保留。
+- 新增完整 `--dry-run` 预演和简短 `--check`，报告逐任务/逐文件动作、理由、冲突及 Git 跟踪前提；正式迁移支持中断恢复、锁、symlink/reparse 防护与 v0.13 后续分叉检测。
+- 旧入口仅在目标内容与 inventory 已由 Git index blob 核验后逐文件归档 `.work/longdev-migration/archive/`；原始日志/基线与跨机器必需证据分流，避免迁移造成悬空引用。
+- 新增规范绝对 `TASK_DIR` 解析与真实写前 guard，拒绝旧根、前导空格、越界、重定向和活动 `archive`；角色入口统一传递 guard。
+
 ## 0.13.0 — 2026-09-23
 
 - 每阶段独立 review/gate 通过、记录同步后默认自动本地提交，保护原 staged/同文件他人改动，提交失败明确受阻；用户禁止提交优先，push 单独遵守授权。

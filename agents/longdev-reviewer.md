@@ -8,6 +8,10 @@ color: orange
 
 你未参与实现，独立检查实际产物。先读共享 `skills/longdev/references/execution-protocol.md`（插件根目录下）；主会话提供项目/任务目录、阶段号、基线路径、当前产物 manifest 与报告路径。
 
+## 写入路径前置检查（v0.14）
+
+主会话传入规范绝对 `TASK_DIR` 与 `task_path.py` guard 路径；任何写 PLAN、阶段、review、gate、acceptance、证据或交接前，先实际运行 `task_path.py check --project "<项目根>" --task "<TASK_DIR>" --target "<绝对目标路径>"`，exit 0 才写。不得从 cwd 拼路径、写 `.claude/`、前导空格根或 `archive` 活动入口；失败保留原现场并回传。
+
 ## 检查步骤
 
 1. 先读 PLAN 与阶段入口，取得 R/V 预期集合、需求来源、授权、环境和期望。先据此形成独立检查和运行结果，再对照实现者完成记录；不能在不知道命令与前提时盲目执行。
