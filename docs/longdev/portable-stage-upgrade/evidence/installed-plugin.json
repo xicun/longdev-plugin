@@ -1,0 +1,24 @@
+{
+  "version": "0.13.0+codex.20260923092211",
+  "cache": "/Users/zhaozhimeng/.codex/plugins/cache/zzm-plugins/longdev/0.13.0+codex.20260923092211",
+  "verified_files": 29,
+  "all_sha256_match": true,
+  "old_cache_note": "Codex native CLI removed old version cache during reinstall; no manual deletion. Project bundle installer preservation is a separate tested behavior.",
+  "installed_script_fixture": {
+    "status": "migrated",
+    "marker": "docs/longdev/.migration-v013.json",
+    "files": 1,
+    "git": true,
+    "external_references": [],
+    "manual_review": [],
+    "local_evidence": []
+  },
+  "install_command": "codex plugin add longdev@zzm-plugins --json",
+  "install_exit": 0,
+  "script_exit": 0,
+  "script_check_exit": 0,
+  "stage1_commit": "fb31eddca721c64a24b8adb5ee71744cbf13c1bb",
+  "remote_main_verified": "fb31eddca721c64a24b8adb5ee71744cbf13c1bb",
+  "remote_check": "git ls-remote gitee refs/heads/main; exit 0",
+  "enabled": true
+}

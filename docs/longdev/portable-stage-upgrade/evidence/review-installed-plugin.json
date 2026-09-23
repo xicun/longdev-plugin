@@ -1,0 +1,65 @@
+{
+  "version": "0.13.0+codex.20260923092211",
+  "enabled": true,
+  "cache": "/Users/zhaozhimeng/.codex/plugins/cache/zzm-plugins/longdev/0.13.0+codex.20260923092211",
+  "files": {
+    ".claude-plugin/marketplace.json": "633341e9841f694d10a02100dc67149514d6b2ae85a29c45fc1dfd4efe927a07",
+    ".claude-plugin/plugin.json": "2c67c9cfe35cb2d40ad0bcf9814089ebaa6fc33b4cef880e3fc2443f1d03de93",
+    ".codex-plugin/plugin.json": "71348f89f2b894df00a101a4cdbe0a7841fc0c04b795a622f54c648c0fd1c7f0",
+    "CHANGELOG.md": "c86bb0c2ba03bdd81373441d9b734c5ed319e441d44ff9896d4d9a38fa044167",
+    "INSTALL.md": "2b59c51ce095e3e55207095a207bd5d38e0b1eea2a01dde48288e7089b698f48",
+    "README.md": "076b7cd42fb9da7f9bdad6d7de615641439f8c67373539aef23f48ab0af77d98",
+    "agents/longdev-acceptance.md": "0f41ab6fe25453fbeda00b8d1de984b9eda322ca4db903c9ab8799b8a048d9a3",
+    "agents/longdev-decider.md": "f4efa6af29405a8fd92d8fdf7a34932758ad5e6a1d994b6f6c368f11c90588c3",
+    "agents/longdev-final-reviewer.md": "103e9bf835e2c34845276d08b85ac32defdbe8526724c70ac32bc7757b611770",
+    "agents/longdev-implementer.md": "5f65a707789827afec8bb69943c9e3392cf43e1773e7e0f88bc3b25b4dd9ff1e",
+    "agents/longdev-planner.md": "a82cc482b45ddc334fbb5268ad854e85dfe28b13ea1111a845367aa5a95d2bbd",
+    "agents/longdev-product-owner.md": "3caac7448aa1580cf4bc023e8f695404a78d1263ee31d8d21ba0956f57bcc4a8",
+    "agents/longdev-reviewer.md": "a780f9997892678b9808d585352966fc4c9a1b4ab2c9bbec03e99fdf80dc93ec",
+    "agents/longdev-scout.md": "55c9a16e98bff49ca915abf97ad2b2d85f22d9112dd4972e241fecabf6e239ea",
+    "scripts/install.py": "5c7c8e8609c2c5dab419e01e2d1610bca969a92571d71b5f05caadbf2396089e",
+    "skills/autopilot/SKILL.md": "5fa6cc3c623235c89e8d518898e715c070a0eae0fdbe4928796a16b88b4559b6",
+    "skills/autopilot/references/backlog-template.md": "427e686e6b54c15d5920537b333cd1a8044bef30ab0b5683713ab80366f3d5d4",
+    "skills/autopilot/references/charter-interview.md": "b8ce07881a6545d5b9c3fd127793e979ac843eb7a08596feb8e32a1099e53a5a",
+    "skills/autopilot/references/charter-template.md": "7187b2c0df1bf2f8bf8face17501667a383aaf409b5eff1807b5178cc09813e9",
+    "skills/autopilot/references/iteration-template.md": "86e9f4941ca68ce3a8440703ae75c548a81d81caed2b537addc61fb7f00acfed",
+    "skills/longdev/SKILL.md": "6745c6e812f4297154e0218c1d303ccd309651fbd1460db78dae844bc767b680",
+    "skills/longdev/references/execution-protocol.md": "eee46710a81acf41062974a9d4eea320ebf45929395453f3448e2846e22dce7a",
+    "skills/longdev/references/plan-template.md": "821926bcb1e07c4af2211bad7c78d2e09ba68e71ad75b24e450b42c35fb2e3b3",
+    "skills/longdev/references/session-runtime.md": "5803fe88c32f835f729923f8deb0a0f31b4b694a5ba52fa09e83fc3cbc2e8695",
+    "skills/longdev/references/show-file.md": "4ec9312b904d76f4c1a005b907710fe96f4d094f936d16fcab373bdceee5cfca",
+    "skills/longdev/references/stage-template.md": "d9a200610b0071e318597defc53b7e4d613b9750f71ffe9ee8853971fc6a2c47",
+    "skills/longdev/scripts/migrate_workspace.py": "abded6c6ac7c3f0a22515371f08361c06ac7655f3745977ea5ceea49fd5c14ce",
+    "tests/test_install.py": "dbc8387506a7c6f9a2fbab1e494ae35bd739c4a4dd4743532f9672bf791e4dcb",
+    "tests/test_migration.py": "99f7b07c12e7983a17694937f54d9dbc8c51637d38024c83c97db1a1576b3370"
+  },
+  "plugin_list_exit": 0,
+  "cache_fixture": [
+    {
+      "status": "migrated",
+      "marker": "docs/longdev/.migration-v013.json",
+      "files": 1,
+      "git": true,
+      "external_references": [],
+      "manual_review": [],
+      "local_evidence": []
+    },
+    {
+      "status": "already_migrated",
+      "marker": "docs/longdev/.migration-v013.json",
+      "git": true,
+      "external_references": [],
+      "manual_review": [],
+      "local_evidence": [],
+      "authority": [
+        "docs/longdev",
+        "docs/autopilot"
+      ]
+    }
+  ],
+  "cache_fixture_exits": [
+    0,
+    0
+  ],
+  "verified_files": 29
+}
