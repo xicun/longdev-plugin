@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.13.0 — 2026-09-23
+
+- 每阶段独立 review/gate 通过、记录同步后默认自动本地提交，保护原 staged/同文件他人改动，提交失败明确受阻；用户禁止提交优先，push 单独遵守授权。
+- 持久任务/产品记录改为 `docs/longdev/`、`docs/autopilot/`，随阶段提交；原始日志、图片与基线副本放 `.work/`，持久记录包含可跨机器复核的摘要/manifest。
+- 新版技能启动当前工作区时运行实际迁移脚本，保留旧目录保护副本；支持冲突预检、忽略检查、独占锁、原子写入、中断恢复与持久完成标记。`status --check` 只读，更新插件不扫描其它工作区，不自动接手旧任务。
+- 新增迁移正常/失败/重复/中断/路径/跨机器/并发测试，三端安装包验证包含脚本；Windows 锁实现与 reparse 防护已提供，真实 Windows 环境仍须实测。
+
 ## 0.12.0 — 2026-09-22
 
 - 增加 Codex 插件清单，复用 `skills/` 作为跨客户端共享底层。
@@ -14,7 +21,7 @@
 - 增加 `context/current.md` 交接契约、会话切换状态机和运行器职责边界。
 - 明确客户端 resume、fork、退出码不能替代 longdev 的实际产物核对、review、gate 和验收。
 
-发版流程：改代码 → 更新本文件 → bump `.claude-plugin/plugin.json` 的 `version`（**唯一**要改的版本号，SKILL.md 开工时直接读它）→ commit → `git tag vX.Y.Z` → push。
+发版流程：改代码 → 更新本文件 → 同步 bump `.claude-plugin/plugin.json` 与 `.codex-plugin/plugin.json` 的 `version`（SKILL.md 开工从前者读取）→ 按授权 commit/tag/push；Codex 本地插件更新按当前安装流程使用版本 cachebuster 并保持两份清单一致。
 其他设备只有在 `version` 字符串变化后才会收到更新（`/plugin update longdev@zzm-plugins` 或自动更新）。
 
 ## 0.10.1 — 2026-09-21

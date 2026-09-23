@@ -28,6 +28,9 @@ class InstallTests(unittest.TestCase):
                 self.assertIn(bundle.as_posix(), (self.project / entry / name / 'SKILL.md').read_text('utf-8'))
                 self.assertTrue((bundle / 'skills' / name / '../../.claude-plugin/plugin.json').resolve().is_file())
             self.assertTrue((bundle / 'agents/longdev-reviewer.md').is_file())
+            script = bundle / 'skills/longdev/scripts/migrate_workspace.py'
+            self.assertEqual(script.read_bytes(), (ROOT / 'skills/longdev/scripts/migrate_workspace.py').read_bytes())
+            self.assertIn('docs/longdev/', (self.project / entry / 'longdev/SKILL.md').read_text('utf-8'))
             installer.install(self.project, client)
             installer.install(self.project, client, check=True)
         self.assertEqual(len(bundles), 1)

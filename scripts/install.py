@@ -44,7 +44,8 @@ def install(project, client, source=SOURCE, check=False):
                 f'客户端：{client}。先读完整技能：\n\n'
                 f'[{name}]({(bundle / "skills" / name / "SKILL.md").as_posix()})\n\n'
                 f'插件根目录：`{bundle.as_posix()}`。相对引用以完整技能所在目录为准。'
-                '角色定义在插件根目录 agents/；任务记录仍在项目 .claude/longdev/。'
+                '角色定义在插件根目录 agents/；持久任务记录在项目 docs/longdev/ 和 docs/autopilot/。'
+                '启动/续接先按完整技能调用包内迁移脚本，status 只读探测；阶段 gate 后默认限定本地提交。'
                 '无独立审查能力时保持待检查，不以同一会话换角色代替。\n')
         entries[f'{ROOTS[client]}/{name}/SKILL.md'] = text.encode('utf-8')
     targets = {bundle / k: v for k, v in files.items()}

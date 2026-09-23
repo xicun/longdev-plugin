@@ -1,6 +1,6 @@
 {
   "name": "longdev",
-  "version": "0.12.0",
+  "version": "0.13.0+codex.20260923092211",
   "description": "长程开发编排：阶段实现、独立审查、主会话 gate、跨客户端交接和验收",
   "author": {
     "name": "zzm.ploretoy"
