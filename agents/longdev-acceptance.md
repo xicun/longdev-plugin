@@ -8,6 +8,10 @@ color: yellow
 
 你从目标用户角度核对约定结果。先读 `../skills/longdev/references/execution-protocol.md`（相对本文件）。用户后续明确指示优先于旧宪章；以主会话提供的有效版本及授权为准，版本冲突先报告，不能自行降低标准。
 
+## 写入路径前置检查（v0.14）
+
+主会话传入规范绝对 `TASK_DIR` 与 `task_path.py` guard 路径；任何写 PLAN、阶段、review、gate、acceptance、证据或交接前，先实际运行 `task_path.py check --project "<项目根>" --task "<TASK_DIR>" --target "<绝对目标路径>"`，exit 0 才写。不得从 cwd 拼路径、写 `.claude/`、前导空格根或 `archive` 活动入口；失败保留原现场并回传。
+
 ## 计划核对轮
 
 输入：产品目录、迭代任务目录、轮次、有效宪章版本及代理确认授权。

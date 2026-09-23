@@ -9,9 +9,15 @@ description: 长程开发编排：按风险、依赖和可验证性拆阶段，�
 
 先读 [执行协议](references/execution-protocol.md)。它统一需求、状态、证据、基线与授权约定；autopilot 及所有 longdev 角色使用同一协议。需要跨客户端或跨会话继续时，再读 [会话运行时适配](references/session-runtime.md)。会话可替换，任务状态不能只存在于对话历史。
 
-启动或续接已获授权的实施任务时，**先运行** `python3 -B "<本 SKILL 所在目录>/scripts/migrate_workspace.py" --project "<当前项目根目录>"`（Windows 使用可用 Python 3）。路径必须由实际技能位置解析，不能依赖当前工作目录；autopilot 共用此入口。它只迁移当前工作区的旧 `.claude/longdev/`、`.claude/autopilot/`，不扫描历史项目，也不自动接手旧任务。插件安装/更新本身不执行用户工作区迁移。
+启动时先判断用户意图：说“先预览迁移”“迁移 dry-run”“只看迁移情况”时，只执行下面命令加 `--dry-run`，不得先正式迁移；`status`/讨论只加 `--check`。已获授权的实施启动/续接才执行无只读参数的命令：
 
-问答、讨论、`status` 只运行相同命令加 `--check`：exit 0 表示无需迁移/已迁移，exit 1 表示待迁移，exit 2 表示受阻；不写文件。实施入口 exit 2 时先按报告处理，不能用旧目录继续写来绕过。迁移操作、兼容边界和 Git 跟踪要求见 [执行协议](references/execution-protocol.md#持久记录与启动迁移)。
+`python3 -B "<本 SKILL 所在目录>/scripts/migrate_workspace.py" --project "<当前项目绝对根目录>"`
+
+Windows 使用可用 Python 3。脚本由实际安装包定位，仅盘点当前工作区 `.claude/longdev/`、`.claude/autopilot/`、带前导空格的 `.claude` 与 `.longdev` 候选，不扫描别的项目，不碰客户端配置/skills/runtime。根据内容和依赖保守分类，不能只靠目录或“已完成”迁走记录。`--dry-run` 输出每任务依据/分类、逐文件源/目标、迁移/历史归档/保留/去重/冲突及 Git 前提；不写目录、锁、journal、索引。`--check` 仅输出简短状态。
+
+只读 exit 0=无待处理记录，1=存在可处理/待跟踪动作，2=需核对或受阻；正式执行 `awaiting_tracking` 以 exit 0 返回，表示复制已校验但旧入口尚未收掉。主会话可继续当前任务 review/gate 和限定提交，再重跑脚本完成逐文件保护归档，不能因等待 Git 跟踪而阻止使其满足的提交。`needs_review`/冲突保留原内容，报告具体项目及独立可继续范围，不宣称整体收敛。详细契约见 [执行协议](references/execution-protocol.md#持久记录与启动迁移)。
+
+主会话在派发前运行 `scripts/task_path.py resolve --project "<项目绝对根>" --kind longdev --name "<任务名>"`，将返回的规范绝对路径作为唯一 `TASK_DIR`，同时传递 guard 脚本绝对路径。每次写任务记录/证据前先运行 `task_path.py check --project "<项目绝对根>" --task "<TASK_DIR>" --target "<实际写入绝对路径>"`；exit 0 后只写已检查目标。角色不得从 cwd 重拼路径。guard 拒绝相对、前导空格、旧根、越界、symlink/reparse 和保留名 `archive`；失败先修正入口，不绕过。它约束本插件角色流程，不能阻止任意旧客户端写文件；旧分叉由下次盘点发现。
 
 ## 组织与分工
 
@@ -36,7 +42,7 @@ description: 长程开发编排：按风险、依赖和可验证性拆阶段，�
 
 ## A. 识别任务与立项
 
-1. 完成上述启动迁移/只读探测后，用 Glob/文件列表检查新任务目录及 PLAN，读取候选状态、授权和剩余事项。`docs/` 是唯一权威入口，不重新导入旧目录。用户明确指定任务或新目标时按其指示处理；只有多个候选且无法推断目标时才澄清，不覆盖已有任务。
+1. 完成上述启动迁移/只读探测后，用 Glob/文件列表检查新任务目录及 PLAN，读取候选状态、授权和剩余事项。`docs/` 是唯一权威入口，不静默重导入旧分叉；`archive/` 不作为活动任务枚举。用户明确指定任务或新目标时按其指示处理；只有多个候选且无法推断目标时才澄清，不覆盖已有任务。
 2. 问答、讨论和 `status` 只读取并汇报。明确实施目标时建立任务目录和任务起点基线（见执行协议），按需派 scout 调研未知依赖。
 3. 派 planner：给用户要求原话、已有授权/决定、调研指针和 `references/plan-template.md`、`references/stage-template.md`。产出 `PLAN.draft.md` 与阶段入口；拆分依据是风险、耦合、依赖和可独立验证性。8 文件/400 行只作重新评估的参考，不是停机阈值。
 4. 核对所有需求已纳入 R/V 映射。关键歧义或未授权的重要取舍集中呈现具体选项与影响；需要用户决定时保留草稿，继续独立工作。用户已授权方案且无关键缺口时，直接将草稿转为 PLAN 并推进，不固定重复确认。

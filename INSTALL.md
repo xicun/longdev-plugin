@@ -44,8 +44,8 @@ codex plugin add longdev@zzm-plugins
 
 ## 升级后的工作区迁移
 
-v0.13.0 技能启动/续接当前工作区时运行包内 `skills/longdev/scripts/migrate_workspace.py --project <项目根>`，Python 与安装器要求相同。安装和更新插件本身不遍历历史工作区，也不启动旧任务；以后在哪个项目使用新版技能，就检查哪个项目。
+v0.14.0 技能启动/续接当前工作区时运行包内 `skills/longdev/scripts/migrate_workspace.py --project <项目根>`，Python 与安装器要求相同。说“先预览迁移/迁移 dry-run”时加 `--dry-run`，只读输出完整动作；`--check` 仅简短探测。安装和更新插件本身不遍历历史工作区，也不启动旧任务；以后在哪个项目使用新版技能，就检查哪个项目。
 
-旧 `.claude/longdev/`、`.claude/autopilot/` 迁入 `docs/`，原始基线/日志/图片等迁入 `.work/`；旧目录保留完整保护副本。完成标记 `docs/longdev/.migration-v013.json` 随记录提交，此后只认新目录，不重导入残留旧数据。脚本不会修改已有冲突内容、Git 索引或业务代码。Markdown/JSON 常见路径会更新；其它格式及迁移树外引用保留并报告供核对。旧状态原样保留，不把迁移当作验证/验收通过。
+旧 `.claude/longdev/`、前导空格 `.claude`、`.longdev` 候选及 `.claude/autopilot/` 按内容识别迁入 `docs/`，可靠结束记录进入 `docs/<kind>/archive/`，原始基线/日志/图片等迁入 `.work/`；旧入口原始副本完成 Git 跟踪核验后进入 `.work/longdev-migration/archive/`。未知文件/目录、冲突、外部 .work 证据和未解析引用保留报告。完成标记 `docs/longdev/.migration-v014.json` 兼容 v0.13 指纹；旧目录新增/变更会报告分叉，不覆盖新 docs。脚本不会修改 Git 索引或业务代码。
 
-`--check` 只读探测：exit 0 表示无需迁移或已迁移，1 表示待迁移，2 表示冲突/忽略/环境受阻。任何启动都检查持久目录是否被忽略。命中时 agent 在项目授权范围内修复最小 `.gitignore` 例外并重验，不改全局规则，不用 `git add -f` 绕过。迁移成功只表示文件准备好，主会话仍须核对归属，并在阶段 gate 后提交记录/标记。用户禁止提交或非 Git 项目需明确同步限制。
+`--check`/`--dry-run` 完全只读：exit 0 表示无待处理，1 表示存在待跟踪或预演动作，2 表示冲突/忽略/环境受阻。任何启动都检查持久目录是否被忽略。命中时 agent 在项目授权范围内修复最小 `.gitignore` 例外并重验，不改全局规则，不用 `git add -f` 绕过。正式迁移返回 awaiting_tracking 时可先提交阶段记录，再重跑完成归档；迁移成功只表示文件准备好，主会话仍须核对归属。非 Git 项目需明确同步限制。

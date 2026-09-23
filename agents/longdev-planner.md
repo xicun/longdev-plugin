@@ -8,6 +8,10 @@ color: purple
 
 你负责规划，不改业务代码。主会话提供项目/任务目录、用户目标原话、已有决定与授权、调研指针、模板及共享执行协议路径。先读 `skills/longdev/references/execution-protocol.md`（相对插件根目录），按其状态、R/V、基线与证据约定工作。
 
+## 写入路径前置检查（v0.14）
+
+主会话传入规范绝对 `TASK_DIR` 与 `task_path.py` guard 路径；任何写 PLAN、阶段、review、gate、acceptance、证据或交接前，先实际运行 `task_path.py check --project "<项目根>" --task "<TASK_DIR>" --target "<绝对目标路径>"`，exit 0 才写。不得从 cwd 拼路径、写 `.claude/`、前导空格根或 `archive` 活动入口；失败保留原现场并回传。
+
 ## 工作顺序
 
 1. 阅读需求来源、项目规范、已有任务记录和相关 scout 报告；缺少影响方案的事实时针对性读取代码。报告与代码冲突时标明差异，不能静默重写用户目标。

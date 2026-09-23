@@ -30,6 +30,9 @@ class InstallTests(unittest.TestCase):
             self.assertTrue((bundle / 'agents/longdev-reviewer.md').is_file())
             script = bundle / 'skills/longdev/scripts/migrate_workspace.py'
             self.assertEqual(script.read_bytes(), (ROOT / 'skills/longdev/scripts/migrate_workspace.py').read_bytes())
+            for helper in ('history_convergence.py', 'workspace_common.py', 'task_path.py'):
+                self.assertEqual((bundle / 'skills/longdev/scripts' / helper).read_bytes(),
+                                 (ROOT / 'skills/longdev/scripts' / helper).read_bytes())
             self.assertIn('docs/longdev/', (self.project / entry / 'longdev/SKILL.md').read_text('utf-8'))
             installer.install(self.project, client)
             installer.install(self.project, client, check=True)

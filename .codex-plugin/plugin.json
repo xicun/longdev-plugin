@@ -1,7 +1,7 @@
 {
   "name": "longdev",
-  "version": "0.13.0+codex.20260923092211",
-  "description": "长程开发编排：阶段实现、独立审查、主会话 gate、跨客户端交接和验收",
+  "version": "0.14.0+codex.20260923183000",
+  "description": "\u957f\u7a0b\u5f00\u53d1\u7f16\u6392\uff1a\u9636\u6bb5\u5b9e\u73b0\u3001\u72ec\u7acb\u5ba1\u67e5\u3001\u4e3b\u4f1a\u8bdd gate\u3001\u8de8\u5ba2\u6237\u7aef\u4ea4\u63a5\u548c\u9a8c\u6536",
   "author": {
     "name": "zzm.ploretoy"
   },
@@ -16,17 +16,17 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Longdev",
-    "shortDescription": "可跨会话、跨客户端的长程开发流程",
-    "longDescription": "按阶段实施、独立审查、主会话 gate，并通过磁盘任务记录在 Claude Code、Codex CLI 和 dsh 之间交接。",
+    "shortDescription": "\u53ef\u8de8\u4f1a\u8bdd\u3001\u8de8\u5ba2\u6237\u7aef\u7684\u957f\u7a0b\u5f00\u53d1\u6d41\u7a0b",
+    "longDescription": "\u6309\u9636\u6bb5\u5b9e\u65bd\u3001\u72ec\u7acb\u5ba1\u67e5\u3001\u4e3b\u4f1a\u8bdd gate\uff0c\u5e76\u901a\u8fc7\u78c1\u76d8\u4efb\u52a1\u8bb0\u5f55\u5728 Claude Code\u3001Codex CLI \u548c dsh \u4e4b\u95f4\u4ea4\u63a5\u3002",
     "developerName": "zzm.ploretoy",
     "category": "Developer Tools",
     "capabilities": [
       "Write"
     ],
     "defaultPrompt": [
-      "按 longdev 流程启动这个开发任务",
-      "从当前交接包恢复 longdev 任务",
-      "检查当前阶段并执行 gate"
+      "\u6309 longdev \u6d41\u7a0b\u542f\u52a8\u8fd9\u4e2a\u5f00\u53d1\u4efb\u52a1",
+      "\u4ece\u5f53\u524d\u4ea4\u63a5\u5305\u6062\u590d longdev \u4efb\u52a1",
+      "\u68c0\u67e5\u5f53\u524d\u9636\u6bb5\u5e76\u6267\u884c gate"
     ]
   }
 }
