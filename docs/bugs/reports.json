@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "revision": 37,
+  "revision": 40,
   "next_bug": 4,
   "next_feedback": 2,
   "issues": {
     "BUG-0001": {
       "id": "BUG-0001",
-      "status": "acceptance",
+      "status": "closed",
       "epoch": 6,
       "facts": [
         "最终修复后默认 core.autocrlf=true 下四条迁移归档路径全通过",
@@ -319,6 +319,17 @@
               }
             ]
           }
+        },
+        {
+          "at": "2026-09-24T06:24:07.776790+00:00",
+          "epoch": 6,
+          "kind": "accept",
+          "data": {
+            "decision": "accepted",
+            "source": "用户 2026-09-24 明确验收消息：R01-R20 通过验收",
+            "id": "BUG-0001",
+            "kind": "user"
+          }
         }
       ],
       "repairs": [
@@ -386,7 +397,12 @@
         "epoch": 6,
         "repair": "FIX-0003"
       },
-      "acceptance": null,
+      "acceptance": {
+        "decision": "accepted",
+        "source": "用户 2026-09-24 明确验收消息：R01-R20 通过验收",
+        "id": "BUG-0001",
+        "kind": "user"
+      },
       "investigation": null,
       "investigations": {},
       "title": "Windows Git 换行导致迁移追踪误判",
@@ -400,7 +416,7 @@
     },
     "BUG-0002": {
       "id": "BUG-0002",
-      "status": "acceptance",
+      "status": "closed",
       "epoch": 6,
       "facts": [
         "最终测试使用 Path.as_posix 在 Windows 稳定注入并恢复",
@@ -625,6 +641,17 @@
               }
             ]
           }
+        },
+        {
+          "at": "2026-09-24T06:24:07.914220+00:00",
+          "epoch": 6,
+          "kind": "accept",
+          "data": {
+            "decision": "accepted",
+            "source": "用户 2026-09-24 明确验收消息：R01-R20 通过验收",
+            "id": "BUG-0002",
+            "kind": "user"
+          }
         }
       ],
       "repairs": [
@@ -688,7 +715,12 @@
         "epoch": 6,
         "repair": "FIX-0003"
       },
-      "acceptance": null,
+      "acceptance": {
+        "decision": "accepted",
+        "source": "用户 2026-09-24 明确验收消息：R01-R20 通过验收",
+        "id": "BUG-0002",
+        "kind": "user"
+      },
       "investigation": null,
       "investigations": {},
       "title": "Windows 中断恢复故障注入路径判断不兼容",
@@ -702,7 +734,7 @@
     },
     "BUG-0003": {
       "id": "BUG-0003",
-      "status": "acceptance",
+      "status": "closed",
       "epoch": 6,
       "facts": [
         "最终 JSON 命令、Windows 路径和空格路径回归全通过",
@@ -952,6 +984,17 @@
               }
             ]
           }
+        },
+        {
+          "at": "2026-09-24T06:24:08.054991+00:00",
+          "epoch": 6,
+          "kind": "accept",
+          "data": {
+            "decision": "accepted",
+            "source": "用户 2026-09-24 明确验收消息：R01-R20 通过验收",
+            "id": "BUG-0003",
+            "kind": "user"
+          }
         }
       ],
       "repairs": [
@@ -1023,7 +1066,12 @@
         "epoch": 6,
         "repair": "FIX-0003"
       },
-      "acceptance": null,
+      "acceptance": {
+        "decision": "accepted",
+        "source": "用户 2026-09-24 明确验收消息：R01-R20 通过验收",
+        "id": "BUG-0003",
+        "kind": "user"
+      },
       "investigation": null,
       "investigations": {},
       "title": "JSON 命令字符串被当作 Windows 路径解析",
