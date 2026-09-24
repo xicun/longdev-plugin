@@ -1,0 +1,1182 @@
+{
+  "schema": 1,
+  "revision": 37,
+  "next_bug": 4,
+  "next_feedback": 2,
+  "issues": {
+    "BUG-0001": {
+      "id": "BUG-0001",
+      "status": "acceptance",
+      "epoch": 6,
+      "facts": [
+        "最终修复后默认 core.autocrlf=true 下四条迁移归档路径全通过",
+        "文本索引比较统一 CRLF/LF，二进制仍逐字节比较"
+      ],
+      "hypotheses": [
+        "追踪检查应对 UTF-8 文本做换行规范化并保持二进制字节精确"
+      ],
+      "quality_refs": [
+        {
+          "kind": "test_case",
+          "id": "test_active_migrate_then_index_verified_archive",
+          "reference": "tests/test_migration.py::MigrationTests.test_active_migrate_then_index_verified_archive"
+        },
+        {
+          "kind": "test_case",
+          "id": "test_true_closed_history_is_portable_archive",
+          "reference": "tests/test_migration.py::MigrationTests.test_true_closed_history_is_portable_archive"
+        },
+        {
+          "kind": "test_case",
+          "id": "test_identical_duplicates_deduplicate_but_conflicting_tasks_do_not_choose_winner",
+          "reference": "tests/test_migration.py::MigrationTests.test_identical_duplicates_deduplicate_but_conflicting_tasks_do_not_choose_winner"
+        },
+        {
+          "kind": "test_case",
+          "id": "test_unknown_file_inside_task_is_not_archived",
+          "reference": "tests/test_migration.py::MigrationTests.test_unknown_file_inside_task_is_not_archived"
+        }
+      ],
+      "history": [
+        {
+          "at": "2026-09-24T05:35:35.772107+00:00",
+          "epoch": 0,
+          "kind": "create",
+          "data": {
+            "title": "Windows Git 换行导致迁移追踪误判",
+            "goal": "Git autocrlf=true 时，工作区与索引内容语义相同即可进入归档",
+            "expected": "迁移能在 docs 已 git add 后收敛，重复任务和已关闭历史按规则清理旧目录",
+            "actual": "四项迁移测试因工作区 CRLF 与索引 LF 原始字节不同而保持 awaiting_tracking，未归档旧目录",
+            "conditions": "Windows Python 3.12，core.autocrlf=true，git add docs 后再次迁移",
+            "scope": "skills/longdev/scripts/history_convergence.py 的 tracked 与迁移归档流程",
+            "facts": [
+              "原始 c10310b 与当前均复现",
+              "autocrlf=false 对照四项通过"
+            ],
+            "hypotheses": [
+              "追踪检查应比较规范化文本内容，而不是原始换行字节"
+            ],
+            "next_step": "补充跨 autocrlf 的语义一致性测试并修复 tracked 比较",
+            "close_condition": "默认 Windows 配置下相关迁移回归通过，二进制和真正内容变化仍被识别"
+          }
+        },
+        {
+          "at": "2026-09-24T05:36:23.546106+00:00",
+          "epoch": 0,
+          "kind": "feedback",
+          "data": {
+            "feedback": "FB-0001",
+            "item": "1",
+            "route": {
+              "kind": "bug",
+              "target": "BUG-0001",
+              "confidence": "confirmed",
+              "reason": "同一迁移流程；默认 Windows 配置下索引换行规范化导致归档无法收敛"
+            }
+          }
+        },
+        {
+          "at": "2026-09-24T05:36:53.697454+00:00",
+          "epoch": 0,
+          "kind": "feedback",
+          "data": {
+            "feedback": "FB-0001",
+            "item": "2",
+            "route": {
+              "kind": "bug",
+              "target": "BUG-0001",
+              "confidence": "confirmed",
+              "reason": "与索引追踪误判共享同一归档阻断路径"
+            }
+          }
+        },
+        {
+          "at": "2026-09-24T05:36:53.816590+00:00",
+          "epoch": 0,
+          "kind": "feedback",
+          "data": {
+            "feedback": "FB-0001",
+            "item": "3",
+            "route": {
+              "kind": "bug",
+              "target": "BUG-0001",
+              "confidence": "confirmed",
+              "reason": "已验收任务未清理是追踪未收敛的同一路径表现"
+            }
+          }
+        },
+        {
+          "at": "2026-09-24T05:36:53.939020+00:00",
+          "epoch": 0,
+          "kind": "feedback",
+          "data": {
+            "feedback": "FB-0001",
+            "item": "4",
+            "route": {
+              "kind": "bug",
+              "target": "BUG-0001",
+              "confidence": "confirmed",
+              "reason": "未知文件保留不应阻止已识别 PLAN 归档，仍由迁移收敛路径处理"
+            }
+          }
+        },
+        {
+          "at": "2026-09-24T05:39:19.523825+00:00",
+          "epoch": 1,
+          "kind": "update",
+          "data": {
+            "id": "BUG-0001",
+            "fields": {
+              "facts": [
+                "原始 c10310b 与当前版本在 Windows 默认 core.autocrlf=true 下复现相同四项失败",
+                "仅进程覆盖 core.autocrlf=false 后四项通过",
+                "失败路径都在 git add docs 后的追踪与归档收敛"
+              ],
+              "hypotheses": [
+                "追踪检查应对 UTF-8 文本做换行规范化并保持二进制字节精确"
+              ],
+              "next_step": "修复 tracked 比较并运行四项迁移回归及全量回归",
+              "quality_refs": [
+                {
+                  "kind": "test_case",
+                  "id": "test_active_migrate_then_index_verified_archive",
+                  "reference": "tests/test_migration.py::MigrationTests.test_active_migrate_then_index_verified_archive"
+                },
+                {
+                  "kind": "test_case",
+                  "id": "test_true_closed_history_is_portable_archive",
+                  "reference": "tests/test_migration.py::MigrationTests.test_true_closed_history_is_portable_archive"
+                },
+                {
+                  "kind": "test_case",
+                  "id": "test_identical_duplicates_deduplicate_but_conflicting_tasks_do_not_choose_winner",
+                  "reference": "tests/test_migration.py::MigrationTests.test_identical_duplicates_deduplicate_but_conflicting_tasks_do_not_choose_winner"
+                },
+                {
+                  "kind": "test_case",
+                  "id": "test_unknown_file_inside_task_is_not_archived",
+                  "reference": "tests/test_migration.py::MigrationTests.test_unknown_file_inside_task_is_not_archived"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "at": "2026-09-24T05:42:07.839086+00:00",
+          "epoch": 2,
+          "kind": "repair",
+          "data": {
+            "id": "BUG-0001",
+            "version": "followup-20260924-7317ed2",
+            "summary": "规范化 UTF-8 文本换行后比较 Git 索引与工作区",
+            "cause": "Git autocrlf 导致同一文本 CRLF/LF 原始字节不同，被误判为未追踪；二进制仍保持字节比较",
+            "coverage": "tracked 追踪、重复任务、已关闭历史、未知文件任务四条归档路径"
+          }
+        },
+        {
+          "at": "2026-09-24T05:42:34.941619+00:00",
+          "epoch": 2,
+          "kind": "verify",
+          "data": {
+            "id": "BUG-0001",
+            "method": "tracked normalization and four archive paths",
+            "expected": "four affected migration cases pass under default core.autocrlf=true",
+            "actual": "Targeted six-test regression and full 57-test plugin suite passed with exit 0",
+            "runtime_version": "followup-20260924-7317ed2",
+            "reproduced": true,
+            "result": "pass",
+            "coverage": "complete",
+            "artifacts": [
+              {
+                "path": "skills/longdev/scripts/history_convergence.py",
+                "sha256": "7317ed2dd63c4e5b7b8898c42faf9798ff4abae6c2d7a45c35e7431616b4da3f"
+              },
+              {
+                "path": "tests/test_migration.py",
+                "sha256": "7450ddb7162be78ffff4848c342cef58220c7b9f651699c77a9d5c57814f348e"
+              }
+            ],
+            "evidence": [
+              {
+                "path": "docs/bugs/evidence/FB-0001-followup-20260924.json",
+                "sha256": "342e6463a55350c818b07c06c96c54a90ae9633b26ad737a74a27db9b8e4d66c"
+              }
+            ]
+          }
+        },
+        {
+          "at": "2026-09-24T05:45:56.290509+00:00",
+          "epoch": 3,
+          "kind": "update",
+          "data": {
+            "id": "BUG-0001",
+            "fields": {
+              "facts": [
+                "最终修复后默认 core.autocrlf=true 下四条迁移归档路径全通过",
+                "文本索引比较统一 CRLF/LF，二进制仍逐字节比较"
+              ],
+              "next_step": "使用当前源文件指纹重新验证并等待验收"
+            }
+          }
+        },
+        {
+          "at": "2026-09-24T05:45:56.657697+00:00",
+          "epoch": 4,
+          "kind": "repair",
+          "data": {
+            "id": "BUG-0001",
+            "version": "followup-20260924-final-7317ed2",
+            "summary": "补齐换行比较安全边界后的追踪修复",
+            "cause": "最终代码只吞 OSError 路径探测异常，ValueError 路径安全拒绝保持；文本换行规范化仍有效",
+            "coverage": "四条迁移归档路径及二进制内容保护"
+          }
+        },
+        {
+          "at": "2026-09-24T05:46:15.772138+00:00",
+          "epoch": 4,
+          "kind": "verify",
+          "data": {
+            "id": "BUG-0001",
+            "method": "tracked normalization and four archive paths",
+            "expected": "four affected migration cases pass under default core.autocrlf=true",
+            "actual": "Targeted six-test regression and full 57-test plugin suite passed with exit 0",
+            "runtime_version": "followup-20260924-final-7317ed2",
+            "reproduced": true,
+            "result": "pass",
+            "coverage": "complete",
+            "artifacts": [
+              {
+                "path": "skills/longdev/scripts/history_convergence.py",
+                "sha256": "3f80077cae5ec8ccdae2ecfdd8e9ac3850b69ed87609ec7d2229568e2aeec333"
+              },
+              {
+                "path": "tests/test_migration.py",
+                "sha256": "7450ddb7162be78ffff4848c342cef58220c7b9f651699c77a9d5c57814f348e"
+              }
+            ],
+            "evidence": [
+              {
+                "path": "docs/bugs/evidence/FB-0001-followup-20260924.json",
+                "sha256": "f57092888ca79c9ae56e247d359b3cc07a13aa095f54b9de12e4ce53c2bb1a0a"
+              }
+            ]
+          }
+        },
+        {
+          "at": "2026-09-24T05:47:35.122194+00:00",
+          "epoch": 5,
+          "kind": "update",
+          "data": {
+            "id": "BUG-0001",
+            "fields": {
+              "facts": [
+                "最终修复后默认 core.autocrlf=true 下四条迁移归档路径全通过",
+                "文本索引比较统一 CRLF/LF，二进制仍逐字节比较"
+              ],
+              "next_step": "使用当前源文件指纹重新验证并等待验收"
+            }
+          }
+        },
+        {
+          "at": "2026-09-24T05:47:35.500133+00:00",
+          "epoch": 6,
+          "kind": "repair",
+          "data": {
+            "id": "BUG-0001",
+            "version": "followup-20260924-final2-3f80077",
+            "summary": "绑定最终定向回归证据的换行追踪修复",
+            "cause": "最终定向六项与全量57项通过，文本换行规范化有效且二进制保持字节精确",
+            "coverage": "四条迁移归档路径及二进制内容保护"
+          }
+        },
+        {
+          "at": "2026-09-24T05:47:52.966852+00:00",
+          "epoch": 6,
+          "kind": "verify",
+          "data": {
+            "id": "BUG-0001",
+            "method": "tracked normalization and four archive paths",
+            "expected": "four affected migration cases pass under default core.autocrlf=true",
+            "actual": "Targeted six-test regression and full 57-test plugin suite passed with exit 0",
+            "runtime_version": "followup-20260924-final2-3f80077",
+            "reproduced": true,
+            "result": "pass",
+            "coverage": "complete",
+            "artifacts": [
+              {
+                "path": "skills/longdev/scripts/history_convergence.py",
+                "sha256": "3f80077cae5ec8ccdae2ecfdd8e9ac3850b69ed87609ec7d2229568e2aeec333"
+              },
+              {
+                "path": "tests/test_migration.py",
+                "sha256": "7450ddb7162be78ffff4848c342cef58220c7b9f651699c77a9d5c57814f348e"
+              }
+            ],
+            "evidence": [
+              {
+                "path": "docs/bugs/evidence/FB-0001-followup-20260924.json",
+                "sha256": "9a9ca454d7ca9b4f4f9c4395af22fa40bac4b9981b35a74f422385ec2132b8ca"
+              }
+            ]
+          }
+        }
+      ],
+      "repairs": [
+        {
+          "id": "FIX-0001",
+          "at": "2026-09-24T05:42:07.839086+00:00",
+          "epoch": 2,
+          "revision": 14,
+          "recurrence": 0,
+          "version": "followup-20260924-7317ed2",
+          "summary": "规范化 UTF-8 文本换行后比较 Git 索引与工作区",
+          "cause": "Git autocrlf 导致同一文本 CRLF/LF 原始字节不同，被误判为未追踪；二进制仍保持字节比较",
+          "coverage": "tracked 追踪、重复任务、已关闭历史、未知文件任务四条归档路径"
+        },
+        {
+          "id": "FIX-0002",
+          "at": "2026-09-24T05:45:56.657697+00:00",
+          "epoch": 4,
+          "revision": 23,
+          "recurrence": 0,
+          "version": "followup-20260924-final-7317ed2",
+          "summary": "补齐换行比较安全边界后的追踪修复",
+          "cause": "最终代码只吞 OSError 路径探测异常，ValueError 路径安全拒绝保持；文本换行规范化仍有效",
+          "coverage": "四条迁移归档路径及二进制内容保护"
+        },
+        {
+          "id": "FIX-0003",
+          "at": "2026-09-24T05:47:35.500133+00:00",
+          "epoch": 6,
+          "revision": 32,
+          "recurrence": 0,
+          "version": "followup-20260924-final2-3f80077",
+          "summary": "绑定最终定向回归证据的换行追踪修复",
+          "cause": "最终定向六项与全量57项通过，文本换行规范化有效且二进制保持字节精确",
+          "coverage": "四条迁移归档路径及二进制内容保护"
+        }
+      ],
+      "recurrences": [],
+      "relations": [],
+      "verification": {
+        "id": "BUG-0001",
+        "method": "tracked normalization and four archive paths",
+        "expected": "four affected migration cases pass under default core.autocrlf=true",
+        "actual": "Targeted six-test regression and full 57-test plugin suite passed with exit 0",
+        "runtime_version": "followup-20260924-final2-3f80077",
+        "reproduced": true,
+        "result": "pass",
+        "coverage": "complete",
+        "artifacts": [
+          {
+            "path": "skills/longdev/scripts/history_convergence.py",
+            "sha256": "3f80077cae5ec8ccdae2ecfdd8e9ac3850b69ed87609ec7d2229568e2aeec333"
+          },
+          {
+            "path": "tests/test_migration.py",
+            "sha256": "7450ddb7162be78ffff4848c342cef58220c7b9f651699c77a9d5c57814f348e"
+          }
+        ],
+        "evidence": [
+          {
+            "path": "docs/bugs/evidence/FB-0001-followup-20260924.json",
+            "sha256": "9a9ca454d7ca9b4f4f9c4395af22fa40bac4b9981b35a74f422385ec2132b8ca"
+          }
+        ],
+        "epoch": 6,
+        "repair": "FIX-0003"
+      },
+      "acceptance": null,
+      "investigation": null,
+      "investigations": {},
+      "title": "Windows Git 换行导致迁移追踪误判",
+      "goal": "Git autocrlf=true 时，工作区与索引内容语义相同即可进入归档",
+      "expected": "迁移能在 docs 已 git add 后收敛，重复任务和已关闭历史按规则清理旧目录",
+      "actual": "四项迁移测试因工作区 CRLF 与索引 LF 原始字节不同而保持 awaiting_tracking，未归档旧目录",
+      "conditions": "Windows Python 3.12，core.autocrlf=true，git add docs 后再次迁移",
+      "scope": "skills/longdev/scripts/history_convergence.py 的 tracked 与迁移归档流程",
+      "next_step": "使用当前源文件指纹重新验证并等待验收",
+      "close_condition": "默认 Windows 配置下相关迁移回归通过，二进制和真正内容变化仍被识别"
+    },
+    "BUG-0002": {
+      "id": "BUG-0002",
+      "status": "acceptance",
+      "epoch": 6,
+      "facts": [
+        "最终测试使用 Path.as_posix 在 Windows 稳定注入并恢复",
+        "中断后的第二次迁移成功清理源目录并保留目标文件"
+      ],
+      "hypotheses": [
+        "故障注入测试应使用路径对象的跨平台表示"
+      ],
+      "quality_refs": [
+        {
+          "kind": "test_case",
+          "id": "test_archive_interruption_after_first_unlink_resumes",
+          "reference": "tests/test_migration.py::MigrationTests.test_archive_interruption_after_first_unlink_resumes"
+        }
+      ],
+      "history": [
+        {
+          "at": "2026-09-24T05:35:47.615074+00:00",
+          "epoch": 0,
+          "kind": "create",
+          "data": {
+            "title": "Windows 中断恢复故障注入路径判断不兼容",
+            "goal": "中断发生在源文件删除后时，迁移应留下可恢复现场并在下一次继续",
+            "expected": "测试在 Windows 路径下稳定注入 OSError，恢复迁移后旧目录被清理且目标文件存在",
+            "actual": "测试以固定 POSIX 分隔符匹配 WindowsPath，未注入 OSError，断言失败",
+            "conditions": "Windows Python 3.12，Path.unlink monkeypatch",
+            "scope": "tests/test_migration.py 的 archive_interruption_after_first_unlink_resumes",
+            "facts": [
+              "path.as_posix() 能匹配同一目标",
+              "原始实现与当前实现一致"
+            ],
+            "hypotheses": [
+              "测试故障注入应使用 Path.as_posix 或路径对象比较"
+            ],
+            "next_step": "修正注入谓词并运行中断/恢复回归",
+            "close_condition": "Windows 与 POSIX 路径下均能触发并验证恢复"
+          }
+        },
+        {
+          "at": "2026-09-24T05:36:54.053329+00:00",
+          "epoch": 0,
+          "kind": "feedback",
+          "data": {
+            "feedback": "FB-0001",
+            "item": "5",
+            "route": {
+              "kind": "bug",
+              "target": "BUG-0002",
+              "confidence": "confirmed",
+              "reason": "WindowsPath 分隔符导致故障注入未触发，属于测试可执行性问题"
+            }
+          }
+        },
+        {
+          "at": "2026-09-24T05:39:19.644789+00:00",
+          "epoch": 1,
+          "kind": "update",
+          "data": {
+            "id": "BUG-0002",
+            "fields": {
+              "facts": [
+                "WindowsPath 的 str 使用反斜线，既有测试以 POSIX 分隔符判断导致注入未触发",
+                "path.as_posix() 能稳定匹配目标"
+              ],
+              "hypotheses": [
+                "故障注入测试应使用路径对象的跨平台表示"
+              ],
+              "next_step": "修正测试谓词并执行中断恢复回归",
+              "quality_refs": [
+                {
+                  "kind": "test_case",
+                  "id": "test_archive_interruption_after_first_unlink_resumes",
+                  "reference": "tests/test_migration.py::MigrationTests.test_archive_interruption_after_first_unlink_resumes"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "at": "2026-09-24T05:42:07.957311+00:00",
+          "epoch": 2,
+          "kind": "repair",
+          "data": {
+            "id": "BUG-0002",
+            "version": "followup-20260924-7450ddb",
+            "summary": "修正 Windows 中断恢复测试的路径注入判断",
+            "cause": "测试故障注入使用固定 POSIX 分隔符，WindowsPath 未命中；使用 as_posix 后能验证真实恢复路径",
+            "coverage": "Windows 中断后重试归档及目标文件保留"
+          }
+        },
+        {
+          "at": "2026-09-24T05:42:35.068747+00:00",
+          "epoch": 2,
+          "kind": "verify",
+          "data": {
+            "id": "BUG-0002",
+            "method": "Windows unlink interruption and retry",
+            "expected": "injected OSError occurs after PLAN unlink; retry archives remaining files and cleans source",
+            "actual": "Targeted six-test regression and full 57-test plugin suite passed with exit 0",
+            "runtime_version": "followup-20260924-7450ddb",
+            "reproduced": true,
+            "result": "pass",
+            "coverage": "complete",
+            "artifacts": [
+              {
+                "path": "tests/test_migration.py",
+                "sha256": "7450ddb7162be78ffff4848c342cef58220c7b9f651699c77a9d5c57814f348e"
+              }
+            ],
+            "evidence": [
+              {
+                "path": "docs/bugs/evidence/FB-0001-followup-20260924.json",
+                "sha256": "342e6463a55350c818b07c06c96c54a90ae9633b26ad737a74a27db9b8e4d66c"
+              }
+            ]
+          }
+        },
+        {
+          "at": "2026-09-24T05:45:56.413213+00:00",
+          "epoch": 3,
+          "kind": "update",
+          "data": {
+            "id": "BUG-0002",
+            "fields": {
+              "facts": [
+                "最终测试使用 Path.as_posix 在 Windows 稳定注入并恢复",
+                "中断后的第二次迁移成功清理源目录并保留目标文件"
+              ],
+              "next_step": "使用当前源文件指纹重新验证并等待验收"
+            }
+          }
+        },
+        {
+          "at": "2026-09-24T05:45:56.771422+00:00",
+          "epoch": 4,
+          "kind": "repair",
+          "data": {
+            "id": "BUG-0002",
+            "version": "followup-20260924-final-7450ddb",
+            "summary": "确认 Windows 中断注入修复后的最终测试轮",
+            "cause": "Path.as_posix 故障注入在最终全量回归中通过",
+            "coverage": "Windows 中断与恢复"
+          }
+        },
+        {
+          "at": "2026-09-24T05:46:15.917979+00:00",
+          "epoch": 4,
+          "kind": "verify",
+          "data": {
+            "id": "BUG-0002",
+            "method": "Windows unlink interruption and retry",
+            "expected": "injected OSError occurs after PLAN unlink; retry archives remaining files and cleans source",
+            "actual": "Targeted six-test regression and full 57-test plugin suite passed with exit 0",
+            "runtime_version": "followup-20260924-final-7450ddb",
+            "reproduced": true,
+            "result": "pass",
+            "coverage": "complete",
+            "artifacts": [
+              {
+                "path": "tests/test_migration.py",
+                "sha256": "7450ddb7162be78ffff4848c342cef58220c7b9f651699c77a9d5c57814f348e"
+              }
+            ],
+            "evidence": [
+              {
+                "path": "docs/bugs/evidence/FB-0001-followup-20260924.json",
+                "sha256": "f57092888ca79c9ae56e247d359b3cc07a13aa095f54b9de12e4ce53c2bb1a0a"
+              }
+            ]
+          }
+        },
+        {
+          "at": "2026-09-24T05:47:35.245997+00:00",
+          "epoch": 5,
+          "kind": "update",
+          "data": {
+            "id": "BUG-0002",
+            "fields": {
+              "facts": [
+                "最终测试使用 Path.as_posix 在 Windows 稳定注入并恢复",
+                "中断后的第二次迁移成功清理源目录并保留目标文件"
+              ],
+              "next_step": "使用当前源文件指纹重新验证并等待验收"
+            }
+          }
+        },
+        {
+          "at": "2026-09-24T05:47:35.622387+00:00",
+          "epoch": 6,
+          "kind": "repair",
+          "data": {
+            "id": "BUG-0002",
+            "version": "followup-20260924-final2-7450ddb",
+            "summary": "绑定最终定向回归证据的 Windows 中断修复",
+            "cause": "最终定向六项与全量57项通过，Path.as_posix 故障注入及恢复路径有效",
+            "coverage": "Windows 中断与恢复"
+          }
+        },
+        {
+          "at": "2026-09-24T05:47:53.102134+00:00",
+          "epoch": 6,
+          "kind": "verify",
+          "data": {
+            "id": "BUG-0002",
+            "method": "Windows unlink interruption and retry",
+            "expected": "injected OSError occurs after PLAN unlink; retry archives remaining files and cleans source",
+            "actual": "Targeted six-test regression and full 57-test plugin suite passed with exit 0",
+            "runtime_version": "followup-20260924-final2-7450ddb",
+            "reproduced": true,
+            "result": "pass",
+            "coverage": "complete",
+            "artifacts": [
+              {
+                "path": "tests/test_migration.py",
+                "sha256": "7450ddb7162be78ffff4848c342cef58220c7b9f651699c77a9d5c57814f348e"
+              }
+            ],
+            "evidence": [
+              {
+                "path": "docs/bugs/evidence/FB-0001-followup-20260924.json",
+                "sha256": "9a9ca454d7ca9b4f4f9c4395af22fa40bac4b9981b35a74f422385ec2132b8ca"
+              }
+            ]
+          }
+        }
+      ],
+      "repairs": [
+        {
+          "id": "FIX-0001",
+          "at": "2026-09-24T05:42:07.957311+00:00",
+          "epoch": 2,
+          "revision": 15,
+          "recurrence": 0,
+          "version": "followup-20260924-7450ddb",
+          "summary": "修正 Windows 中断恢复测试的路径注入判断",
+          "cause": "测试故障注入使用固定 POSIX 分隔符，WindowsPath 未命中；使用 as_posix 后能验证真实恢复路径",
+          "coverage": "Windows 中断后重试归档及目标文件保留"
+        },
+        {
+          "id": "FIX-0002",
+          "at": "2026-09-24T05:45:56.771422+00:00",
+          "epoch": 4,
+          "revision": 24,
+          "recurrence": 0,
+          "version": "followup-20260924-final-7450ddb",
+          "summary": "确认 Windows 中断注入修复后的最终测试轮",
+          "cause": "Path.as_posix 故障注入在最终全量回归中通过",
+          "coverage": "Windows 中断与恢复"
+        },
+        {
+          "id": "FIX-0003",
+          "at": "2026-09-24T05:47:35.622387+00:00",
+          "epoch": 6,
+          "revision": 33,
+          "recurrence": 0,
+          "version": "followup-20260924-final2-7450ddb",
+          "summary": "绑定最终定向回归证据的 Windows 中断修复",
+          "cause": "最终定向六项与全量57项通过，Path.as_posix 故障注入及恢复路径有效",
+          "coverage": "Windows 中断与恢复"
+        }
+      ],
+      "recurrences": [],
+      "relations": [],
+      "verification": {
+        "id": "BUG-0002",
+        "method": "Windows unlink interruption and retry",
+        "expected": "injected OSError occurs after PLAN unlink; retry archives remaining files and cleans source",
+        "actual": "Targeted six-test regression and full 57-test plugin suite passed with exit 0",
+        "runtime_version": "followup-20260924-final2-7450ddb",
+        "reproduced": true,
+        "result": "pass",
+        "coverage": "complete",
+        "artifacts": [
+          {
+            "path": "tests/test_migration.py",
+            "sha256": "7450ddb7162be78ffff4848c342cef58220c7b9f651699c77a9d5c57814f348e"
+          }
+        ],
+        "evidence": [
+          {
+            "path": "docs/bugs/evidence/FB-0001-followup-20260924.json",
+            "sha256": "9a9ca454d7ca9b4f4f9c4395af22fa40bac4b9981b35a74f422385ec2132b8ca"
+          }
+        ],
+        "epoch": 6,
+        "repair": "FIX-0003"
+      },
+      "acceptance": null,
+      "investigation": null,
+      "investigations": {},
+      "title": "Windows 中断恢复故障注入路径判断不兼容",
+      "goal": "中断发生在源文件删除后时，迁移应留下可恢复现场并在下一次继续",
+      "expected": "测试在 Windows 路径下稳定注入 OSError，恢复迁移后旧目录被清理且目标文件存在",
+      "actual": "测试以固定 POSIX 分隔符匹配 WindowsPath，未注入 OSError，断言失败",
+      "conditions": "Windows Python 3.12，Path.unlink monkeypatch",
+      "scope": "tests/test_migration.py 的 archive_interruption_after_first_unlink_resumes",
+      "next_step": "使用当前源文件指纹重新验证并等待验收",
+      "close_condition": "Windows 与 POSIX 路径下均能触发并验证恢复"
+    },
+    "BUG-0003": {
+      "id": "BUG-0003",
+      "status": "acceptance",
+      "epoch": 6,
+      "facts": [
+        "最终 JSON 命令、Windows 路径和空格路径回归全通过",
+        "非法文件名候选只跳过探测，ValueError 安全边界仍保留"
+      ],
+      "hypotheses": [
+        "非法路径候选应安全跳过，命令内旧路径仍由 rewrite 处理"
+      ],
+      "quality_refs": [
+        {
+          "kind": "test_case",
+          "id": "test_reference_rewrite_preserves_json_commands_spaces_and_windows",
+          "reference": "tests/test_migration.py::MigrationTests.test_reference_rewrite_preserves_json_commands_spaces_and_windows"
+        }
+      ],
+      "history": [
+        {
+          "at": "2026-09-24T05:35:54.559546+00:00",
+          "epoch": 0,
+          "kind": "create",
+          "data": {
+            "title": "JSON 命令字符串被当作 Windows 路径解析",
+            "goal": "迁移引用扫描不应因 JSON 中的 shell 命令字符串抛路径异常",
+            "expected": "命令字符串中的旧路径可被安全重写，其他字符串不作为路径探测并且迁移完成",
+            "actual": "references 将所有 JSON 字符串加入候选，resolve_reference 对带引号命令整串 lstat，触发 WinError 123",
+            "conditions": "JSON 含 cat \".claude/longdev/t/PLAN.md\" 及 Windows 路径",
+            "scope": "skills/longdev/scripts/history_convergence.py resolve_reference/references 与 workspace_common rewrite",
+            "facts": [
+              "基线与当前同样触发",
+              "JSON rewrite 已有 token 处理路径命令的逻辑"
+            ],
+            "hypotheses": [
+              "引用扫描需忽略命令整串，或对非法路径候选安全跳过"
+            ],
+            "next_step": "修复引用扫描异常处理并补 JSON 命令回归",
+            "close_condition": "命令保留前缀并正确重写路径，非法路径字符串不抛异常"
+          }
+        },
+        {
+          "at": "2026-09-24T05:36:54.169777+00:00",
+          "epoch": 0,
+          "kind": "feedback",
+          "data": {
+            "feedback": "FB-0001",
+            "item": "6",
+            "route": {
+              "kind": "bug",
+              "target": "BUG-0003",
+              "confidence": "confirmed",
+              "reason": "JSON 命令字符串被作为文件路径探测导致 WinError 123"
+            }
+          }
+        },
+        {
+          "at": "2026-09-24T05:39:19.766144+00:00",
+          "epoch": 1,
+          "kind": "update",
+          "data": {
+            "id": "BUG-0003",
+            "fields": {
+              "facts": [
+                "references 将 JSON 中所有字符串加入路径候选",
+                "带引号的 shell 命令整串 lstat 在 Windows 触发 WinError 123",
+                "结构化 rewrite 已有命令内路径 token 处理"
+              ],
+              "hypotheses": [
+                "非法路径候选应安全跳过，命令内旧路径仍由 rewrite 处理"
+              ],
+              "next_step": "安全跳过非法路径探测并执行 JSON 命令迁移回归",
+              "quality_refs": [
+                {
+                  "kind": "test_case",
+                  "id": "test_reference_rewrite_preserves_json_commands_spaces_and_windows",
+                  "reference": "tests/test_migration.py::MigrationTests.test_reference_rewrite_preserves_json_commands_spaces_and_windows"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "at": "2026-09-24T05:42:08.074288+00:00",
+          "epoch": 2,
+          "kind": "repair",
+          "data": {
+            "id": "BUG-0003",
+            "version": "followup-20260924-7317ed2",
+            "summary": "忽略无法作为文件名的 JSON 字符串候选并保留结构化命令重写",
+            "cause": "JSON 命令整串被 lstat 为文件路径触发 WinError 123；非法候选安全跳过，rewrite 继续处理命令内路径",
+            "coverage": "JSON 命令、Windows 路径、空格路径与迁移引用"
+          }
+        },
+        {
+          "at": "2026-09-24T05:42:35.190317+00:00",
+          "epoch": 2,
+          "kind": "verify",
+          "data": {
+            "id": "BUG-0003",
+            "method": "JSON command/path rewrite",
+            "expected": "full JSON command, Windows path, spaces and migration references pass without WinError 123",
+            "actual": "Targeted six-test regression and full 57-test plugin suite passed with exit 0",
+            "runtime_version": "followup-20260924-7317ed2",
+            "reproduced": true,
+            "result": "pass",
+            "coverage": "complete",
+            "artifacts": [
+              {
+                "path": "skills/longdev/scripts/history_convergence.py",
+                "sha256": "7317ed2dd63c4e5b7b8898c42faf9798ff4abae6c2d7a45c35e7431616b4da3f"
+              },
+              {
+                "path": "skills/longdev/scripts/workspace_common.py",
+                "sha256": "e2d3da6191f275a4008b3b747d63c0a8352a8a85818228351544877c8d66d2af"
+              },
+              {
+                "path": "tests/test_migration.py",
+                "sha256": "7450ddb7162be78ffff4848c342cef58220c7b9f651699c77a9d5c57814f348e"
+              }
+            ],
+            "evidence": [
+              {
+                "path": "docs/bugs/evidence/FB-0001-followup-20260924.json",
+                "sha256": "342e6463a55350c818b07c06c96c54a90ae9633b26ad737a74a27db9b8e4d66c"
+              }
+            ]
+          }
+        },
+        {
+          "at": "2026-09-24T05:45:56.532907+00:00",
+          "epoch": 3,
+          "kind": "update",
+          "data": {
+            "id": "BUG-0003",
+            "fields": {
+              "facts": [
+                "最终 JSON 命令、Windows 路径和空格路径回归全通过",
+                "非法文件名候选只跳过探测，ValueError 安全边界仍保留"
+              ],
+              "next_step": "使用当前源文件指纹重新验证并等待验收"
+            }
+          }
+        },
+        {
+          "at": "2026-09-24T05:45:56.887801+00:00",
+          "epoch": 4,
+          "kind": "repair",
+          "data": {
+            "id": "BUG-0003",
+            "version": "followup-20260924-final-7317ed2",
+            "summary": "确认 JSON 命令引用修复后的最终测试轮",
+            "cause": "OSError 候选跳过且 ValueError 安全边界保留，JSON 迁移全量通过",
+            "coverage": "JSON 命令与路径引用"
+          }
+        },
+        {
+          "at": "2026-09-24T05:46:16.052194+00:00",
+          "epoch": 4,
+          "kind": "verify",
+          "data": {
+            "id": "BUG-0003",
+            "method": "JSON command/path rewrite",
+            "expected": "full JSON command, Windows path, spaces and migration references pass without WinError 123",
+            "actual": "Targeted six-test regression and full 57-test plugin suite passed with exit 0",
+            "runtime_version": "followup-20260924-final-7317ed2",
+            "reproduced": true,
+            "result": "pass",
+            "coverage": "complete",
+            "artifacts": [
+              {
+                "path": "skills/longdev/scripts/history_convergence.py",
+                "sha256": "3f80077cae5ec8ccdae2ecfdd8e9ac3850b69ed87609ec7d2229568e2aeec333"
+              },
+              {
+                "path": "skills/longdev/scripts/workspace_common.py",
+                "sha256": "e2d3da6191f275a4008b3b747d63c0a8352a8a85818228351544877c8d66d2af"
+              },
+              {
+                "path": "tests/test_migration.py",
+                "sha256": "7450ddb7162be78ffff4848c342cef58220c7b9f651699c77a9d5c57814f348e"
+              }
+            ],
+            "evidence": [
+              {
+                "path": "docs/bugs/evidence/FB-0001-followup-20260924.json",
+                "sha256": "f57092888ca79c9ae56e247d359b3cc07a13aa095f54b9de12e4ce53c2bb1a0a"
+              }
+            ]
+          }
+        },
+        {
+          "at": "2026-09-24T05:47:35.380596+00:00",
+          "epoch": 5,
+          "kind": "update",
+          "data": {
+            "id": "BUG-0003",
+            "fields": {
+              "facts": [
+                "最终 JSON 命令、Windows 路径和空格路径回归全通过",
+                "非法文件名候选只跳过探测，ValueError 安全边界仍保留"
+              ],
+              "next_step": "使用当前源文件指纹重新验证并等待验收"
+            }
+          }
+        },
+        {
+          "at": "2026-09-24T05:47:35.738635+00:00",
+          "epoch": 6,
+          "kind": "repair",
+          "data": {
+            "id": "BUG-0003",
+            "version": "followup-20260924-final2-3f80077",
+            "summary": "绑定最终定向回归证据的 JSON 引用修复",
+            "cause": "最终定向六项与全量57项通过，OSError 候选跳过且 ValueError 安全边界保留",
+            "coverage": "JSON 命令与路径引用"
+          }
+        },
+        {
+          "at": "2026-09-24T05:47:53.221049+00:00",
+          "epoch": 6,
+          "kind": "verify",
+          "data": {
+            "id": "BUG-0003",
+            "method": "JSON command/path rewrite",
+            "expected": "full JSON command, Windows path, spaces and migration references pass without WinError 123",
+            "actual": "Targeted six-test regression and full 57-test plugin suite passed with exit 0",
+            "runtime_version": "followup-20260924-final2-3f80077",
+            "reproduced": true,
+            "result": "pass",
+            "coverage": "complete",
+            "artifacts": [
+              {
+                "path": "skills/longdev/scripts/history_convergence.py",
+                "sha256": "3f80077cae5ec8ccdae2ecfdd8e9ac3850b69ed87609ec7d2229568e2aeec333"
+              },
+              {
+                "path": "skills/longdev/scripts/workspace_common.py",
+                "sha256": "e2d3da6191f275a4008b3b747d63c0a8352a8a85818228351544877c8d66d2af"
+              },
+              {
+                "path": "tests/test_migration.py",
+                "sha256": "7450ddb7162be78ffff4848c342cef58220c7b9f651699c77a9d5c57814f348e"
+              }
+            ],
+            "evidence": [
+              {
+                "path": "docs/bugs/evidence/FB-0001-followup-20260924.json",
+                "sha256": "9a9ca454d7ca9b4f4f9c4395af22fa40bac4b9981b35a74f422385ec2132b8ca"
+              }
+            ]
+          }
+        }
+      ],
+      "repairs": [
+        {
+          "id": "FIX-0001",
+          "at": "2026-09-24T05:42:08.074288+00:00",
+          "epoch": 2,
+          "revision": 16,
+          "recurrence": 0,
+          "version": "followup-20260924-7317ed2",
+          "summary": "忽略无法作为文件名的 JSON 字符串候选并保留结构化命令重写",
+          "cause": "JSON 命令整串被 lstat 为文件路径触发 WinError 123；非法候选安全跳过，rewrite 继续处理命令内路径",
+          "coverage": "JSON 命令、Windows 路径、空格路径与迁移引用"
+        },
+        {
+          "id": "FIX-0002",
+          "at": "2026-09-24T05:45:56.887801+00:00",
+          "epoch": 4,
+          "revision": 25,
+          "recurrence": 0,
+          "version": "followup-20260924-final-7317ed2",
+          "summary": "确认 JSON 命令引用修复后的最终测试轮",
+          "cause": "OSError 候选跳过且 ValueError 安全边界保留，JSON 迁移全量通过",
+          "coverage": "JSON 命令与路径引用"
+        },
+        {
+          "id": "FIX-0003",
+          "at": "2026-09-24T05:47:35.738635+00:00",
+          "epoch": 6,
+          "revision": 34,
+          "recurrence": 0,
+          "version": "followup-20260924-final2-3f80077",
+          "summary": "绑定最终定向回归证据的 JSON 引用修复",
+          "cause": "最终定向六项与全量57项通过，OSError 候选跳过且 ValueError 安全边界保留",
+          "coverage": "JSON 命令与路径引用"
+        }
+      ],
+      "recurrences": [],
+      "relations": [],
+      "verification": {
+        "id": "BUG-0003",
+        "method": "JSON command/path rewrite",
+        "expected": "full JSON command, Windows path, spaces and migration references pass without WinError 123",
+        "actual": "Targeted six-test regression and full 57-test plugin suite passed with exit 0",
+        "runtime_version": "followup-20260924-final2-3f80077",
+        "reproduced": true,
+        "result": "pass",
+        "coverage": "complete",
+        "artifacts": [
+          {
+            "path": "skills/longdev/scripts/history_convergence.py",
+            "sha256": "3f80077cae5ec8ccdae2ecfdd8e9ac3850b69ed87609ec7d2229568e2aeec333"
+          },
+          {
+            "path": "skills/longdev/scripts/workspace_common.py",
+            "sha256": "e2d3da6191f275a4008b3b747d63c0a8352a8a85818228351544877c8d66d2af"
+          },
+          {
+            "path": "tests/test_migration.py",
+            "sha256": "7450ddb7162be78ffff4848c342cef58220c7b9f651699c77a9d5c57814f348e"
+          }
+        ],
+        "evidence": [
+          {
+            "path": "docs/bugs/evidence/FB-0001-followup-20260924.json",
+            "sha256": "9a9ca454d7ca9b4f4f9c4395af22fa40bac4b9981b35a74f422385ec2132b8ca"
+          }
+        ],
+        "epoch": 6,
+        "repair": "FIX-0003"
+      },
+      "acceptance": null,
+      "investigation": null,
+      "investigations": {},
+      "title": "JSON 命令字符串被当作 Windows 路径解析",
+      "goal": "迁移引用扫描不应因 JSON 中的 shell 命令字符串抛路径异常",
+      "expected": "命令字符串中的旧路径可被安全重写，其他字符串不作为路径探测并且迁移完成",
+      "actual": "references 将所有 JSON 字符串加入候选，resolve_reference 对带引号命令整串 lstat，触发 WinError 123",
+      "conditions": "JSON 含 cat \".claude/longdev/t/PLAN.md\" 及 Windows 路径",
+      "scope": "skills/longdev/scripts/history_convergence.py resolve_reference/references 与 workspace_common rewrite",
+      "next_step": "使用当前源文件指纹重新验证并等待验收",
+      "close_condition": "命令保留前缀并正确重写路径，非法路径字符串不抛异常"
+    }
+  },
+  "feedback": {
+    "FB-0001": {
+      "id": "FB-0001",
+      "raw": "迁移全量回归有六项失败：active migrate 后索引仍 awaiting_tracking；相同任务重复迁移未清理旧目录；已验收历史未归档；未知文件任务的 PLAN 未归档；中断恢复测试没有注入预期 OSError；JSON 命令引用解析触发 Windows WinError 123。",
+      "source": "Windows Python 3.12 全量迁移回归 2026-09-24",
+      "at": "2026-09-24T05:35:26.907235+00:00",
+      "created_revision": 1,
+      "items": [
+        {
+          "id": "1",
+          "text": "active migrate 后索引仍 awaiting_tracking",
+          "route": {
+            "kind": "bug",
+            "target": "BUG-0001",
+            "confidence": "confirmed",
+            "reason": "同一迁移流程；默认 Windows 配置下索引换行规范化导致归档无法收敛"
+          },
+          "history": [
+            {
+              "at": "2026-09-24T05:36:23.546106+00:00",
+              "previous": null,
+              "route": {
+                "kind": "bug",
+                "target": "BUG-0001",
+                "confidence": "confirmed",
+                "reason": "同一迁移流程；默认 Windows 配置下索引换行规范化导致归档无法收敛"
+              }
+            }
+          ]
+        },
+        {
+          "id": "2",
+          "text": "相同任务重复迁移未清理旧目录",
+          "route": {
+            "kind": "bug",
+            "target": "BUG-0001",
+            "confidence": "confirmed",
+            "reason": "与索引追踪误判共享同一归档阻断路径"
+          },
+          "history": [
+            {
+              "at": "2026-09-24T05:36:53.697454+00:00",
+              "previous": null,
+              "route": {
+                "kind": "bug",
+                "target": "BUG-0001",
+                "confidence": "confirmed",
+                "reason": "与索引追踪误判共享同一归档阻断路径"
+              }
+            }
+          ]
+        },
+        {
+          "id": "3",
+          "text": "已验收历史未归档",
+          "route": {
+            "kind": "bug",
+            "target": "BUG-0001",
+            "confidence": "confirmed",
+            "reason": "已验收任务未清理是追踪未收敛的同一路径表现"
+          },
+          "history": [
+            {
+              "at": "2026-09-24T05:36:53.816590+00:00",
+              "previous": null,
+              "route": {
+                "kind": "bug",
+                "target": "BUG-0001",
+                "confidence": "confirmed",
+                "reason": "已验收任务未清理是追踪未收敛的同一路径表现"
+              }
+            }
+          ]
+        },
+        {
+          "id": "4",
+          "text": "未知文件任务的 PLAN 未归档",
+          "route": {
+            "kind": "bug",
+            "target": "BUG-0001",
+            "confidence": "confirmed",
+            "reason": "未知文件保留不应阻止已识别 PLAN 归档，仍由迁移收敛路径处理"
+          },
+          "history": [
+            {
+              "at": "2026-09-24T05:36:53.939020+00:00",
+              "previous": null,
+              "route": {
+                "kind": "bug",
+                "target": "BUG-0001",
+                "confidence": "confirmed",
+                "reason": "未知文件保留不应阻止已识别 PLAN 归档，仍由迁移收敛路径处理"
+              }
+            }
+          ]
+        },
+        {
+          "id": "5",
+          "text": "中断恢复测试没有注入预期 OSError",
+          "route": {
+            "kind": "bug",
+            "target": "BUG-0002",
+            "confidence": "confirmed",
+            "reason": "WindowsPath 分隔符导致故障注入未触发，属于测试可执行性问题"
+          },
+          "history": [
+            {
+              "at": "2026-09-24T05:36:54.053329+00:00",
+              "previous": null,
+              "route": {
+                "kind": "bug",
+                "target": "BUG-0002",
+                "confidence": "confirmed",
+                "reason": "WindowsPath 分隔符导致故障注入未触发，属于测试可执行性问题"
+              }
+            }
+          ]
+        },
+        {
+          "id": "6",
+          "text": "JSON 命令引用解析触发 Windows WinError 123",
+          "route": {
+            "kind": "bug",
+            "target": "BUG-0003",
+            "confidence": "confirmed",
+            "reason": "JSON 命令字符串被作为文件路径探测导致 WinError 123"
+          },
+          "history": [
+            {
+              "at": "2026-09-24T05:36:54.169777+00:00",
+              "previous": null,
+              "route": {
+                "kind": "bug",
+                "target": "BUG-0003",
+                "confidence": "confirmed",
+                "reason": "JSON 命令字符串被作为文件路径探测导致 WinError 123"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

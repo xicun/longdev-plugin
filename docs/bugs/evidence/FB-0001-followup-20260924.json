@@ -1,0 +1,54 @@
+{
+  "feedback": "FB-0001",
+  "date": "2026-09-24",
+  "environment": {
+    "os": "Windows",
+    "python": "3.12",
+    "core.autocrlf": "true"
+  },
+  "command": "py -3.12 -B -m unittest discover -s tests -v",
+  "cwd": "D:\\Works\\harness\\longdev-plugin",
+  "targeted": {
+    "tests": 6,
+    "passed": 6,
+    "returncode": 0,
+    "elapsed_seconds": 17.325,
+    "log": ".work/longdev/bug-reports/evidence/followup-targeted-current.log"
+  },
+  "safety_targeted": {
+    "tests": 2,
+    "passed": 2,
+    "returncode": 0,
+    "log": ".work/longdev/bug-reports/evidence/followup-targeted-final.log"
+  },
+  "full": {
+    "tests": 57,
+    "passed": 57,
+    "returncode": 0,
+    "elapsed_seconds": 74.068,
+    "log": ".work/longdev/bug-reports/evidence/followup-plugin-full-final.log"
+  },
+  "changes": [
+    "history_convergence.tracked normalizes UTF-8 CRLF/LF before index comparison and keeps binary bytes exact",
+    "history_convergence.resolve_reference skips invalid filesystem candidates while structured rewrite preserves JSON command paths",
+    "test_migration archive interruption injection uses Path.as_posix for Windows portability"
+  ],
+  "artifacts": [
+    {
+      "path": "skills/longdev/scripts/history_convergence.py",
+      "sha256": "3f80077cae5ec8ccdae2ecfdd8e9ac3850b69ed87609ec7d2229568e2aeec333"
+    },
+    {
+      "path": "skills/longdev/scripts/workspace_common.py",
+      "sha256": "e2d3da6191f275a4008b3b747d63c0a8352a8a85818228351544877c8d66d2af"
+    },
+    {
+      "path": "tests/test_migration.py",
+      "sha256": "7450ddb7162be78ffff4848c342cef58220c7b9f651699c77a9d5c57814f348e"
+    }
+  ],
+  "limitations": [
+    "The original six failures were reproduced from c10310b; this fix is validated on Windows only",
+    "No user project or global Git configuration was modified"
+  ]
+}

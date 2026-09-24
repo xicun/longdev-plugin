@@ -288,7 +288,7 @@ class MigrationTests(unittest.TestCase):
         counter=[]
         def interrupt(path,*args,**kwargs):
             result=original(path,*args,**kwargs)
-            if str(path).endswith('.claude/longdev/t/PLAN.md'):
+            if path.as_posix().endswith('.claude/longdev/t/PLAN.md'):
                 counter.append(str(path)); raise OSError('after source unlink')
             return result
         with patch.object(Path,'unlink',interrupt):

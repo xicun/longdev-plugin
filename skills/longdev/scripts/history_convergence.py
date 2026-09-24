@@ -174,8 +174,11 @@ def resolve_reference(root, source, value, known):
             try:
                 if safe(root, path).is_file():
                     return path
-            except ValueError:
-                raise
+            except OSError:
+                # JSON command strings and other non-path values may contain
+                # characters rejected by the host filesystem. Structured
+                # rewrite handles those values; inventory should skip them.
+                continue
     return None
 
 
@@ -206,12 +209,22 @@ def previous_sources(root):
 
 
 def tracked(root, paths, outputs=None):
+    def comparable(data):
+        # core.autocrlf can store LF in the index while Windows exposes CRLF
+        # in the worktree. Normalize decoded text; keep binary bytes exact.
+        if b'\0' in data:
+            return data
+        try:
+            return data.decode('utf-8').replace('\r\n', '\n').encode('utf-8')
+        except UnicodeDecodeError:
+            return data
+
     pending = []
     for path in sorted(set(paths)):
         file = safe(root, path)
         index = git(root, ['show', ':' + path])
         expected = (outputs or {}).get(path, file.read_bytes() if file.is_file() else None)
-        if expected is None or index.returncode or digest(index.stdout) != digest(expected):
+        if expected is None or index.returncode or digest(comparable(index.stdout)) != digest(comparable(expected)):
             pending.append(path)
     return pending
 

@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "revision": 37,
+  "issues": [
+    {
+      "id": "BUG-0001",
+      "title": "Windows Git 换行导致迁移追踪误判",
+      "status": "acceptance",
+      "goal": "Git autocrlf=true 时，工作区与索引内容语义相同即可进入归档",
+      "conditions": "Windows Python 3.12，core.autocrlf=true，git add docs 后再次迁移",
+      "actual": "四项迁移测试因工作区 CRLF 与索引 LF 原始字节不同而保持 awaiting_tracking，未归档旧目录",
+      "next_step": "使用当前源文件指纹重新验证并等待验收",
+      "recurrence_count": 0,
+      "alias_of": null
+    },
+    {
+      "id": "BUG-0002",
+      "title": "Windows 中断恢复故障注入路径判断不兼容",
+      "status": "acceptance",
+      "goal": "中断发生在源文件删除后时，迁移应留下可恢复现场并在下一次继续",
+      "conditions": "Windows Python 3.12，Path.unlink monkeypatch",
+      "actual": "测试以固定 POSIX 分隔符匹配 WindowsPath，未注入 OSError，断言失败",
+      "next_step": "使用当前源文件指纹重新验证并等待验收",
+      "recurrence_count": 0,
+      "alias_of": null
+    },
+    {
+      "id": "BUG-0003",
+      "title": "JSON 命令字符串被当作 Windows 路径解析",
+      "status": "acceptance",
+      "goal": "迁移引用扫描不应因 JSON 中的 shell 命令字符串抛路径异常",
+      "conditions": "JSON 含 cat \".claude/longdev/t/PLAN.md\" 及 Windows 路径",
+      "actual": "references 将所有 JSON 字符串加入候选，resolve_reference 对带引号命令整串 lstat，触发 WinError 123",
+      "next_step": "使用当前源文件指纹重新验证并等待验收",
+      "recurrence_count": 0,
+      "alias_of": null
+    }
+  ],
+  "feedback": [
+    {
+      "id": "FB-0001",
+      "source": "Windows Python 3.12 全量迁移回归 2026-09-24",
+      "unrouted": []
+    }
+  ]
+}
