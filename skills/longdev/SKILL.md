@@ -9,6 +9,10 @@ description: 长程开发编排：按风险、依赖和可验证性拆阶段，�
 
 先读 [执行协议](references/execution-protocol.md)。它统一需求、状态、证据、基线与授权约定；autopilot 及所有 longdev 角色使用同一协议。需要跨客户端或跨会话继续时，再读 [会话运行时适配](references/session-runtime.md)。会话可替换，任务状态不能只存在于对话历史。
 
+已知 compact/恢复/模型切换后先按会话适配重读规则与任务现场。每阶段和任务结束检查目标、队列、状态及证据一致性；需要 new 时先备好 `context/current.md` 与 `context/next-prompt.md`，记录换会话依据。没有可靠上下文指标时标未知，不猜百分比、不把技能当自动重启器。
+
+收到异常/验收失败反馈时主动读取 [bug-reports](../bug-reports/SKILL.md)，先登记原始反馈及逐项去向，再修复。立项/续接读取相关问题摘要，派发关联 Bug 与反馈编号；修复后再次反馈升级调查。review/gate 与交付按执行协议的“开发反馈与项目问题档案”检查原始反馈覆盖和当前证据，交接保留编号及下一步；不用阶段记录复制问题事实。
+
 启动时先判断用户意图：说“先预览迁移”“迁移 dry-run”“只看迁移情况”时，只执行下面命令加 `--dry-run`，不得先正式迁移；`status`/讨论只加 `--check`。已获授权的实施启动/续接才执行无只读参数的命令：
 
 `python3 -B "<本 SKILL 所在目录>/scripts/migrate_workspace.py" --project "<当前项目绝对根目录>"`

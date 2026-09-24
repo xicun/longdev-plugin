@@ -7,6 +7,12 @@ from pathlib import Path
 
 SOURCE = Path(__file__).resolve().parents[1]
 ROOTS = {'codex': '.agents/skills', 'dsh': '.dsh/skills', 'claude': '.claude/skills'}
+SKILLS = ('longdev', 'autopilot', 'bug-reports')
+REQUIRED = tuple(f'skills/{name}/SKILL.md' for name in SKILLS) + (
+    'agents/longdev-reviewer.md', '.claude-plugin/plugin.json', '.codex-plugin/plugin.json',
+    'skills/bug-reports/scripts/bug_reports.py',
+    'skills/bug-reports/references/cli.md',
+)
 
 
 def sha(data):
@@ -26,8 +32,7 @@ def install(project, client, source=SOURCE, check=False):
     files = {p.relative_to(source).as_posix(): p.read_bytes()
              for folder in ('skills', 'agents', '.claude-plugin', '.codex-plugin')
              for p in sorted((source / folder).rglob('*')) if p.is_file()}
-    for required in ('agents/longdev-reviewer.md', 'skills/autopilot/SKILL.md',
-                     'skills/longdev/SKILL.md', '.claude-plugin/plugin.json', '.codex-plugin/plugin.json'):
+    for required in REQUIRED:
         if required not in files:
             raise ValueError('Missing dependency: ' + required)
     if json.loads(files['.claude-plugin/plugin.json'])['version'] != json.loads(files['.codex-plugin/plugin.json'])['version']:
@@ -38,15 +43,22 @@ def install(project, client, source=SOURCE, check=False):
     receipt = project / '.longdev-runtime' / (client + '.json')
     old = json.loads(receipt.read_text('utf-8')) if receipt.exists() else {}
     entries = {}
-    for name in ('longdev', 'autopilot'):
+    for name in SKILLS:
         header = files[f'skills/{name}/SKILL.md'].decode('utf-8').split('---', 2)[1]
+        guidance = (
+            '可独立处理反馈，无需启动 longdev。项目问题事实源为 docs/bugs/reports.json，'
+            'index.json 为可重建索引；原始临时材料放 .work/bugs/。'
+            '先读取相关历史并逐项登记去向，复发时复查旧修复和验证缺口；交付前运行完整技能的检查命令。\n'
+            if name == 'bug-reports' else
+            '角色定义在插件根目录 agents/；持久任务记录在项目 docs/longdev/ 和 docs/autopilot/。'
+            '启动/续接先按完整技能调用包内迁移脚本，status 只读探测；阶段 gate 后默认限定本地提交。'
+            '无独立审查能力时保持待检查，不以同一会话换角色代替。\n'
+        )
         text = ('---' + header + '---\n\n<!-- longdev managed entry -->\n'
                 f'客户端：{client}。先读完整技能：\n\n'
                 f'[{name}]({(bundle / "skills" / name / "SKILL.md").as_posix()})\n\n'
                 f'插件根目录：`{bundle.as_posix()}`。相对引用以完整技能所在目录为准。'
-                '角色定义在插件根目录 agents/；持久任务记录在项目 docs/longdev/ 和 docs/autopilot/。'
-                '启动/续接先按完整技能调用包内迁移脚本，status 只读探测；阶段 gate 后默认限定本地提交。'
-                '无独立审查能力时保持待检查，不以同一会话换角色代替。\n')
+                + guidance)
         entries[f'{ROOTS[client]}/{name}/SKILL.md'] = text.encode('utf-8')
     targets = {bundle / k: v for k, v in files.items()}
     targets.update({project / k: v for k, v in entries.items()})

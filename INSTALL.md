@@ -15,17 +15,21 @@ py -3 "<checkout>/scripts/install.py" --client <client> --project "<project>" --
 
 macOS/Linux 将 `py -3` 换成 `python3`。`--check` 校验完整包内容、入口和安装记录，非零退出不得报告成功。
 
-共享包存入 `<project>/.longdev-runtime/<内容指纹>/`，包括两个 skills、所有 references、工作区迁移脚本、agents 和版本文件。三端只生成薄入口：
+共享包存入 `<project>/.longdev-runtime/<内容指纹>/`，包括 longdev、autopilot、bug-reports 三个 skills、所有 references、问题管理 CLI、工作区迁移脚本、agents 和版本文件。三端只生成薄入口：
 
 | 客户端 | 自动发现入口 |
 |---|---|
-| Claude Code | `.claude/skills/{longdev,autopilot}/SKILL.md` |
-| Codex CLI | `.agents/skills/{longdev,autopilot}/SKILL.md` |
-| dsh | `.dsh/skills/{longdev,autopilot}/SKILL.md` |
+| Claude Code | `.claude/skills/{longdev,autopilot,bug-reports}/SKILL.md` |
+| Codex CLI | `.agents/skills/{longdev,autopilot,bug-reports}/SKILL.md` |
+| dsh | `.dsh/skills/{longdev,autopilot,bug-reports}/SKILL.md` |
 
 入口使用完整包的绝对路径，无软链权限要求。移动项目后须从新路径重跑安装。升级同样重跑；旧包保留供现有会话使用，不自动清理。未知来源的已有入口或用户编辑会被拒绝覆盖；报告冲突路径，不自行删除。dsh 默认 filesystem provider 必须启用；自定义 profile 禁用它时，报告发现能力缺口，不改用户 profile。
 
-安装后新开一次客户端会话，要求列出 longdev/autopilot 并读取完整技能及版本。已有用户级技能或插件可能同名遮蔽，核对实际加载路径，不能仅凭目录存在宣布已加载。安装器校验不证明模型调用、独立审查、自动 restart 或视觉隔离已实跑。
+安装后新开一次客户端会话，要求列出 longdev/autopilot/bug-reports 并读取完整技能及版本。已有用户级技能或插件可能同名遮蔽，核对实际加载路径，不能仅凭目录存在宣布已加载。安装器校验不证明模型调用、独立审查、自动 restart 或视觉隔离已实跑。
+
+旧版双技能受管理入口可直接升级；新增 bug-reports 入口不存在时创建，已有未知内容或手改内容保留并报冲突。`--check` 只读，不自动补包或改写用户档案。
+
+bug-reports 可独立使用，无需启动 longdev 或执行其任务迁移、独立审查流程。问题事实源为业务项目 `docs/bugs/reports.json`，`docs/bugs/index.json` 可重建；原始临时材料在 `.work/bugs/`。安装目录只提供技能和 CLI，不保存业务问题。
 
 ## Codex 原生插件方式（可选）
 

@@ -4,6 +4,7 @@ Claude Code、Codex CLI、dsh 共用的长程开发技能，包含两个执行�
 
 - **longdev**：按风险和依赖拆分长任务，逐阶段实现、独立审查、主会话 gate、整体检查和验收。
 - **autopilot**：在已确认目标、授权和预算内自主迭代，每轮使用 longdev，由获授权的 acceptance 核对产品验收项。
+- **bug-reports**：记录原始反馈和逐项去向，关联历史问题、调查修复后复发并核对验证/验收依据；可独立用于小修复，也由 longdev/autopilot 在反馈、续接和交付时调用。
 
 ## 工作机制
 
@@ -22,6 +23,8 @@ v0.14 增加完整迁移预演：用户说“先预览迁移”“迁移 dry-run
 自主模式逐项核对产品 V 全集，报告缺失、重复、过期与未验证项。本轮任务只以明确选定目标及回归为必需子集。隔离项保留失败及依赖，独立子集可以交付，整体未达成不能写成成功。停止原因区分目标达成、预算停止、候选耗尽和受阻。
 
 ## 使用与维护
+
+项目问题保存在 `docs/bugs/reports.json`（唯一事实源），`index.json` 为可重建摘要；通过 [bug-reports](skills/bug-reports/SKILL.md) 的 CLI 按反馈/问题编号读取，原始日志留 `.work/bugs/`。任务计划引用 Bug 编号及本轮范围，问题可跨任务、跨会话追踪。脚本检查结构、引用和当前证据，模型负责语义关联和事实核验；提示词与 CLI 不是后台强制拦截器。
 
 市场清单位于 `.claude-plugin/marketplace.json`；`.claude-plugin/plugin.json` 与 `.codex-plugin/plugin.json` 版本必须同步，技能开工从前者读取版本，变更记录在 `CHANGELOG.md`。仅查看或修改本插件的请求不应触发产品开发循环。
 
@@ -45,6 +48,7 @@ v0.14 增加完整迁移预演：用户说“先预览迁移”“迁移 dry-run
 |---|---|
 | `skills/longdev/` | 阶段编排、共享执行协议、计划与阶段模板 |
 | `skills/autopilot/` | 产品循环、宪章问卷、backlog 与迭代模板 |
+| `skills/bug-reports/` | 原始反馈、项目问题档案、复发分析与覆盖/证据检查 CLI |
 | `agents/` | scout、planner、implementer、reviewer、decider、final-reviewer、product-owner、acceptance |
 | `skills/longdev/scripts/migrate_workspace.py` | 当前工作区迁移、只读探测、冲突/忽略检查与中断恢复 |
 

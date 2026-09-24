@@ -1,4 +1,5 @@
 import importlib.util
+import json
 import shutil
 import tempfile
 import unittest
@@ -24,7 +25,7 @@ class InstallTests(unittest.TestCase):
             result = installer.install(self.project, client)
             bundle = Path(result['bundle'])
             bundles.add(bundle)
-            for name in ('longdev', 'autopilot'):
+            for name in installer.SKILLS:
                 self.assertIn(bundle.as_posix(), (self.project / entry / name / 'SKILL.md').read_text('utf-8'))
                 self.assertTrue((bundle / 'skills' / name / '../../.claude-plugin/plugin.json').resolve().is_file())
             self.assertTrue((bundle / 'agents/longdev-reviewer.md').is_file())
@@ -34,6 +35,11 @@ class InstallTests(unittest.TestCase):
                 self.assertEqual((bundle / 'skills/longdev/scripts' / helper).read_bytes(),
                                  (ROOT / 'skills/longdev/scripts' / helper).read_bytes())
             self.assertIn('docs/longdev/', (self.project / entry / 'longdev/SKILL.md').read_text('utf-8'))
+            bug_entry = (self.project / entry / 'bug-reports/SKILL.md').read_text('utf-8')
+            self.assertIn('docs/bugs/reports.json', bug_entry)
+            self.assertNotIn('启动/续接先按完整技能调用包内迁移脚本', bug_entry)
+            self.assertEqual((bundle / 'skills/bug-reports/scripts/bug_reports.py').read_bytes(),
+                             (ROOT / 'skills/bug-reports/scripts/bug_reports.py').read_bytes())
             installer.install(self.project, client)
             installer.install(self.project, client, check=True)
         self.assertEqual(len(bundles), 1)
@@ -60,6 +66,61 @@ class InstallTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             installer.install(self.project, 'dsh', check=True)
 
+    def snapshot(self):
+        return {p.relative_to(self.project).as_posix(): (p.stat().st_mtime_ns, p.read_bytes())
+                for p in self.project.rglob('*') if p.is_file()}
+
+    def test_legacy_two_skill_receipt_upgrade_and_unknown_third(self):
+        installer.install(self.project, 'codex')
+        entry = self.project / '.agents/skills/bug-reports/SKILL.md'
+        entry.unlink()
+        receipt = self.project / '.longdev-runtime/codex.json'
+        old = json.loads(receipt.read_bytes())
+        old['entries'].pop('.agents/skills/bug-reports/SKILL.md')
+        old['files'] = {k: v for k, v in old['files'].items() if not k.startswith('skills/bug-reports/')}
+        old['bundle'] = 'legacy-two-skills'
+        receipt.write_text(json.dumps(old), encoding='utf-8')
+        archive = self.project / 'docs/bugs/reports.json'
+        archive.parent.mkdir(parents=True)
+        archive.write_bytes(b'user reports')
+        before = self.snapshot()
+        with self.assertRaises(ValueError):
+            installer.install(self.project, 'codex', check=True)
+        self.assertEqual(before, self.snapshot())
+        entry.write_bytes(b'unknown third skill')
+        before = self.snapshot()
+        with self.assertRaises(ValueError):
+            installer.install(self.project, 'codex')
+        self.assertEqual(before, self.snapshot())
+        entry.unlink()
+        installer.install(self.project, 'codex')
+        before = self.snapshot()
+        installer.install(self.project, 'codex', check=True)
+        self.assertEqual(before, self.snapshot())
+        self.assertEqual(archive.read_bytes(), b'user reports')
+        entry.write_bytes(b'user edited bug skill')
+        before = self.snapshot()
+        with self.assertRaises(ValueError):
+            installer.install(self.project, 'codex')
+        self.assertEqual(before, self.snapshot())
+
+    def test_missing_bug_script_source_or_cache_is_rejected_readonly(self):
+        source = self.project / 'source'
+        for name in ('skills', 'agents', '.claude-plugin', '.codex-plugin'):
+            shutil.copytree(ROOT / name, source / name)
+        result = installer.install(self.project, 'claude', source=source)
+        script = Path(result['bundle']) / 'skills/bug-reports/scripts/bug_reports.py'
+        script.unlink()
+        before = self.snapshot()
+        with self.assertRaisesRegex(ValueError, 'Installation mismatch'):
+            installer.install(self.project, 'claude', source=source, check=True)
+        self.assertEqual(before, self.snapshot())
+        (source / 'skills/bug-reports/scripts/bug_reports.py').unlink()
+        before = self.snapshot()
+        with self.assertRaisesRegex(ValueError, 'Missing dependency'):
+            installer.install(self.project, 'claude', source=source)
+        self.assertEqual(before, self.snapshot())
+
     def test_update_and_move_preserve_old_bundle(self):
         source = self.project / 'source'
         for name in ('skills', 'agents', '.claude-plugin', '.codex-plugin'):
@@ -75,6 +136,24 @@ class InstallTests(unittest.TestCase):
         shutil.copytree(self.project / '.longdev-runtime', moved / '.longdev-runtime')
         installer.install(moved, 'codex', source=source)
         installer.install(moved, 'codex', source=source, check=True)
+
+    def test_missing_cli_contract_source_and_cache_are_rejected(self):
+        source = self.project / 'source'
+        for name in ('skills', 'agents', '.claude-plugin', '.codex-plugin'):
+            shutil.copytree(ROOT / name, source / name)
+        result = installer.install(self.project, 'codex', source=source)
+        relative = 'skills/bug-reports/references/cli.md'
+        (Path(result['bundle']) / relative).unlink()
+        before = self.snapshot()
+        with self.assertRaisesRegex(ValueError, 'Installation mismatch'):
+            installer.install(self.project, 'codex', source=source, check=True)
+        self.assertEqual(before, self.snapshot())
+        (source / relative).unlink()
+        before = self.snapshot()
+        for check in (False, True):
+            with self.assertRaisesRegex(ValueError, 'Missing dependency'):
+                installer.install(self.project, 'codex', source=source, check=check)
+            self.assertEqual(before, self.snapshot())
 
 
 if __name__ == '__main__':
