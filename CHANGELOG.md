@@ -1,3 +1,8 @@
+## 0.17.0 — 2026-09-27
+
+- 新增跨 worktree **写租约** `skills/longdev/scripts/write_lease.py`（acquire/release/status）：锁在 Git common dir，同一仓库各 worktree 共享，串行写共享状态、不吞冲突（避免 worktree 并行开发对 `testcases/` 等共享文件竞争）。
+- `checks`/执行协议/`longdev-testcases` 角色接入写租约：改共享库先 acquire、后 release；bug 档案沿用 `docs/bugs/.write.lock`；任务记录单写。
+- 适配“worktree 并行开发”：建议一个状态 owner 串行维护 longdev 状态、其它 worktree 只改代码。
 ## 0.16.0 — 2026-09-26
 
 - 新增测试用例闭环：项目级**共享用例库**（`<项目>/testcases/`）由 `longdev-testcases` 角色按 Plan 设计/补全、把任务引用子集映射 R/V，`longdev-checker` 角色每阶段与收口用 `check_runner.py --cases <子集>` 跑回归落证据；`quality_refs` kind 并入 `bug`。

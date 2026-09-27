@@ -58,6 +58,10 @@ project reference subsets of it rather than copying cases. A task records which
 case ids it uses, and runs them with `--cases <id,id>` (comma-separated). This
 keeps cases reusable and convergent, and keeps harness/plugin development cases
 out of a consuming project's library.
+
+## Write lease (cross-worktree)
+
+- Editing the shared library must hold the `testcases` write lease: `.../skills/longdev/scripts/write_lease.py acquire --project <project> --resource testcases` before writing, and `release --token <token>` after. The lock lives under the Git common dir so worktrees of the same repo serialize instead of silently conflicting. Bug archives already use `docs/bugs/.write.lock`.
 ## Output
 
 Each run lands in a unique directory under `--output`, never overwriting an

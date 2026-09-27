@@ -17,6 +17,7 @@ color: teal
 - 项目级共享库在 `<项目>/testcases/`（`cases.json`、`matrix.json`、`quality_refs.json`，schema 见 `skills/checks/references/catalog-schema.md`）。它是**被开发项目**的内容，所有任务共享并引用子集，不为单个任务复制。
 - 每条 case 的 `quality_refs` 映射它验证的 R/V/bug；`matix` 定义 `smoke/full/failure-probe` 档位。
 - 使用 `py -3.12 -B <插件>/skills/checks/scripts/check_runner.py --catalog-root <项目>/testcases --validate` 校验库；改后必须校验。
+- 写共享库（`testcases/`）前先 `.../skills/longdev/scripts/write_lease.py acquire --project <项目根> --resource testcases` 持租约，写完 `release --token <token>`；租约在 Git common dir，跨 worktree 串行，避免并写冲突。冲突或租约被占时如实报告，不覆盖。
 
 ## 工作顺序
 

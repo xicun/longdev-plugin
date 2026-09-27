@@ -56,5 +56,6 @@ v0.14 增加完整迁移预演：用户说“先预览迁移”“迁移 dry-run
 | `agents/longdev-checker.md` | 验证执行者：每阶段/收口运行子集出证据 |
 | `agents/` | scout、planner、implementer、checker、reviewer、testcases、decider、final-reviewer、product-owner、acceptance |
 | `skills/longdev/scripts/migrate_workspace.py` | 当前工作区迁移、只读探测、冲突/忽略检查与中断恢复 |
+| `skills/longdev/scripts/write_lease.py` | 跨 worktree 写租约：锁在 Git common dir，串行写共享状态不吞冲突 |
 
 验证分为文件结构/一致性检查、场景推演和实际 Claude 执行。前两者不能证明第三者已通过，也不能证明长期质量收益。

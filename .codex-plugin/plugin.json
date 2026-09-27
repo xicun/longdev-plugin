@@ -1,6 +1,6 @@
 {
   "name": "longdev",
-  "version": "0.16.0+codex.20260926224637",
+  "version": "0.17.0+codex.20260927153015",
   "description": "长程开发、产品自主迭代、项目问题追踪与通用回归目录：阶段实施、独立审查、验收、跨会话交接和 checks 回归",
   "author": {
     "name": "zzm.ploretoy"

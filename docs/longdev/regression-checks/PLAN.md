@@ -20,7 +20,7 @@
 | R06 | 接入 plan/stage 模板、执行协议、longdev SKILL（闭环在 Plan 与每阶段/收口） | 模板+协议+SKILL | V06 | 待检查 |
 | R07 | 版本 0.16.0 + CHANGELOG + 两份 plugin.json 同步 | 版本文件 | V07 | 待检查 |
 
-## 验证证据（已实测，待独立 review/最终 gate）
+- 追加（0.17.0）：跨 worktree 写租约 `skills/longdev/scripts/write_lease.py`（锁在 Git common dir，串行写共享状态不吞冲突），已接入 checks/协议/`longdev-testcases` 角色，并含测试 `tests/test_write_lease.py`。## 验证证据（已实测，待独立 review/最终 gate）
 
 - 插件单测 `tests/test_check_runner.py` 5/5（含 `--cases` 子集与未知 id 拒绝），exit 0。
 - 插件共享库独立运行 `.work/checks/plugin-smoke` exit 0；父 `testcases/` 经插件 runner 跑 `full`（`--cases` 或 profile）`harness-full` exit 0，`harness-unit-tests-full` 与 `plugin-regression` 通过。

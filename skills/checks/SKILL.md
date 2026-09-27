@@ -17,6 +17,8 @@ description: 测试用例闭环能力：维护项目级共享测试用例库（c
 - **checker 角色**：执行——每阶段用 `--cases <子集>` 跑任务引用用例、出证据；收口跑全量闭环。
 - **reviewer**：审设计/覆盖（核对 checker 证据），职责独立。
 
+- 写共享库前先持有 `testcases` 写租约（`skills/longdev/scripts/write_lease.py acquire --project <项目根> --resource testcases`），写完 `release`；租约在 Git common dir，跨 worktree 串行不吞冲突。
+
 ## 运行
 
 ```powershell

@@ -80,6 +80,7 @@ review 与 gate 各记录所覆盖 V 集合、产物 manifest、阻塞项与结�
 - `longdev-checker` 角色执行验证：每阶段用 `check_runner.py --catalog-root <项目>/testcases --source-root <项目根> --cases <子集>` 跑回归、出 manifest/指纹证据；整体收口运行任务引用的**全量**闭环。checker 与 reviewer 职责独立（checker 验行为/回归，reviewer 审设计/覆盖）。
 - `exit=0` 只证明该次运行结果，仍需按需求覆盖与语义核对；按 quality_refs 映射：`requirement/acceptance` 对 R/V、`test_case/test_run` 对既有用例、`bug` 对 `docs/bugs/reports.json`。失败重试须有新证据或修复，不无依据重复相同 run。
 - 运行器是通用机制；是否跑、跑哪些子集、证据如何引用，由项目与本任务记录决定，不在协议中为某项目硬编码。
+- 写共享可变状态（库、任务记录、bug 档案等）时遵循“写租约”：库用 `skills/longdev/scripts/write_lease.py acquire --resource testcases`，bug 档案用其自带 `docs/bugs/.write.lock`；同一任务记录单写。租约在 Git common dir，跨 worktree 串行、不吞冲突。
 ## 授权、决策与恢复
 
 宿主提供可调用的异步提问或消息追加工具时，澄清可使用该能力；提问后继续不依赖答案的已授权工作，回复到达后更新同一任务队列。依赖答案的操作保持等待，未回复不视为批准。先核实当前工具与客户端能力，缺少时用普通简短提问，不因规则提及就假定工具存在；SKILL 本身不创建消息队列、界面或后台运行器。
