@@ -32,6 +32,13 @@
 |---|---|---|---|---|---|---|---|
 | 1 | <一行> | R01 / V01 | 无 | 待执行 | stages/1.md | — | 待 gate；成功后以 trailer/SHA 查证 |
 
+## 测试用例闭环
+
+- 项目共享库：`<项目>/testcases/`（schema 见 `skills/checks/references/catalog-schema.md`）；被开发项目内容，所有任务共享并引用子集。
+- 本任务引用 case 子集：`<case id 列表>`（来自共享库，不复制）。
+- 映射：每条引用 case 的 `quality_refs` 指向本任务 R/V / acceptance / bug。
+- `testcases` 角色维护库（Plan 设计/补全用例、bug→case 晋升）；`checker` 每阶段与收口运行子集出证据；`checker` 与 `reviewer` 职责独立。
+- 运行：`py -3.12 -B <插件>/skills/checks/scripts/check_runner.py --catalog-root <项目>/testcases --source-root <项目根> --cases <子集> --output <evidence>`。
 ## 全局决策及变更
 
 - <决定、依据、授权来源、影响阶段/R/V、日期；详细记录路径>

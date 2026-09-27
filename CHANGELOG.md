@@ -1,3 +1,10 @@
+## 0.16.0 — 2026-09-26
+
+- 新增测试用例闭环：项目级**共享用例库**（`<项目>/testcases/`）由 `longdev-testcases` 角色按 Plan 设计/补全、把任务引用子集映射 R/V，`longdev-checker` 角色每阶段与收口用 `check_runner.py --cases <子集>` 跑回归落证据；`quality_refs` kind 并入 `bug`。
+- 新增 `longdev-testcases` 与 `longdev-checker` 两个角色，接入 plan/stage 模板与执行协议；checker 与 reviewer 职责独立（验行为/回归 vs 审设计/覆盖）。
+- bug 修复验证通过且符合客观门槛（可复现、回归价值高、稳定）时，由 testcases 角色把该 bug 晋升为共享库 case，映射其 R/V/bug。
+- runner 支持 `--cases <id,...>` 子集运行；`testcases/` 为被开发项目内容，harness/插件各自留自己的库、不进使用方项目；子模块不引用父仓库。
+- 退役独立 `../test-cases` 仓库，其 runner 迁至本 `checks`、harness 相关 case 迁至父仓库 `testcases/`、插件相关 case 迁至插件 `testcases/`。
 # Changelog
 
 ## 0.15.0 — 2026-09-24

@@ -5,6 +5,7 @@ Claude Code、Codex CLI、dsh 共用的长程开发技能，包含两个执行�
 - **longdev**：按风险和依赖拆分长任务，逐阶段实现、独立审查、主会话 gate、整体检查和验收。
 - **autopilot**：在已确认目标、授权和预算内自主迭代，每轮使用 longdev，由获授权的 acceptance 核对产品验收项。
 - **bug-reports**：记录原始反馈和逐项去向，关联历史问题、调查修复后复发并核对验证/验收依据；可独立用于小修复，也由 longdev/autopilot 在反馈、续接和交付时调用。
+- **checks**：测试用例闭环——项目级共享用例库（`testcases/`）由 `longdev-testcases` 角色按 Plan 构建、`longdev-checker` 角色按任务引用子集跑回归并落证据，映射 R/V/Bug；harness 父仓库驱动自身库。
 
 ## 工作机制
 
@@ -49,7 +50,11 @@ v0.14 增加完整迁移预演：用户说“先预览迁移”“迁移 dry-run
 | `skills/longdev/` | 阶段编排、共享执行协议、计划与阶段模板 |
 | `skills/autopilot/` | 产品循环、宪章问卷、backlog 与迭代模板 |
 | `skills/bug-reports/` | 原始反馈、项目问题档案、复发分析与覆盖/证据检查 CLI |
-| `agents/` | scout、planner、implementer、reviewer、decider、final-reviewer、product-owner、acceptance |
+| `skills/checks/` | 测试用例闭环：共享库 schema、运行器与自身测试 |
+| `testcases/` | 项目级共享测试用例库（cases/matrix/quality_refs） |
+| `agents/longdev-testcases.md` | 测试用例闭环设计者：设计/补全用例、bug→case 晋升、映射 R/V |
+| `agents/longdev-checker.md` | 验证执行者：每阶段/收口运行子集出证据 |
+| `agents/` | scout、planner、implementer、checker、reviewer、testcases、decider、final-reviewer、product-owner、acceptance |
 | `skills/longdev/scripts/migrate_workspace.py` | 当前工作区迁移、只读探测、冲突/忽略检查与中断恢复 |
 
 验证分为文件结构/一致性检查、场景推演和实际 Claude 执行。前两者不能证明第三者已通过，也不能证明长期质量收益。

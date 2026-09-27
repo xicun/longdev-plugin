@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "references": [
+    {"kind": "requirement", "id": "REG-1", "reference": "docs/longdev/regression-checks/PLAN.md#R01"},
+    {"kind": "requirement", "id": "REG-2", "reference": "docs/longdev/regression-checks/PLAN.md#R02"},
+    {"kind": "test_case", "id": "plugin-unittest", "reference": "tests"},
+    {"kind": "test_run", "id": "plugin-unit-run", "reference": "skills/checks/scripts/check_runner.py profiles"}
+  ]
+}

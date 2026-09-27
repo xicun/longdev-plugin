@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "environments": [
+    {"id": "windows-python312", "os": "Windows", "python": "3.12", "status": "verified", "notes": "py launcher under PowerShell"}
+  ],
+  "profiles": {"smoke": ["plugin-unit-tests"], "full": ["plugin-unit-tests-full"], "failure-probe": ["failure-probe-nonzero"]}
+}

@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "cases": [
+    {
+      "id": "plugin-unit-tests",
+      "title": "Longdev plugin unit tests (smoke)",
+      "profile": "smoke",
+      "command": ["py", "-3.12", "-B", "-m", "unittest", "discover", "-s", "tests", "-v"],
+      "cwd": ".",
+      "expected_exit": 0,
+      "source": "longdev-plugin/tests",
+      "quality_refs": ["requirement:REG-1", "test_case:plugin-unittest", "test_run:plugin-unit-run"]
+    },
+    {
+      "id": "plugin-unit-tests-full",
+      "title": "Longdev plugin unit tests (full)",
+      "profile": "full",
+      "command": ["py", "-3.12", "-B", "-m", "unittest", "discover", "-s", "tests", "-v"],
+      "cwd": ".",
+      "expected_exit": 0,
+      "source": "longdev-plugin/tests",
+      "quality_refs": ["requirement:REG-1", "test_case:plugin-unittest", "test_run:plugin-unit-run"]
+    },
+    {
+      "id": "failure-probe-nonzero",
+      "title": "Intentional exit mismatch probe",
+      "profile": "failure-probe",
+      "command": ["py", "-3.12", "-B", "-c", "import sys; print('intentional failure probe'); sys.exit(7)"],
+      "cwd": ".",
+      "expected_exit": 0,
+      "source": "runner failure handling",
+      "quality_refs": ["requirement:REG-2", "test_run:plugin-unit-run"]
+    }
+  ]
+}
