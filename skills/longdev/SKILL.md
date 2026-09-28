@@ -5,6 +5,12 @@ description: 长程开发编排：按风险、依赖和可验证性拆阶段，�
 
 # longdev
 
+## 插件身份与协议路径
+
+- 本 skill 的插件身份由宿主的 marketplace/plugin 清单决定。Codex 原生安装使用 `longdev@zzm-plugins`，技能命名空间通常为 `longdev:longdev`；不要把仓库目录名 `longdev-plugin` 推断成宿主命名空间。
+- 当前文件的规范位置是 `<plugin-root>/skills/longdev/SKILL.md`，共享协议的规范位置是同一目录下的 `references/execution-protocol.md`。读取协议时以**实际加载的本文件所在目录**为基准解析相对链接；不要从 `<plugin-root>/<version>/` 或其它版本目录直接拼接 `references`。
+- 主会话派发角色时优先传递解析后的协议绝对路径；角色说明中的 `skills/longdev/references/...` 仅表示插件根目录相对路径，不能替代主会话提供的绝对路径。
+
 开工读取 `../../.claude-plugin/plugin.json`，报告 `longdev v<version>`。模型默认继承主会话；仅在用户或适用项目约定明确指定时覆盖，不根据猜测的价格或模型等级自动降级。
 
 先读 [执行协议](references/execution-protocol.md)。它统一需求、状态、证据、基线与授权约定；autopilot 及所有 longdev 角色使用同一协议。需要跨客户端或跨会话继续时，再读 [会话运行时适配](references/session-runtime.md)。会话可替换，任务状态不能只存在于对话历史。

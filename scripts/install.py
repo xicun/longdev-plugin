@@ -45,6 +45,11 @@ def install(project, client, source=SOURCE, check=False):
     entries = {}
     for name in SKILLS:
         header = files[f'skills/{name}/SKILL.md'].decode('utf-8').split('---', 2)[1]
+        protocol_hint = (
+            f'共享协议完整路径：`{(bundle / "skills" / "longdev" / "references" / "execution-protocol.md").as_posix()}`。'
+            '读取协议时以已加载 SKILL.md 所在目录为基准，不从版本目录直接拼接 references。\n'
+            if name in ('longdev', 'autopilot') else ''
+        )
         guidance = (
             '可独立处理反馈，无需启动 longdev。项目问题事实源为 docs/bugs/reports.json，'
             'index.json 为可重建索引；原始临时材料放 .work/bugs/。'
@@ -57,7 +62,8 @@ def install(project, client, source=SOURCE, check=False):
         text = ('---' + header + '---\n\n<!-- longdev managed entry -->\n'
                 f'客户端：{client}。先读完整技能：\n\n'
                 f'[{name}]({(bundle / "skills" / name / "SKILL.md").as_posix()})\n\n'
-                f'插件根目录：`{bundle.as_posix()}`。相对引用以完整技能所在目录为准。'
+                f'插件根目录：`{bundle.as_posix()}`。相对引用以完整技能所在目录为准。\n'
+                + protocol_hint
                 + guidance)
         entries[f'{ROOTS[client]}/{name}/SKILL.md'] = text.encode('utf-8')
     targets = {bundle / k: v for k, v in files.items()}

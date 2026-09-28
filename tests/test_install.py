@@ -26,8 +26,13 @@ class InstallTests(unittest.TestCase):
             bundle = Path(result['bundle'])
             bundles.add(bundle)
             for name in installer.SKILLS:
-                self.assertIn(bundle.as_posix(), (self.project / entry / name / 'SKILL.md').read_text('utf-8'))
+                entry_text = (self.project / entry / name / 'SKILL.md').read_text('utf-8')
+                self.assertIn(bundle.as_posix(), entry_text)
                 self.assertTrue((bundle / 'skills' / name / '../../.claude-plugin/plugin.json').resolve().is_file())
+                if name in ('longdev', 'autopilot'):
+                    protocol = (bundle / 'skills' / 'longdev' / 'references' / 'execution-protocol.md').as_posix()
+                    self.assertIn(protocol, entry_text)
+                    self.assertIn('不从版本目录直接拼接 references', entry_text)
             self.assertTrue((bundle / 'agents/longdev-reviewer.md').is_file())
             script = bundle / 'skills/longdev/scripts/migrate_workspace.py'
             self.assertEqual(script.read_bytes(), (ROOT / 'skills/longdev/scripts/migrate_workspace.py').read_bytes())
