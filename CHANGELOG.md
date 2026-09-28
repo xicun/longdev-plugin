@@ -1,3 +1,9 @@
+## 0.18.0 — 2026-09-28
+
+- harness 在实施前按任务形态路由 longdev，局部可逆任务保持普通流程。
+- longdev 主会话承接中途提出的 vibe 变更，使用 `C` 变更队列记录分类、R/V/阶段影响、证据失效和最终去向。
+- Plan/Stage 模板与共享执行协议补充中途变更和单一写入者规则，避免变更遗漏或复用过期验证证据。
+
 ## 0.17.0 — 2026-09-27
 
 - 新增跨 worktree **写租约** `skills/longdev/scripts/write_lease.py`（acquire/release/status）：锁在 Git common dir，同一仓库各 worktree 共享，串行写共享状态、不吞冲突（避免 worktree 并行开发对 `testcases/` 等共享文件竞争）。
