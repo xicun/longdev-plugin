@@ -1,0 +1,44 @@
+{
+  "scope": "protocol rules and installation compatibility only",
+  "runtime_slot_release": "unverified; current host has no explicit close tool",
+  "install": {
+    "command": [
+      "C:\\Users\\<local-user>\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-p",
+      "test_install.py",
+      "-v"
+    ],
+    "cwd": "D:\\Works\\harness\\longdev-plugin",
+    "exit_code": 0,
+    "seconds": 6.83,
+    "files": {
+      "skills/longdev/SKILL.md": "b82baadf158d19a584ba097c569406024f2e1bedca6446f6ea7ab7ec82354f01",
+      "skills/autopilot/SKILL.md": "d9a1f5a7f100aa61f2917d1c86eb4f15bf26e369171a746f3128266b91e66d9a",
+      "skills/longdev/references/execution-protocol.md": "2f661398a1c8b51b624865d90a4a67981a085f56a3d1de948c8bc3749f2846e2",
+      "skills/longdev/references/session-runtime.md": "6dce2f94e55b46d29a2f2c8d8ca0c50b680b9a80404bbcd02b2c351b3e362e41"
+    },
+    "source_unchanged": true
+  },
+  "forward_test": {
+    "path": "evidence/forward-test.md",
+    "sha256": "69eeb9804db7a504187b539d7e0a3ed683f15f478442ea71c94c40aa1f9e56ee",
+    "scenarios": 16,
+    "mode": "independent simulated rule application, not live host execution"
+  },
+  "review": {
+    "path": "reviews/stage-1.md",
+    "sha256": "cf2ebd63038056b6a7904bf69e4a0f0be31356c253a75310bab7310f54b7bf01",
+    "result": "passed"
+  },
+  "original_feedback": "FB-0005",
+  "bug": "BUG-0004",
+  "bug_status": "investigating; real host test pending"
+}

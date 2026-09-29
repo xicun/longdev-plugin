@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "revision": 49,
-  "next_bug": 4,
-  "next_feedback": 4,
+  "revision": 59,
+  "next_bug": 5,
+  "next_feedback": 6,
   "issues": {
     "BUG-0001": {
       "id": "BUG-0001",
@@ -1082,6 +1082,151 @@
       "scope": "skills/longdev/scripts/history_convergence.py resolve_reference/references 与 workspace_common rewrite",
       "next_step": "使用当前源文件指纹重新验证并等待验收",
       "close_condition": "命令保留前缀并正确重写路径，非法路径字符串不抛异常"
+    },
+    "BUG-0004": {
+      "id": "BUG-0004",
+      "status": "investigating",
+      "epoch": 3,
+      "facts": [
+        "当前源协议没有完成后回收、暂留期限与名额释放确认规则",
+        "用户报告DeepSeek槽位不足时关闭六个代理，未取得原始工具轨迹",
+        "BUG首次描述及FB-0004因本轮PowerShell stdin编码变为问号，当前描述已修正，原始反馈以FB-0005为准"
+      ],
+      "hypotheses": [
+        "实际宿主可能存在未调用close或回收缺陷，尚未实测归因"
+      ],
+      "quality_refs": [],
+      "history": [
+        {
+          "at": "2026-09-29T04:15:34.855728+00:00",
+          "epoch": 0,
+          "kind": "create",
+          "data": {
+            "title": "????????????????",
+            "goal": "longdev?????????????????????",
+            "expected": "???????????????????????????????????????",
+            "actual": "?????????????????????????????????????????",
+            "conditions": "longdev??????????????",
+            "scope": "longdev/autopilot??????????????????????????",
+            "facts": [
+              "???????????????????????",
+              "???????interrupt_agent??????????????close??",
+              "????DeepSeek??????????????????????????"
+            ],
+            "hypotheses": [
+              "???????????close??????????????"
+            ],
+            "next_step": "????????????????????????????",
+            "close_condition": "??????????????????????????????????????"
+          }
+        },
+        {
+          "at": "2026-09-29T04:17:30.196500+00:00",
+          "epoch": 1,
+          "kind": "update",
+          "data": {
+            "id": "BUG-0004",
+            "fields": {
+              "title": "子代理完成后的回收与复用协议缺失",
+              "goal": "longdev编排明确管理子代理从派发到回收的职责与证据",
+              "expected": "安全接收成果后回收无需保留的代理；槽位不足有收敛处理；同职责复用且保留独立审查",
+              "actual": "当前协议仅要求并发不足排队，没有完成后关闭与释放确认规则；用户反馈完成代理持续占槽",
+              "conditions": "longdev多阶段、多轮派发与旧代理恢复",
+              "scope": "longdev/autopilot共享生命周期规则及宿主能力适配，不修改宿主调度器",
+              "facts": [
+                "当前源协议没有完成后回收、暂留期限与名额释放确认规则",
+                "用户报告DeepSeek槽位不足时关闭六个代理，未取得原始工具轨迹",
+                "BUG首次描述及FB-0004因本轮PowerShell stdin编码变为问号，当前描述已修正，原始反馈以FB-0005为准"
+              ],
+              "hypotheses": [
+                "实际宿主可能存在未调用close或回收缺陷，尚未实测归因"
+              ],
+              "next_step": "实施规则并独立演练、review；实际宿主效果待实测",
+              "close_condition": "协议修正经独立检查，且明确区分规则演练与真实资源释放；用户验收后关闭"
+            }
+          }
+        },
+        {
+          "at": "2026-09-29T04:17:30.573298+00:00",
+          "epoch": 1,
+          "kind": "feedback",
+          "data": {
+            "feedback": "FB-0005",
+            "item": "1",
+            "route": {
+              "kind": "bug",
+              "target": "BUG-0004",
+              "confidence": "confirmed",
+              "reason": "已确认生命周期协议缺口；宿主实际回收根因仍待实测，不混为已修复"
+            }
+          }
+        },
+        {
+          "at": "2026-09-29T04:17:30.943099+00:00",
+          "epoch": 1,
+          "kind": "feedback",
+          "data": {
+            "feedback": "FB-0005",
+            "item": "2",
+            "route": {
+              "kind": "bug",
+              "target": "BUG-0004",
+              "confidence": "confirmed",
+              "reason": "已确认生命周期协议缺口；宿主实际回收根因仍待实测，不混为已修复"
+            }
+          }
+        },
+        {
+          "at": "2026-09-29T04:24:52.851250+00:00",
+          "epoch": 2,
+          "kind": "repair",
+          "data": {
+            "id": "BUG-0004",
+            "version": "subagent-lifecycle working tree based on d49d071",
+            "summary": "补齐子代理生命周期共享协议及longdev/autopilot入口与宿主适配，待独立演练及用户环境验证",
+            "cause": "已确认协议没有接收成果后回收、暂留复核及释放确认规则；用户宿主实际占槽根因仍未确定",
+            "coverage": "仅协议实现与安装兼容；独立场景演练进行中，未调用真实close工具或验证实际释放"
+          }
+        },
+        {
+          "at": "2026-09-29T04:28:23.114578+00:00",
+          "epoch": 3,
+          "kind": "update",
+          "data": {
+            "id": "BUG-0004",
+            "fields": {
+              "next_step": "协议已实现，16项隔离规则演练与9项安装回归通过；在用户实际宿主验证完成代理关闭和槽位回收，保存close/状态原始回执；未经实测不verify/accept原始占槽问题。"
+            }
+          }
+        }
+      ],
+      "repairs": [
+        {
+          "id": "FIX-0001",
+          "at": "2026-09-29T04:24:52.850250+00:00",
+          "epoch": 2,
+          "revision": 58,
+          "recurrence": 0,
+          "version": "subagent-lifecycle working tree based on d49d071",
+          "summary": "补齐子代理生命周期共享协议及longdev/autopilot入口与宿主适配，待独立演练及用户环境验证",
+          "cause": "已确认协议没有接收成果后回收、暂留复核及释放确认规则；用户宿主实际占槽根因仍未确定",
+          "coverage": "仅协议实现与安装兼容；独立场景演练进行中，未调用真实close工具或验证实际释放"
+        }
+      ],
+      "recurrences": [],
+      "relations": [],
+      "verification": null,
+      "acceptance": null,
+      "investigation": null,
+      "investigations": {},
+      "title": "子代理完成后的回收与复用协议缺失",
+      "goal": "longdev编排明确管理子代理从派发到回收的职责与证据",
+      "expected": "安全接收成果后回收无需保留的代理；槽位不足有收敛处理；同职责复用且保留独立审查",
+      "actual": "当前协议仅要求并发不足排队，没有完成后关闭与释放确认规则；用户反馈完成代理持续占槽",
+      "conditions": "longdev多阶段、多轮派发与旧代理恢复",
+      "scope": "longdev/autopilot共享生命周期规则及宿主能力适配，不修改宿主调度器",
+      "next_step": "协议已实现，16项隔离规则演练与9项安装回归通过；在用户实际宿主验证完成代理关闭和槽位回收，保存close/状态原始回执；未经实测不verify/accept原始占槽问题。",
+      "close_condition": "协议修正经独立检查，且明确区分规则演练与真实资源释放；用户验收后关闭"
     }
   },
   "feedback": {
@@ -1378,6 +1523,108 @@
                 "kind": "requirement",
                 "destination": "docs/longdev/requirements-design-compatibility/PLAN.md#R10",
                 "reason": "已纳入本轮流程护栏；不把规则变更视为GLM运行时故障已修复"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "FB-0004": {
+      "id": "FB-0004",
+      "raw": "longdev ???????????? subagent ?????????????????????????????????????????????????\n\ndeepseek ? longdev ?????????? close ?6???????????????resume session??????????",
+      "source": "??2026-09-29????????????????????",
+      "at": "2026-09-29T04:15:34.640330+00:00",
+      "created_revision": 50,
+      "items": [
+        {
+          "id": "1",
+          "text": "longdev ???????????? subagent ?????????????????????????????????????????????????",
+          "route": {
+            "kind": "clarify",
+            "destination": "FB-0005；本批次由本轮PowerShell stdin错误造成原话损坏，已另存准确原文，无需用户重复提供",
+            "reason": "保留录入事故历史，实际调查按正确原始反馈执行，不将损坏内容作为用户原话"
+          },
+          "history": [
+            {
+              "at": "2026-09-29T04:17:30.378758+00:00",
+              "previous": null,
+              "route": {
+                "kind": "clarify",
+                "destination": "FB-0005；本批次由本轮PowerShell stdin错误造成原话损坏，已另存准确原文，无需用户重复提供",
+                "reason": "保留录入事故历史，实际调查按正确原始反馈执行，不将损坏内容作为用户原话"
+              }
+            }
+          ]
+        },
+        {
+          "id": "2",
+          "text": "deepseek ? longdev ?????????? close ?6???????????????resume session??????????",
+          "route": {
+            "kind": "clarify",
+            "destination": "FB-0005；本批次由本轮PowerShell stdin错误造成原话损坏，已另存准确原文，无需用户重复提供",
+            "reason": "保留录入事故历史，实际调查按正确原始反馈执行，不将损坏内容作为用户原话"
+          },
+          "history": [
+            {
+              "at": "2026-09-29T04:17:30.756869+00:00",
+              "previous": null,
+              "route": {
+                "kind": "clarify",
+                "destination": "FB-0005；本批次由本轮PowerShell stdin错误造成原话损坏，已另存准确原文，无需用户重复提供",
+                "reason": "保留录入事故历史，实际调查按正确原始反馈执行，不将损坏内容作为用户原话"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "FB-0005": {
+      "id": "FB-0005",
+      "raw": "longdev 技能里有一个小问题，就是 subagent 做完事情后，不会自动关闭，一直占用着资源，导致后面再派活的时候会出现并发不够的现象，这个你了解么？\n\ndeepseek 在 longdev 时发现槽位不足，然后 close 了6个。我理解，如果是同一个任务，resume session是好的，不然要小心？",
+      "source": "用户2026-09-29原始反馈；补全FB-0004录入时PowerShell stdin编码损坏，原话以本批次为准",
+      "at": "2026-09-29T04:17:30.007534+00:00",
+      "created_revision": 52,
+      "items": [
+        {
+          "id": "1",
+          "text": "longdev 技能里有一个小问题，就是 subagent 做完事情后，不会自动关闭，一直占用着资源，导致后面再派活的时候会出现并发不够的现象，这个你了解么？",
+          "route": {
+            "kind": "bug",
+            "target": "BUG-0004",
+            "confidence": "confirmed",
+            "reason": "已确认生命周期协议缺口；宿主实际回收根因仍待实测，不混为已修复"
+          },
+          "history": [
+            {
+              "at": "2026-09-29T04:17:30.573826+00:00",
+              "previous": null,
+              "route": {
+                "kind": "bug",
+                "target": "BUG-0004",
+                "confidence": "confirmed",
+                "reason": "已确认生命周期协议缺口；宿主实际回收根因仍待实测，不混为已修复"
+              }
+            }
+          ]
+        },
+        {
+          "id": "2",
+          "text": "deepseek 在 longdev 时发现槽位不足，然后 close 了6个。我理解，如果是同一个任务，resume session是好的，不然要小心？",
+          "route": {
+            "kind": "bug",
+            "target": "BUG-0004",
+            "confidence": "confirmed",
+            "reason": "已确认生命周期协议缺口；宿主实际回收根因仍待实测，不混为已修复"
+          },
+          "history": [
+            {
+              "at": "2026-09-29T04:17:30.943099+00:00",
+              "previous": null,
+              "route": {
+                "kind": "bug",
+                "target": "BUG-0004",
+                "confidence": "confirmed",
+                "reason": "已确认生命周期协议缺口；宿主实际回收根因仍待实测，不混为已修复"
               }
             }
           ]

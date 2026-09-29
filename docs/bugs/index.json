@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "revision": 40,
+  "revision": 59,
   "issues": [
     {
       "id": "BUG-0001",
@@ -34,12 +34,43 @@
       "next_step": "使用当前源文件指纹重新验证并等待验收",
       "recurrence_count": 0,
       "alias_of": null
+    },
+    {
+      "id": "BUG-0004",
+      "title": "子代理完成后的回收与复用协议缺失",
+      "status": "investigating",
+      "goal": "longdev编排明确管理子代理从派发到回收的职责与证据",
+      "conditions": "longdev多阶段、多轮派发与旧代理恢复",
+      "actual": "当前协议仅要求并发不足排队，没有完成后关闭与释放确认规则；用户反馈完成代理持续占槽",
+      "next_step": "协议已实现，16项隔离规则演练与9项安装回归通过；在用户实际宿主验证完成代理关闭和槽位回收，保存close/状态原始回执；未经实测不verify/accept原始占槽问题。",
+      "recurrence_count": 0,
+      "alias_of": null
     }
   ],
   "feedback": [
     {
       "id": "FB-0001",
       "source": "Windows Python 3.12 全量迁移回归 2026-09-24",
+      "unrouted": []
+    },
+    {
+      "id": "FB-0002",
+      "source": "用户 2026-09-29 longdev 兼容与运行时反馈",
+      "unrouted": []
+    },
+    {
+      "id": "FB-0003",
+      "source": "用户 2026-09-29 原始运行时反馈及ABCABC补充；FB-0002先前仅摘要，原话以本批次补全",
+      "unrouted": []
+    },
+    {
+      "id": "FB-0004",
+      "source": "??2026-09-29????????????????????",
+      "unrouted": []
+    },
+    {
+      "id": "FB-0005",
+      "source": "用户2026-09-29原始反馈；补全FB-0004录入时PowerShell stdin编码损坏，原话以本批次为准",
       "unrouted": []
     }
   ]
