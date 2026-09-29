@@ -33,6 +33,10 @@ v0.14 增加完整迁移预演：用户说“先预览迁移”“迁移 dry-run
 
 ## 多客户端安装边界
 
+需求讨论和方案设计可独立使用 [requirements-design](skills/requirements-design/SKILL.md)；进入 longdev 后由设计角色提供已有事实源或分析设计索引，主会话执行设计 gate，planner 消费结论建立阶段。旧任务保留原记录/编号，按需自动创建兼容旁车，不批量重写历史。
+
+调查护栏按“待判定事项→实际结论/有效证据→下一动作”推进，覆盖成功动作重复及 ABCABC 无进展周期；正常空输出、异步 pending 与工具响应丢失分别处理。这是流程约定，不是客户端强制监控器，也不代表已修复特定模型的运行时故障。
+
 共享底层是 `skills/` 下的标准 skill；不同客户端只提供安装入口和运行时适配。当前目录同时提供 `.claude-plugin/` 和 `.codex-plugin/` 清单，dsh 通过 `adapters/dsh/` 同步共享 skill。
 
 - **Codex CLI**：使用 `.codex-plugin/plugin.json` 加载 `skills/`。Codex 插件安装后仍需核对 `agents/`、hooks、MCP 和权限能力；本插件的核心流程只依赖 skill、项目文件和普通工具，因此不要求 Claude 专属 agent 才能运行。
@@ -48,6 +52,7 @@ v0.14 增加完整迁移预演：用户说“先预览迁移”“迁移 dry-run
 | 路径 | 用途 |
 |---|---|
 | `skills/longdev/` | 阶段编排、共享执行协议、计划与阶段模板 |
+| `skills/requirements-design/` | 独立需求讨论、行为边界、方案及可行性设计 |
 | `skills/autopilot/` | 产品循环、宪章问卷、backlog 与迭代模板 |
 | `skills/bug-reports/` | 原始反馈、项目问题档案、复发分析与覆盖/证据检查 CLI |
 | `skills/checks/` | 测试用例闭环：共享库 schema、运行器与自身测试 |
@@ -56,6 +61,7 @@ v0.14 增加完整迁移预演：用户说“先预览迁移”“迁移 dry-run
 | `agents/longdev-checker.md` | 验证执行者：每阶段/收口运行子集出证据 |
 | `agents/` | scout、planner、implementer、checker、reviewer、testcases、decider、final-reviewer、product-owner、acceptance |
 | `skills/longdev/scripts/migrate_workspace.py` | 当前工作区迁移、只读探测、冲突/忽略检查与中断恢复 |
+| `skills/longdev/scripts/compatibility_upgrade.py` | 选中任务的不可变兼容旁车；不改旧任务内容和授权 |
 | `skills/longdev/scripts/write_lease.py` | 跨 worktree 写租约：锁在 Git common dir，串行写共享状态不吞冲突 |
 
 验证分为文件结构/一致性检查、场景推演和实际 Claude 执行。前两者不能证明第三者已通过，也不能证明长期质量收益。

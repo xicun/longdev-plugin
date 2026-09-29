@@ -12,7 +12,7 @@ LEGACY_MARKER = 'docs/longdev/.migration-v013.json'
 JOURNAL = '.work/longdev-migration/convergence-journal.json'
 KINDS = ('longdev', 'autopilot')
 MAIN = ('PLAN.md', 'PLAN.draft.md', 'CHARTER.md')
-TOP = {*MAIN, 'BACKLOG.md', 'README.md', 'notes.md', 'context.md', 'scout-repo.md'}
+TOP = {*MAIN, 'COMPATIBILITY.json', 'BACKLOG.md', 'README.md', 'notes.md', 'context.md', 'scout-repo.md'}
 TREES = {'stages', 'reviews', 'gates', 'evidence', 'context', 'notes', 'decisions', 'scout',
          'iterations', 'acceptance', 'design', 'baselines'}
 TEXT = {'.md', '.txt', '.json', '.yaml', '.yml', '.toml', '.csv'}

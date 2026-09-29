@@ -7,11 +7,14 @@ from pathlib import Path
 
 SOURCE = Path(__file__).resolve().parents[1]
 ROOTS = {'codex': '.agents/skills', 'dsh': '.dsh/skills', 'claude': '.claude/skills'}
-SKILLS = ('longdev', 'autopilot', 'bug-reports')
+SKILLS = ('longdev', 'autopilot', 'bug-reports', 'requirements-design')
 REQUIRED = tuple(f'skills/{name}/SKILL.md' for name in SKILLS) + (
     'agents/longdev-reviewer.md', '.claude-plugin/plugin.json', '.codex-plugin/plugin.json',
     'skills/bug-reports/scripts/bug_reports.py',
     'skills/bug-reports/references/cli.md',
+    'agents/longdev-requirements-designer.md',
+    'skills/longdev/references/analysis-design-template.md',
+    'skills/longdev/references/execution-protocol.md',
 )
 
 
@@ -51,6 +54,10 @@ def install(project, client, source=SOURCE, check=False):
             if name in ('longdev', 'autopilot') else ''
         )
         guidance = (
+            '可由主会话独立完成需求讨论与方案设计，按需委派 requirements-designer。'
+            '纯讨论不要求建立 PLAN、任务目录或运行迁移；只有持久设计授权才写文档。'
+            '复用既有稳定需求编号与事实源；讨论目标达到即结束，已有实施授权且无关键缺口时继续 planner。\n'
+            if name == 'requirements-design' else
             '可独立处理反馈，无需启动 longdev。项目问题事实源为 docs/bugs/reports.json，'
             'index.json 为可重建索引；原始临时材料放 .work/bugs/。'
             '先读取相关历史并逐项登记去向，复发时复查旧修复和验证缺口；交付前运行完整技能的检查命令。\n'

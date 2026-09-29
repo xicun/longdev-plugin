@@ -8,10 +8,18 @@ import sys
 # 同一完整 skill bundle 内的模块，既可从 CLI 也可从隔离测试导入。
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from history_convergence import converge, MARKER, LEGACY_MARKER, JOURNAL
+from compatibility_upgrade import upgrade
 
 
-def migrate(project, check=False, dry_run=False):
-    return converge(project, check=check, dry_run=dry_run)
+def migrate(project, check=False, dry_run=False, task=None):
+    report = converge(project, check=check, dry_run=dry_run)
+    compatibility = upgrade(project, check=check, dry_run=dry_run, task=task)
+    report['compatibility'] = compatibility
+    if compatibility['status'] == 'needs_review':
+        report['status'] = 'needs_review'
+    elif task and compatibility['status'] in {'pending', 'upgraded'} and report['status'] == 'current':
+        report['status'] = compatibility['status']
+    return report
 
 
 def main():
@@ -20,15 +28,19 @@ def main():
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument('--check', action='store_true', help='Read-only compact status')
     mode.add_argument('--dry-run', action='store_true', help='Read-only complete task/file action preview')
+    parser.add_argument('--task', help='Explicit task to receive a compatibility sidecar')
     args = parser.parse_args()
     try:
-        report = migrate(args.project, args.check, args.dry_run)
-        result = report if not args.check else {key: report[key] for key in ('status', 'summary', 'tracking_pending')}
+        report = migrate(args.project, args.check, args.dry_run, args.task)
+        result = report if not args.check else {
+            key: report[key] for key in ('status', 'summary', 'tracking_pending', 'compatibility')
+        }
         print(json.dumps(result, ensure_ascii=False, indent=2))
         if report['status'] == 'needs_review':
             return 2
         if args.check or args.dry_run:
-            return 1 if report['actions'] else 0
+            pending = bool(report['actions']) or report.get('compatibility', {}).get('summary', {}).get('pending', 0)
+            return 1 if pending else 0
         return 0
     except (OSError, ValueError, KeyError, subprocess.SubprocessError) as error:
         print(json.dumps({'status': 'blocked', 'error': str(error)}, ensure_ascii=False))

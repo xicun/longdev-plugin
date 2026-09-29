@@ -34,6 +34,7 @@ class InstallTests(unittest.TestCase):
                     self.assertIn(protocol, entry_text)
                     self.assertIn('不从版本目录直接拼接 references', entry_text)
             self.assertTrue((bundle / 'agents/longdev-reviewer.md').is_file())
+            self.assertTrue((bundle / 'agents/longdev-requirements-designer.md').is_file())
             script = bundle / 'skills/longdev/scripts/migrate_workspace.py'
             self.assertEqual(script.read_bytes(), (ROOT / 'skills/longdev/scripts/migrate_workspace.py').read_bytes())
             for helper in ('history_convergence.py', 'workspace_common.py', 'task_path.py'):
@@ -45,6 +46,11 @@ class InstallTests(unittest.TestCase):
             self.assertNotIn('启动/续接先按完整技能调用包内迁移脚本', bug_entry)
             self.assertEqual((bundle / 'skills/bug-reports/scripts/bug_reports.py').read_bytes(),
                              (ROOT / 'skills/bug-reports/scripts/bug_reports.py').read_bytes())
+            design_entry = (self.project / entry / 'requirements-design/SKILL.md').read_text('utf-8')
+            self.assertIn('只有持久设计授权才写文档', design_entry)
+            self.assertNotIn('启动/续接先按完整技能调用包内迁移脚本', design_entry)
+            self.assertEqual((bundle / 'skills/requirements-design/SKILL.md').read_bytes(),
+                             (ROOT / 'skills/requirements-design/SKILL.md').read_bytes())
             installer.install(self.project, client)
             installer.install(self.project, client, check=True)
         self.assertEqual(len(bundles), 1)
@@ -156,9 +162,73 @@ class InstallTests(unittest.TestCase):
         (source / relative).unlink()
         before = self.snapshot()
         for check in (False, True):
-            with self.assertRaisesRegex(ValueError, 'Missing dependency'):
-                installer.install(self.project, 'codex', source=source, check=check)
-            self.assertEqual(before, self.snapshot())
+                with self.assertRaisesRegex(ValueError, 'Missing dependency'):
+                    installer.install(self.project, 'codex', source=source, check=check)
+                self.assertEqual(before, self.snapshot())
+
+    def test_upgrade_adds_design_entry_preserves_old_bundle_and_task_records(self):
+        result = installer.install(self.project, 'codex')
+        bundle = Path(result['bundle'])
+        entry = self.project / '.agents/skills/requirements-design/SKILL.md'
+        entry.unlink()
+        receipt = self.project / '.longdev-runtime/codex.json'
+        old = json.loads(receipt.read_bytes())
+        old['entries'].pop('.agents/skills/requirements-design/SKILL.md')
+        old['files'] = {k: v for k, v in old['files'].items()
+                        if not k.startswith('skills/requirements-design/')}
+        old['bundle'] = 'legacy-three-skills'
+        receipt.write_text(json.dumps(old), encoding='utf-8')
+        plan = self.project / 'docs/longdev/existing/PLAN.md'
+        plan.parent.mkdir(parents=True)
+        plan.write_text('R07: existing requirement; accepted; custom content', encoding='utf-8')
+        before = self.snapshot()
+        with self.assertRaises(ValueError):
+            installer.install(self.project, 'codex', check=True)
+        self.assertEqual(before, self.snapshot())
+        entry.write_bytes(b'user design skill')
+        before = self.snapshot()
+        with self.assertRaises(ValueError):
+            installer.install(self.project, 'codex')
+        self.assertEqual(before, self.snapshot())
+        entry.unlink()
+        previous_plan = (plan.stat().st_mtime_ns, plan.read_bytes())
+        installer.install(self.project, 'codex')
+        self.assertTrue(entry.is_file())
+        self.assertTrue(bundle.is_dir())
+        self.assertEqual(previous_plan, (plan.stat().st_mtime_ns, plan.read_bytes()))
+        before = self.snapshot()
+        installer.install(self.project, 'codex', check=True)
+        self.assertEqual(before, self.snapshot())
+        entry.write_bytes(b'user edited design skill')
+        before = self.snapshot()
+        with self.assertRaises(ValueError):
+            installer.install(self.project, 'codex')
+        self.assertEqual(before, self.snapshot())
+
+    def test_design_dependency_missing_source_or_cache_fails_without_mutation(self):
+        dependencies = (
+            'skills/requirements-design/SKILL.md',
+            'agents/longdev-requirements-designer.md',
+            'skills/longdev/references/analysis-design-template.md',
+        )
+        for number, relative in enumerate(dependencies):
+            with self.subTest(relative=relative):
+                source = self.project / f'source-{number}'
+                target = self.project / f'project-{number}'
+                for name in ('skills', 'agents', '.claude-plugin', '.codex-plugin'):
+                    shutil.copytree(ROOT / name, source / name)
+                result = installer.install(target, 'codex', source=source)
+                (Path(result['bundle']) / relative).unlink()
+                before = self.snapshot()
+                with self.assertRaisesRegex(ValueError, 'Installation mismatch'):
+                    installer.install(target, 'codex', source=source, check=True)
+                self.assertEqual(before, self.snapshot())
+                (source / relative).unlink()
+                before = self.snapshot()
+                for check in (False, True):
+                    with self.assertRaisesRegex(ValueError, 'Missing dependency'):
+                        installer.install(target, 'codex', source=source, check=check)
+                    self.assertEqual(before, self.snapshot())
 
 
 if __name__ == '__main__':

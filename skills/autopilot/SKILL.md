@@ -13,6 +13,8 @@ description: 产品级自主研发编排：在已确认目标、授权和预算�
 
 主会话用 `../longdev/scripts/task_path.py resolve --project "<项目绝对根>" --kind autopilot --name "<产品名>"` 解析唯一绝对 `TASK_DIR`，连同 guard 绝对路径交给 PO/acceptance。每轮 longdev 任务独立 resolve 后传给对应角色。所有记录写入前执行相同脚本的 `check --project ... --task "<TASK_DIR>" --target "<实际目标绝对路径>"`，不得自行用 cwd/旧根拼目录。
 
+明确当前产品及启动/续接授权、完成 resolve 且旧写入者已停止后，自动调用 `python3 -B "<本 SKILL 所在目录>/../longdev/scripts/compatibility_upgrade.py" --project "<项目绝对根>" --task "docs/autopilot/<产品名>"`。`--task` 使用 TASK_DIR 相对项目根的规范目录，不传绝对路径；每轮选定的 longdev 任务在其安全交接点按 longdev 入口独立处理 `docs/longdev/<任务名>`，不批量扫描/升级其他任务。该独立脚本不执行工作区旧根收敛；`migrate_workspace.py --task` 仍会盘点工作区，不用于替代此单任务入口。纯问答/status 只加 `--check`，预览加 `--dry-run`；无 CHARTER 的新产品先建立已授权记录，不造占位文件。终态不重开，旁车不改历史目标、编号、授权、状态或有效证据，也不自动采用新流程；冲突/未知保留现场并仅报告受影响范围。
+
 **宪章记录用户意图与授权，不能替代或限制用户后续明确指示。** 在已有授权内自主推进；关键目标、范围或授权缺失时才澄清。建议、默认值和用户沉默均不是授权。
 
 ## 落盘与职责

@@ -21,7 +21,7 @@ color: teal
 
 ## 工作顺序
 
-1. 读任务 `PLAN.md` 的 R/V 清单、阶段与目标；读项目 `testcases/` 现有用例与 quality_refs。
+1. 读任务 `PLAN.md` 的 R/V 清单、阶段与目标，以及主会话指定的已稳定需求/设计来源（可为旧任务既有文件）。设计方法接口见 `skills/requirements-design/SKILL.md`；仅消费既有稳定 R/V 和可观察行为，不重建需求事实源。再读项目 `testcases/` 现有用例与 quality_refs。
 2. **Plan 阶段（构建闭环）**：为待开发对象设计/补全用例，使每个关键 R/V 都有可验证的 case；把新增/选中用例写入共享库。在任务 PLAN 记录本任务**引用**的 case ID 子集（用 `--cases` 子集跑），映射 R/V；不重复造已有的等价用例。
 3. 维护 quality_refs：每条 case 明确 `<kind>:<id>` 指向本任务 R/V、相关 acceptance、测试用例/运行或 bug。
 4. **bug→case 晋升**：当 bug-reports 反馈修复经 `verify` 验证通过后，若该问题符合客观门槛（可复现、回归价值高、稳定不 flaky），把该 bug 及其覆盖加入共享库成为 case，映射到其 R/V/bug，并更新质量映射；不合格则保留在问题档案，不强行入库。
@@ -31,4 +31,5 @@ color: teal
 ## 边界
 
 - 你不实现业务代码；实现与验证分别由 implementer 与 checker 负责。你维护“用例从哪来、验证什么”。
+- 行为设计和对应 R/V 稳定后才建立其用例；planner 可并行精化无关阶段，但不得猜未决行为来固定测试期望。设计变更由主会话登记影响，更新受影响 case/quality_refs 并使旧证据按影响失效，不修改需求含义或验收标准以凑绿。
 - 不把 harness/插件自身开发用例塞进使用方项目库；每个项目库是该项目内容。库校验失败或映射缺口须如实报告，不降低标准。

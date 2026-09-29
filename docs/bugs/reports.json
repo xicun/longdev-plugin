@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "revision": 40,
+  "revision": 49,
   "next_bug": 4,
-  "next_feedback": 2,
+  "next_feedback": 4,
   "issues": {
     "BUG-0001": {
       "id": "BUG-0001",
@@ -1220,6 +1220,164 @@
                 "target": "BUG-0003",
                 "confidence": "confirmed",
                 "reason": "JSON 命令字符串被作为文件路径探测导致 WinError 123"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "FB-0002": {
+      "id": "FB-0002",
+      "raw": "agent 在低 context 时反复确认仓库结构、查看状态和创建设计/最小实现，手动 compact 后恢复；context 充足时调用 cat 等工具返回 no output 或 no tool，agent 继续死循环，打断后恢复；开发时软链 agents.md 指向 global-instructions.md，更新开发规则会影响其他智能体使用。",
+      "source": "用户 2026-09-29 longdev 兼容与运行时反馈",
+      "at": "2026-09-29T02:10:38.398757+00:00",
+      "created_revision": 41,
+      "items": [
+        {
+          "id": "1",
+          "text": "agent 在低 context 时反复确认仓库结构、查看状态和创建设计/最小实现，手动 compact 后恢复",
+          "route": {
+            "kind": "requirement",
+            "destination": "docs/longdev/requirements-design-compatibility/PLAN.md#R06",
+            "reason": "已纳入本轮流程护栏；不把规则变更视为GLM运行时故障已修复"
+          },
+          "history": [
+            {
+              "at": "2026-09-29T03:09:50.653340+00:00",
+              "previous": null,
+              "route": {
+                "kind": "requirement",
+                "destination": "docs/longdev/requirements-design-compatibility/PLAN.md#R06",
+                "reason": "已纳入本轮流程护栏；不把规则变更视为GLM运行时故障已修复"
+              }
+            }
+          ]
+        },
+        {
+          "id": "2",
+          "text": "context 充足时调用 cat 等工具返回 no output 或 no tool，agent 继续死循环，打断后恢复",
+          "route": {
+            "kind": "requirement",
+            "destination": "docs/longdev/requirements-design-compatibility/PLAN.md#R08",
+            "reason": "已纳入本轮流程护栏；不把规则变更视为GLM运行时故障已修复"
+          },
+          "history": [
+            {
+              "at": "2026-09-29T03:09:51.046294+00:00",
+              "previous": null,
+              "route": {
+                "kind": "requirement",
+                "destination": "docs/longdev/requirements-design-compatibility/PLAN.md#R08",
+                "reason": "已纳入本轮流程护栏；不把规则变更视为GLM运行时故障已修复"
+              }
+            }
+          ]
+        },
+        {
+          "id": "3",
+          "text": "开发时软链 agents.md 指向 global-instructions.md，更新开发规则会影响其他智能体使用",
+          "route": {
+            "kind": "requirement",
+            "destination": "docs/longdev/requirements-design-compatibility/PLAN.md#R07",
+            "reason": "已纳入本轮流程护栏；不把规则变更视为GLM运行时故障已修复"
+          },
+          "history": [
+            {
+              "at": "2026-09-29T03:09:51.431830+00:00",
+              "previous": null,
+              "route": {
+                "kind": "requirement",
+                "destination": "docs/longdev/requirements-design-compatibility/PLAN.md#R07",
+                "reason": "已纳入本轮流程护栏；不把规则变更视为GLM运行时故障已修复"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "FB-0003": {
+      "id": "FB-0003",
+      "raw": "两个支线：\n现在遇到一个比较大的问题，在 codex + glm5.3 flash + longdev 0.18.1 的组合下，plan出一个大迭代，待设计和实现，然后智能体就开始：\n1、确认仓库结构和现有模块边界，然后开始创建P5设计与最小实现；\n2、看一下当前仓库状态，然后一次性把P设计和最小实现落地；\n3、直接把P5设计和最小实现落下来，先看仓库结构；\n4、回到1，或者看子模块的状态、看抽象和复用，拿不到有效信息，又回到1\n\n这就崩溃了，一直死循环，这是 codex 和 glm 配合不了的坑么？还是 GLM 的调度能力就是很蠢？！因为 deepseek v4 flash 和 gpt astra 都没有这个问题。这种情况容易发生在 context 剩余比较低的时候（比如15%）？那GLM为啥不会触发 compact 呢？刚才我手动compact 之后说继续，它就恢复了，那这就是问题的可能根因。\n\n另外：当前是利用软链把 agents.md 指向 global-instructions.md，但我们在开发时，会更新这个，这就会影响别的智能体使用，这有没有什么更好的方式？或者隔离开发和发布、或者复制部署？\n\n刚才发现GLM的另一现象，就是context 非常充足，90%left，但是调用工具比如 cat 啥的 codex 会返回 no output，或者 no tool 啥的，于是它又开始死循环，必须打断后再继续，才能回到正常轨道上。\n\n刚才GLM陷入了， ABCABC 这样的死循环，单次任务都OK，但给自己设计了一个互相嵌套的死循环，看有没有剩余工作 -> 核对具体情况 -> 看已有代码覆盖 -> 准备补齐实现 -> 看有没有剩余工作。。。。。。\n\nGLM刚才又出现一个死循环，它自己的解释是：在同一轮里没有建立\"完成清单+有效证据\"的收敛点，工具返回成功后又被我当成本轮还没完成，于是重复执行同一个只读/验证动作。真正缺的是每次工具调用前写明\"预期新信息\"，拿到结论后马上物化。\n\n你觉得它说得有道理吗？",
+      "source": "用户 2026-09-29 原始运行时反馈及ABCABC补充；FB-0002先前仅摘要，原话以本批次补全",
+      "at": "2026-09-29T03:09:26.508008+00:00",
+      "created_revision": 42,
+      "items": [
+        {
+          "id": "1",
+          "text": "两个支线：\n现在遇到一个比较大的问题，在 codex + glm5.3 flash + longdev 0.18.1 的组合下，plan出一个大迭代，待设计和实现，然后智能体就开始：\n1、确认仓库结构和现有模块边界，然后开始创建P5设计与最小实现；\n2、看一下当前仓库状态，然后一次性把P设计和最小实现落地；\n3、直接把P5设计和最小实现落下来，先看仓库结构；\n4、回到1，或者看子模块的状态、看抽象和复用，拿不到有效信息，又回到1\n\n这就崩溃了，一直死循环，这是 codex 和 glm 配合不了的坑么？还是 GLM 的调度能力就是很蠢？！因为 deepseek v4 flash 和 gpt astra 都没有这个问题。这种情况容易发生在 context 剩余比较低的时候（比如15%）？那GLM为啥不会触发 compact 呢？刚才我手动compact 之后说继续，它就恢复了，那这就是问题的可能根因。\n\n另外：当前是利用软链把 agents.md 指向 global-instructions.md，但我们在开发时，会更新这个，这就会影响别的智能体使用，这有没有什么更好的方式？或者隔离开发和发布、或者复制部署？",
+          "route": {
+            "kind": "requirement",
+            "destination": "docs/longdev/requirements-design-compatibility/PLAN.md#R06",
+            "reason": "关联R06无进展与R07软链隔离；仅本轮护栏/部署改造，实际GLM根因及真实运行效果未验证"
+          },
+          "history": [
+            {
+              "at": "2026-09-29T03:09:52.003787+00:00",
+              "previous": null,
+              "route": {
+                "kind": "requirement",
+                "destination": "docs/longdev/requirements-design-compatibility/PLAN.md#R06",
+                "reason": "关联R06无进展与R07软链隔离；仅本轮护栏/部署改造，实际GLM根因及真实运行效果未验证"
+              }
+            }
+          ]
+        },
+        {
+          "id": "2",
+          "text": "刚才发现GLM的另一现象，就是context 非常充足，90%left，但是调用工具比如 cat 啥的 codex 会返回 no output，或者 no tool 啥的，于是它又开始死循环，必须打断后再继续，才能回到正常轨道上。",
+          "route": {
+            "kind": "requirement",
+            "destination": "docs/longdev/requirements-design-compatibility/PLAN.md#R08",
+            "reason": "已纳入本轮流程护栏；不把规则变更视为GLM运行时故障已修复"
+          },
+          "history": [
+            {
+              "at": "2026-09-29T03:09:52.388661+00:00",
+              "previous": null,
+              "route": {
+                "kind": "requirement",
+                "destination": "docs/longdev/requirements-design-compatibility/PLAN.md#R08",
+                "reason": "已纳入本轮流程护栏；不把规则变更视为GLM运行时故障已修复"
+              }
+            }
+          ]
+        },
+        {
+          "id": "3",
+          "text": "刚才GLM陷入了， ABCABC 这样的死循环，单次任务都OK，但给自己设计了一个互相嵌套的死循环，看有没有剩余工作 -> 核对具体情况 -> 看已有代码覆盖 -> 准备补齐实现 -> 看有没有剩余工作。。。。。。",
+          "route": {
+            "kind": "requirement",
+            "destination": "docs/longdev/requirements-design-compatibility/PLAN.md#R10",
+            "reason": "已纳入本轮流程护栏；不把规则变更视为GLM运行时故障已修复"
+          },
+          "history": [
+            {
+              "at": "2026-09-29T03:09:52.788294+00:00",
+              "previous": null,
+              "route": {
+                "kind": "requirement",
+                "destination": "docs/longdev/requirements-design-compatibility/PLAN.md#R10",
+                "reason": "已纳入本轮流程护栏；不把规则变更视为GLM运行时故障已修复"
+              }
+            }
+          ]
+        },
+        {
+          "id": "4",
+          "text": "GLM刚才又出现一个死循环，它自己的解释是：在同一轮里没有建立\"完成清单+有效证据\"的收敛点，工具返回成功后又被我当成本轮还没完成，于是重复执行同一个只读/验证动作。真正缺的是每次工具调用前写明\"预期新信息\"，拿到结论后马上物化。\n\n你觉得它说得有道理吗？",
+          "route": {
+            "kind": "requirement",
+            "destination": "docs/longdev/requirements-design-compatibility/PLAN.md#R10",
+            "reason": "已纳入本轮流程护栏；不把规则变更视为GLM运行时故障已修复"
+          },
+          "history": [
+            {
+              "at": "2026-09-29T03:09:53.193898+00:00",
+              "previous": null,
+              "route": {
+                "kind": "requirement",
+                "destination": "docs/longdev/requirements-design-compatibility/PLAN.md#R10",
+                "reason": "已纳入本轮流程护栏；不把规则变更视为GLM运行时故障已修复"
               }
             }
           ]

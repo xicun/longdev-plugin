@@ -15,17 +15,21 @@ py -3 "<checkout>/scripts/install.py" --client <client> --project "<project>" --
 
 macOS/Linux 将 `py -3` 换成 `python3`。`--check` 校验完整包内容、入口和安装记录，非零退出不得报告成功。
 
-共享包存入 `<project>/.longdev-runtime/<内容指纹>/`，包括 longdev、autopilot、bug-reports 三个 skills、所有 references、问题管理 CLI、工作区迁移脚本、agents 和版本文件。三端只生成薄入口：
+共享包存入 `<project>/.longdev-runtime/<内容指纹>/`，包含完整 skills、references、问题管理 CLI、迁移脚本、agents 和版本文件。三端生成 longdev、autopilot、bug-reports、requirements-design 四个薄入口；checks 由完整包内调用：
 
 | 客户端 | 自动发现入口 |
 |---|---|
-| Claude Code | `.claude/skills/{longdev,autopilot,bug-reports}/SKILL.md` |
-| Codex CLI | `.agents/skills/{longdev,autopilot,bug-reports}/SKILL.md` |
-| dsh | `.dsh/skills/{longdev,autopilot,bug-reports}/SKILL.md` |
+| Claude Code | `.claude/skills/{longdev,autopilot,bug-reports,requirements-design}/SKILL.md` |
+| Codex CLI | `.agents/skills/{longdev,autopilot,bug-reports,requirements-design}/SKILL.md` |
+| dsh | `.dsh/skills/{longdev,autopilot,bug-reports,requirements-design}/SKILL.md` |
 
 入口使用完整包的绝对路径，无软链权限要求。移动项目后须从新路径重跑安装。升级同样重跑；旧包保留供现有会话使用，不自动清理。未知来源的已有入口或用户编辑会被拒绝覆盖；报告冲突路径，不自行删除。dsh 默认 filesystem provider 必须启用；自定义 profile 禁用它时，报告发现能力缺口，不改用户 profile。
 
-安装后新开一次客户端会话，要求列出 longdev/autopilot/bug-reports 并读取完整技能及版本。已有用户级技能或插件可能同名遮蔽，核对实际加载路径，不能仅凭目录存在宣布已加载。安装器校验不证明模型调用、独立审查、自动 restart 或视觉隔离已实跑。
+安装后新开一次客户端会话，要求列出上述四个入口并读取适用技能及版本。已有用户级技能或插件可能同名遮蔽，核对实际加载路径，不能仅凭目录存在宣布已加载。安装器校验不证明模型调用、独立审查、自动 restart 或视觉隔离已实跑。
+
+requirements-design 可独立完成需求讨论与方案设计，不要求创建 PLAN 或运行迁移。设计达到目标即交付；已有实施授权且无关键待决项时继续 planner，不在章节小结处反复请求继续。旧任务沿用既有设计来源和 R/V，不重编号或复制为第二套事实源。
+
+已授权启动/续接且选定唯一任务后，主会话在旧写入者停止的安全交接点自动调用 `skills/longdev/scripts/compatibility_upgrade.py --project <项目绝对根> --task docs/longdev/<任务>`（autopilot 使用 docs/autopilot/<产品>）。该命令只处理选中任务，不扫描其它任务；纯讨论不调用，状态查询/预演加 `--check`/`--dry-run`。旁车 `COMPATIBILITY.json` 是不可变初始快照，保留旧语义，不代表新设计通过或旧证据重新验收。终态不重开，未知状态/格式和完整性冲突保留待核对；`.work/longdev-migration/compatibility/` journal 支持中断恢复。旁车存在但 journal 缺失时只能保留并报告无法校验，不能宣称完整性通过。
 
 旧版双技能受管理入口可直接升级；新增 bug-reports 入口不存在时创建，已有未知内容或手改内容保留并报冲突。`--check` 只读，不自动补包或改写用户档案。
 
