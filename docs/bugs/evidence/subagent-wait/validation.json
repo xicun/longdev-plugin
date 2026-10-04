@@ -1,0 +1,64 @@
+{
+  "scope": "规则修订验证，不代表真实codex-glm原路径通过",
+  "environment": {
+    "python": "3.11.6",
+    "platform": "macOS-14.4.1-arm64-arm-64bit"
+  },
+  "baseline": "2e18b8a46b8458f3c9449949f0769616d48b0eac",
+  "artifacts": [
+    {
+      "path": "skills/longdev/SKILL.md",
+      "sha256": "afb3ed19c3857c6e561b79bb7358a30abffcdf2de8626827159bcc6ae02967b2"
+    },
+    {
+      "path": "skills/longdev/references/execution-protocol.md",
+      "sha256": "ec83766d997078344f2b622cb7c792174e6ab2bf3d9b7ddf6a145939c6029488"
+    },
+    {
+      "path": "skills/longdev/references/session-runtime.md",
+      "sha256": "4466021e6963f0c73ad51e084d9745ba9228d9f9832528819cbf85fad1cb376a"
+    }
+  ],
+  "checks": [
+    {
+      "command": "python3 -B -m unittest discover -s tests -p test_install.py -v",
+      "cwd": "plugin root",
+      "exit_code": 0,
+      "expected": "9 existing install tests pass",
+      "actual": [
+        "----------------------------------------------------------------------",
+        "Ran 9 tests in 0.596s",
+        "",
+        "OK"
+      ],
+      "log": ".work/subagent-wait/install-tests.log",
+      "log_sha256": "1a88d630dfe90997d0288af1ec8bbb85ff7c04ec23521fde065df01f1e50ff15"
+    },
+    {
+      "command": "python3 -B <installed skill-creator>/scripts/quick_validate.py skills/longdev",
+      "cwd": "plugin root (equivalent relative path; original cwd harness root)",
+      "exit_code": 0,
+      "actual": "Skill is valid!; structural check only"
+    },
+    {
+      "method": "independent forward application of 14 simulated scenarios",
+      "actual": "14 answers reviewed against R1-R4; no blocking discrepancy",
+      "evidence": "docs/bugs/evidence/subagent-wait/forward-results.md",
+      "sha256": "a10c1c567a3bb874edb0e1417190db57eff3aa35e995cbd0b6ef1a6239ddbe03"
+    },
+    {
+      "method": "independent diff/references review plus incremental recheck",
+      "actual": "no blocking issues; 2 clarifications adopted and rechecked",
+      "evidence": "docs/bugs/evidence/subagent-wait/review.md",
+      "sha256": "9208e6ca9be276e1216be128c82eeaa3f02879845c974ffdb5e816a92b56bb3a"
+    }
+  ],
+  "unverified": [
+    "fault session exact client/model/plugin version",
+    "real codex-glm before/after wait continuation",
+    "real automatic completion/timer wakeup",
+    "real reasoning configuration change receipt"
+  ],
+  "runtime_deployed": false,
+  "bug_status": "investigating; no verify/accept"
+}
