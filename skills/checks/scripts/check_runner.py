@@ -17,6 +17,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import re
 import subprocess
 import sys
 import time
@@ -29,6 +30,18 @@ PROFILES = ("smoke", "full", "failure-probe")
 # reference requirements, acceptance items, test cases/runs and past bugs without
 # the runner knowing the concrete semantics.
 REF_KINDS = {"requirement", "acceptance", "test_case", "test_run", "bug"}
+# Case IDs become path segments under the run directory (run_dir/cases/<id>), so
+# they must be a single safe segment: no separators, no traversal, no reserved
+# device names. Keeps a naming mistake from writing logs outside the run root.
+SAFE_CASE_ID = r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}"
+WINDOWS_RESERVED = {"CON", "PRN", "AUX", "NUL",
+                    *(f"COM{i}" for i in range(1, 10)), *(f"LPT{i}" for i in range(1, 10))}
+
+
+def safe_case_id(case_id: str) -> bool:
+    if not re.fullmatch(SAFE_CASE_ID, case_id) or case_id in {".", ".."}:
+        return False
+    return case_id.split(".")[0].upper() not in WINDOWS_RESERVED
 
 
 class CatalogError(ValueError):
@@ -81,6 +94,10 @@ def validate_catalog(catalog_root: Path) -> tuple[dict[str, Any], dict[str, Any]
         case_id = case["id"]
         if not isinstance(case_id, str) or not case_id or case_id in case_map:
             raise CatalogError(f"case IDs must be unique nonempty strings: {case_id!r}")
+        if not safe_case_id(case_id):
+            raise CatalogError(
+                f"case id must be a single safe path segment (letters, digits, '.', '_', '-'; "
+                f"no separators, traversal, or reserved device names): {case_id!r}")
         if case["profile"] not in PROFILES or not isinstance(case["command"], list) or not case["command"]:
             raise CatalogError(f"invalid profile or command for {case_id}")
         if not isinstance(case["cwd"], str) or Path(case["cwd"]).is_absolute() or ".." in Path(case["cwd"]).parts:
@@ -146,6 +163,11 @@ def run_cases(catalog_root: Path, source_root: Path, profile: str, case_id: str 
 
     for case in selected:
         case_dir = run_dir / "cases" / case["id"]
+        # 纵深防御：即使 catalog 校验放行，派生目录也必须留在 run 根内且不经链接重定向。
+        if (os.path.sep in case["id"] or "/" in case["id"] or "\\" in case["id"]
+                or Path(case["id"]).is_absolute()
+                or not case_dir.resolve().is_relative_to(run_dir.resolve())):
+            raise CatalogError(f"derived case directory escapes the run root: {case['id']!r}")
         case_dir.mkdir(parents=True)
         cwd = source_root / case["cwd"]
         command = [str(item) for item in case["command"]]

@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "revision": 59,
+  "revision": 75,
   "issues": [
     {
       "id": "BUG-0001",
@@ -45,6 +45,50 @@
       "next_step": "协议已实现，16项隔离规则演练与9项安装回归通过；在用户实际宿主验证完成代理关闭和槽位回收，保存close/状态原始回执；未经实测不verify/accept原始占槽问题。",
       "recurrence_count": 0,
       "alias_of": null
+    },
+    {
+      "id": "BUG-0005",
+      "title": "子代理等待未完成后主会话结束并作出无回执的持续执行/配置声明",
+      "status": "investigating",
+      "goal": "等待未完成时主会话依据宿主状态接续，配置声明有实际证据",
+      "conditions": "codex-glm使用longdev；实际故障会话的客户端、模型和插件版本尚未核实",
+      "actual": "用户提供三次No agents completed yet后主会话显示Worked，并声称已切高推理档、等待回传",
+      "next_step": "规则修订和隔离检查完成；保持investigating，核实故障版本后按docs/bugs/evidence/subagent-wait/scenarios.md补真实codex-glm前后轨迹；未部署、未verify/accept",
+      "recurrence_count": 0,
+      "alias_of": null
+    },
+    {
+      "id": "BUG-0006",
+      "title": "codex-glm开发中的无进展命令循环仍被报告",
+      "status": "investigating",
+      "goal": "任务调用收敛到新证据、实现或具体阻碍",
+      "conditions": "codex-glm使用longdev，具体命令/输出和实际版本待补",
+      "actual": "用户报告经常陷入命令调用死循环，本次未提供循环轨迹",
+      "next_step": "本轮异常等待/失效ID/无活动任务的有限诊断边界已检查（场景2/3/11/13），实际命令循环仍缺原始轨迹与版本；收集后再定位，不宣称本次已修复",
+      "recurrence_count": 0,
+      "alias_of": null
+    },
+    {
+      "id": "BUG-0007",
+      "title": "写租约按超龄/损坏自动删除，可抢占仍活跃的写入者",
+      "status": "acceptance",
+      "goal": "租约在锁损坏或超龄时不自动抢占；接管须显式且可追溯，活跃写入者不被误伤",
+      "conditions": "两个acquire重叠于锁创建/写入窗口；或共享库编辑跨过30分钟后另一任务申请同一资源",
+      "actual": "stale()对空/坏JSON返回true，acquire直接unlink接管；完整锁仅按30分钟年龄判过期；锁文件创建与写JSON之间存在被其他进程读空删锁的窗口",
+      "next_step": "原子发布（temp+os.link）消除空锁窗口；损坏/超龄只拒绝并提示takeover；renew续租与gen代计数；takeover显式核对state/token并记录被接管记录",
+      "recurrence_count": 0,
+      "alias_of": null
+    },
+    {
+      "id": "BUG-0008",
+      "title": "check_runner接受含穿越/分隔符的case ID并拼进输出路径",
+      "status": "acceptance",
+      "goal": "case ID只能是单一安全路径段，stdout/stderr及manifest不得落出run根",
+      "conditions": "共享库误填带分隔符或穿越的ID即可触发，无需恶意来源",
+      "actual": "case ID仅校验非空字符串且唯一，直接拼成run_dir/cases/<id>，内存校验反证中'../../../outside'被接受并解析到run目录外",
+      "next_step": "单段安全ID正则约束（字母/数字/._-开头字母数字，拒绝保留设备名）；run_cases派生目录包含检查；隔离回归覆盖",
+      "recurrence_count": 0,
+      "alias_of": null
     }
   ],
   "feedback": [
@@ -71,6 +115,11 @@
     {
       "id": "FB-0005",
       "source": "用户2026-09-29原始反馈；补全FB-0004录入时PowerShell stdin编码损坏，原话以本批次为准",
+      "unrouted": []
+    },
+    {
+      "id": "FB-0006",
+      "source": "用户2026-09-30 codex-glm等待提前结束与命令循环反馈；含用户粘贴轨迹，非宿主原始日志",
       "unrouted": []
     }
   ]

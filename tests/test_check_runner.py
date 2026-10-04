@@ -1,4 +1,5 @@
 import json
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -17,7 +18,7 @@ def _source_catalog(root: Path) -> Path:
     catalog.mkdir()
     cases = {"schema": 1, "cases": [{
         "id": "probe", "title": "probe", "profile": "smoke",
-        "command": ["py", "-3.12", "-B", "-c", "import sys; print('ok'); sys.exit(0)"],
+        "command": [sys.executable, "-B", "-c", "import sys; print('ok'); sys.exit(0)"],
         "cwd": ".", "expected_exit": 0, "source": "sample", "quality_refs": ["requirement:R-1", "test_case:T-1", "bug:B-1"],
     }]}
     matrix = {"schema": 1, "profiles": {"smoke": ["probe"], "full": [], "failure-probe": []}}
@@ -71,6 +72,24 @@ class CheckRunnerTests(unittest.TestCase):
             catalog = _source_catalog(Path(temp))
             with self.assertRaises(RUNNER.CatalogError):
                 RUNNER.run_cases(catalog, source, "smoke", None, ["nope"], Path(temp) / "run")
+
+    def test_unsafe_case_ids_are_rejected(self):
+        # L02：case ID 会成为 run 目录下的路径段，穿越/分隔符/保留名必须在校验层拒绝。
+        unsafe = ["../evil", "../../outside", "a/b", "a\\b", "/abs", "..", ".", "aux", "com1", "-lead"]
+        for bad in unsafe:
+            with tempfile.TemporaryDirectory() as temp:
+                catalog = _source_catalog(Path(temp))
+                payload = json.loads((catalog / "cases.json").read_text(encoding="utf-8"))
+                payload["cases"][0]["id"] = bad
+                (catalog / "cases.json").write_text(json.dumps(payload), encoding="utf-8")
+                with self.assertRaises(RUNNER.CatalogError):
+                    RUNNER.validate_catalog(catalog)
+
+    def test_safe_case_ids_are_kept(self):
+        for good in ("probe", "R01", "case-2_x.y", "z" * 128):
+            self.assertTrue(RUNNER.safe_case_id(good))
+        for bad in ("../evil", "a/b", "a\\b", "/abs", "..", ".", "", "-lead", "con", "com1", "x" * 129):
+            self.assertFalse(RUNNER.safe_case_id(bad), bad)
 
 
 if __name__ == "__main__":

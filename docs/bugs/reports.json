@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "revision": 59,
-  "next_bug": 5,
-  "next_feedback": 6,
+  "revision": 75,
+  "next_bug": 9,
+  "next_feedback": 7,
   "issues": {
     "BUG-0001": {
       "id": "BUG-0001",
@@ -1198,6 +1198,17 @@
               "next_step": "协议已实现，16项隔离规则演练与9项安装回归通过；在用户实际宿主验证完成代理关闭和槽位回收，保存close/状态原始回执；未经实测不verify/accept原始占槽问题。"
             }
           }
+        },
+        {
+          "at": "2026-09-30T09:23:14.574799+00:00",
+          "epoch": 3,
+          "kind": "relation",
+          "data": {
+            "id": "BUG-0005",
+            "target": "BUG-0004",
+            "kind": "related",
+            "reason": "同属子代理调度，但等待续接与槽位回收是不同可观察问题，未证明同根因"
+          }
         }
       ],
       "repairs": [
@@ -1214,7 +1225,13 @@
         }
       ],
       "recurrences": [],
-      "relations": [],
+      "relations": [
+        {
+          "target": "BUG-0005",
+          "kind": "related",
+          "reason": "同属子代理调度，但等待续接与槽位回收是不同可观察问题，未证明同根因"
+        }
+      ],
       "verification": null,
       "acceptance": null,
       "investigation": null,
@@ -1227,6 +1244,583 @@
       "scope": "longdev/autopilot共享生命周期规则及宿主能力适配，不修改宿主调度器",
       "next_step": "协议已实现，16项隔离规则演练与9项安装回归通过；在用户实际宿主验证完成代理关闭和槽位回收，保存close/状态原始回执；未经实测不verify/accept原始占槽问题。",
       "close_condition": "协议修正经独立检查，且明确区分规则演练与真实资源释放；用户验收后关闭"
+    },
+    "BUG-0005": {
+      "id": "BUG-0005",
+      "status": "investigating",
+      "epoch": 2,
+      "facts": [
+        "用户粘贴轨迹显示三次等待未收到完成结果，其间发送文字请求；随后主会话结束本轮",
+        "没有实际配置变更回执或自动唤醒证据；不能证明后台代理不存在",
+        "本机安装0.18.2与仓库协议一致，不证明故障会话加载了该版本"
+      ],
+      "hypotheses": [
+        "正常等待可能被三次无新事实规则误判；尚未证实",
+        "模型主动final或宿主续接缺失，需原始事件区分"
+      ],
+      "quality_refs": [
+        {
+          "kind": "requirement",
+          "id": "R1",
+          "reference": "docs/bugs/evidence/subagent-wait/plan.md"
+        },
+        {
+          "kind": "requirement",
+          "id": "R2",
+          "reference": "docs/bugs/evidence/subagent-wait/plan.md"
+        },
+        {
+          "kind": "requirement",
+          "id": "R3",
+          "reference": "docs/bugs/evidence/subagent-wait/plan.md"
+        },
+        {
+          "kind": "requirement",
+          "id": "R4",
+          "reference": "docs/bugs/evidence/subagent-wait/plan.md"
+        },
+        {
+          "kind": "test_run",
+          "id": "wait-protocol-scenarios-20260930",
+          "reference": "docs/bugs/evidence/subagent-wait/validation.json"
+        }
+      ],
+      "history": [
+        {
+          "at": "2026-09-30T09:23:14.401878+00:00",
+          "epoch": 0,
+          "kind": "create",
+          "data": {
+            "title": "子代理等待未完成后主会话结束并作出无回执的持续执行/配置声明",
+            "goal": "等待未完成时主会话依据宿主状态接续，配置声明有实际证据",
+            "expected": "区分等待超时与任务结束，继续有期限的等待或诊断；不以文字消息证明推理档位改变",
+            "actual": "用户提供三次No agents completed yet后主会话显示Worked，并声称已切高推理档、等待回传",
+            "conditions": "codex-glm使用longdev；实际故障会话的客户端、模型和插件版本尚未核实",
+            "scope": "harness等待/收敛规则与longdev子代理调度、宿主适配、配置证据",
+            "facts": [
+              "用户粘贴轨迹显示三次等待未收到完成结果，其间发送文字请求；随后主会话结束本轮",
+              "没有实际配置变更回执或自动唤醒证据；不能证明后台代理不存在",
+              "本机安装0.18.2与仓库协议一致，不证明故障会话加载了该版本"
+            ],
+            "hypotheses": [
+              "正常等待可能被三次无新事实规则误判；尚未证实",
+              "模型主动final或宿主续接缺失，需原始事件区分"
+            ],
+            "next_step": "按已授权四项规则修订并独立场景审查；真实codex-glm轨迹仍待验证",
+            "close_condition": "核实故障运行版本，在原路径复现并验证新规则下连续等待后接续、异常处理及配置声明；不能用静态审查关闭"
+          }
+        },
+        {
+          "at": "2026-09-30T09:23:14.471017+00:00",
+          "epoch": 0,
+          "kind": "feedback",
+          "data": {
+            "feedback": "FB-0006",
+            "item": "1",
+            "route": {
+              "kind": "bug",
+              "target": "BUG-0005",
+              "confidence": "suspected",
+              "reason": "按本轮等待与命令循环分别保留；粘贴轨迹支持现象，未证实运行时根因"
+            }
+          }
+        },
+        {
+          "at": "2026-09-30T09:23:14.540228+00:00",
+          "epoch": 0,
+          "kind": "feedback",
+          "data": {
+            "feedback": "FB-0006",
+            "item": "3",
+            "route": {
+              "kind": "bug",
+              "target": "BUG-0005",
+              "confidence": "suspected",
+              "reason": "按本轮等待与命令循环分别保留；粘贴轨迹支持现象，未证实运行时根因"
+            }
+          }
+        },
+        {
+          "at": "2026-09-30T09:23:14.574865+00:00",
+          "epoch": 0,
+          "kind": "relate",
+          "data": {
+            "id": "BUG-0005",
+            "target": "BUG-0004",
+            "kind": "related",
+            "reason": "同属子代理调度，但等待续接与槽位回收是不同可观察问题，未证明同根因"
+          }
+        },
+        {
+          "at": "2026-09-30T09:31:47.063649+00:00",
+          "epoch": 1,
+          "kind": "repair",
+          "data": {
+            "id": "BUG-0005",
+            "version": "working tree based on 2e18b8a; artifact SHA256 in docs/bugs/evidence/subagent-wait/validation.json",
+            "summary": "补充正常等待豁免、返回分类与接续、复核点和预算边界、宿主唤醒与配置回执要求",
+            "cause": "已确认协议缺少上述明确分界；真实提前final机制未确认，三次阈值误判仅是假设",
+            "coverage": "R1-R4源码修订、14项独立题设演练、独立审查、9项安装回归；尚未覆盖原故障会话/真实GLM"
+          }
+        },
+        {
+          "at": "2026-09-30T09:31:47.098420+00:00",
+          "epoch": 2,
+          "kind": "update",
+          "data": {
+            "id": "BUG-0005",
+            "fields": {
+              "next_step": "规则修订和隔离检查完成；保持investigating，核实故障版本后按docs/bugs/evidence/subagent-wait/scenarios.md补真实codex-glm前后轨迹；未部署、未verify/accept",
+              "quality_refs": [
+                {
+                  "kind": "requirement",
+                  "id": "R1",
+                  "reference": "docs/bugs/evidence/subagent-wait/plan.md"
+                },
+                {
+                  "kind": "requirement",
+                  "id": "R2",
+                  "reference": "docs/bugs/evidence/subagent-wait/plan.md"
+                },
+                {
+                  "kind": "requirement",
+                  "id": "R3",
+                  "reference": "docs/bugs/evidence/subagent-wait/plan.md"
+                },
+                {
+                  "kind": "requirement",
+                  "id": "R4",
+                  "reference": "docs/bugs/evidence/subagent-wait/plan.md"
+                },
+                {
+                  "kind": "test_run",
+                  "id": "wait-protocol-scenarios-20260930",
+                  "reference": "docs/bugs/evidence/subagent-wait/validation.json"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "repairs": [
+        {
+          "id": "FIX-0001",
+          "at": "2026-09-30T09:31:47.063561+00:00",
+          "epoch": 1,
+          "revision": 67,
+          "recurrence": 0,
+          "version": "working tree based on 2e18b8a; artifact SHA256 in docs/bugs/evidence/subagent-wait/validation.json",
+          "summary": "补充正常等待豁免、返回分类与接续、复核点和预算边界、宿主唤醒与配置回执要求",
+          "cause": "已确认协议缺少上述明确分界；真实提前final机制未确认，三次阈值误判仅是假设",
+          "coverage": "R1-R4源码修订、14项独立题设演练、独立审查、9项安装回归；尚未覆盖原故障会话/真实GLM"
+        }
+      ],
+      "recurrences": [],
+      "relations": [
+        {
+          "target": "BUG-0004",
+          "kind": "related",
+          "reason": "同属子代理调度，但等待续接与槽位回收是不同可观察问题，未证明同根因"
+        }
+      ],
+      "verification": null,
+      "acceptance": null,
+      "investigation": null,
+      "investigations": {},
+      "title": "子代理等待未完成后主会话结束并作出无回执的持续执行/配置声明",
+      "goal": "等待未完成时主会话依据宿主状态接续，配置声明有实际证据",
+      "expected": "区分等待超时与任务结束，继续有期限的等待或诊断；不以文字消息证明推理档位改变",
+      "actual": "用户提供三次No agents completed yet后主会话显示Worked，并声称已切高推理档、等待回传",
+      "conditions": "codex-glm使用longdev；实际故障会话的客户端、模型和插件版本尚未核实",
+      "scope": "harness等待/收敛规则与longdev子代理调度、宿主适配、配置证据",
+      "next_step": "规则修订和隔离检查完成；保持investigating，核实故障版本后按docs/bugs/evidence/subagent-wait/scenarios.md补真实codex-glm前后轨迹；未部署、未verify/accept",
+      "close_condition": "核实故障运行版本，在原路径复现并验证新规则下连续等待后接续、异常处理及配置声明；不能用静态审查关闭"
+    },
+    "BUG-0006": {
+      "id": "BUG-0006",
+      "status": "investigating",
+      "epoch": 1,
+      "facts": [
+        "FB-0003已记录类似工具异常与ABCABC循环，但以需求路由，未有相同根因证据",
+        "本次提供的等待轨迹不能作为死循环复现"
+      ],
+      "hypotheses": [
+        "可能与既有护栏执行不稳定或工具适配有关，未验证"
+      ],
+      "quality_refs": [],
+      "history": [
+        {
+          "at": "2026-09-30T09:23:14.436474+00:00",
+          "epoch": 0,
+          "kind": "create",
+          "data": {
+            "title": "codex-glm开发中的无进展命令循环仍被报告",
+            "goal": "任务调用收敛到新证据、实现或具体阻碍",
+            "expected": "无依据重复命令或跨命令周期被识别并停止该路径",
+            "actual": "用户报告经常陷入命令调用死循环，本次未提供循环轨迹",
+            "conditions": "codex-glm使用longdev，具体命令/输出和实际版本待补",
+            "scope": "关联既有FB-0003的R06/R08/R10护栏，本轮仅保护异常循环边界，不宣称修复未知运行时根因",
+            "facts": [
+              "FB-0003已记录类似工具异常与ABCABC循环，但以需求路由，未有相同根因证据",
+              "本次提供的等待轨迹不能作为死循环复现"
+            ],
+            "hypotheses": [
+              "可能与既有护栏执行不稳定或工具适配有关，未验证"
+            ],
+            "next_step": "保留无效ID/错误/无活动任务的有限诊断规则；收集一段实际循环的命令与返回值后定位",
+            "close_condition": "以实际循环轨迹复现并验证改动能收敛；与正常异步等待分别验收"
+          }
+        },
+        {
+          "at": "2026-09-30T09:23:14.505675+00:00",
+          "epoch": 0,
+          "kind": "feedback",
+          "data": {
+            "feedback": "FB-0006",
+            "item": "2",
+            "route": {
+              "kind": "bug",
+              "target": "BUG-0006",
+              "confidence": "suspected",
+              "reason": "按本轮等待与命令循环分别保留；粘贴轨迹支持现象，未证实运行时根因"
+            }
+          }
+        },
+        {
+          "at": "2026-09-30T09:31:47.133041+00:00",
+          "epoch": 1,
+          "kind": "update",
+          "data": {
+            "id": "BUG-0006",
+            "fields": {
+              "next_step": "本轮异常等待/失效ID/无活动任务的有限诊断边界已检查（场景2/3/11/13），实际命令循环仍缺原始轨迹与版本；收集后再定位，不宣称本次已修复"
+            }
+          }
+        }
+      ],
+      "repairs": [],
+      "recurrences": [],
+      "relations": [],
+      "verification": null,
+      "acceptance": null,
+      "investigation": null,
+      "investigations": {},
+      "title": "codex-glm开发中的无进展命令循环仍被报告",
+      "goal": "任务调用收敛到新证据、实现或具体阻碍",
+      "expected": "无依据重复命令或跨命令周期被识别并停止该路径",
+      "actual": "用户报告经常陷入命令调用死循环，本次未提供循环轨迹",
+      "conditions": "codex-glm使用longdev，具体命令/输出和实际版本待补",
+      "scope": "关联既有FB-0003的R06/R08/R10护栏，本轮仅保护异常循环边界，不宣称修复未知运行时根因",
+      "next_step": "本轮异常等待/失效ID/无活动任务的有限诊断边界已检查（场景2/3/11/13），实际命令循环仍缺原始轨迹与版本；收集后再定位，不宣称本次已修复",
+      "close_condition": "以实际循环轨迹复现并验证改动能收敛；与正常异步等待分别验收"
+    },
+    "BUG-0007": {
+      "id": "BUG-0007",
+      "status": "acceptance",
+      "epoch": 1,
+      "facts": [
+        "审计L01隔离反证：临时目录中超龄锁被第二次acquire直接接管，旧token释放报lease token mismatch；空锁同样被接管",
+        "修订前tests/test_write_lease.py把年龄自动接管作为正确预期，与session-runtime.md:82'过期不能自动证明旧客户端已停止'矛盾"
+      ],
+      "hypotheses": [],
+      "quality_refs": [],
+      "history": [
+        {
+          "at": "2026-10-04T02:11:22.223439+00:00",
+          "epoch": 0,
+          "kind": "create",
+          "data": {
+            "title": "写租约按超龄/损坏自动删除，可抢占仍活跃的写入者",
+            "goal": "租约在锁损坏或超龄时不自动抢占；接管须显式且可追溯，活跃写入者不被误伤",
+            "expected": "损坏/空/超龄锁只标疑似失联并拒绝acquire；接管须显式命令并核对观察到的状态与token；活跃写入者可通过续租保持租约",
+            "actual": "stale()对空/坏JSON返回true，acquire直接unlink接管；完整锁仅按30分钟年龄判过期；锁文件创建与写JSON之间存在被其他进程读空删锁的窗口",
+            "conditions": "两个acquire重叠于锁创建/写入窗口；或共享库编辑跨过30分钟后另一任务申请同一资源",
+            "scope": "skills/longdev/scripts/write_lease.py、tests/test_write_lease.py；契约以session-runtime.md既有租约原则为准",
+            "next_step": "原子发布（temp+os.link）消除空锁窗口；损坏/超龄只拒绝并提示takeover；renew续租与gen代计数；takeover显式核对state/token并记录被接管记录",
+            "close_condition": "隔离回归覆盖原子发布、超龄/损坏锁拒绝自动接管、续租与代计数、显式接管及旧token拒绝；脚本行为与session-runtime.md:82一致",
+            "facts": [
+              "审计L01隔离反证：临时目录中超龄锁被第二次acquire直接接管，旧token释放报lease token mismatch；空锁同样被接管",
+              "修订前tests/test_write_lease.py把年龄自动接管作为正确预期，与session-runtime.md:82'过期不能自动证明旧客户端已停止'矛盾"
+            ]
+          }
+        },
+        {
+          "at": "2026-10-04T02:12:16.594843+00:00",
+          "epoch": 1,
+          "kind": "repair",
+          "data": {
+            "id": "BUG-0007",
+            "version": "working tree based on 2e18b8a46b8458f3c9449949f0769616d48b0eac（含等待接续规则未提交修订）",
+            "summary": "write_lease.py改为原子发布（temp+os.link，无链接回退O_EXCL）；损坏/空/超龄锁一律拒绝acquire不再自动删除；新增renew（续租+gen代计数）与takeover（显式核对expect-state/expect-token，仅限stale/corrupt，记录took_over_from）；status输出corrupt标志",
+            "cause": "stale()把空/坏JSON当过期并自动unlink，完整锁仅按年龄判过期，锁创建与写JSON间存在窗口；违反session-runtime.md:82'过期不能自动证明旧客户端已停止'",
+            "coverage": "tests/test_write_lease.py 8项：原子发布完整性、超龄/损坏拒绝自动接管、显式接管核对state/token、接管拒绝fresh锁、renew续租与代计数、旧token续租拒绝、竞争拒绝、token释放匹配",
+            "refuted": "未实测两进程在创建窗口的竞态本身（隔离测试以发布后记录完整性替代）；旧协议声称的跨worktree串行在接管语义修订后整体成立性待真实多客户端会话验证"
+          }
+        },
+        {
+          "at": "2026-10-04T02:15:32.617565+00:00",
+          "epoch": 1,
+          "kind": "verify",
+          "data": {
+            "id": "BUG-0007",
+            "method": "隔离unittest回归（修订前后对照：修订前test_stale_lease_is_reclaimed把年龄接管当正确预期，修订后8项契约测试全过）+ CLI冒烟（status/acquire/takeover）+ 真实testcases目录校验",
+            "expected": "损坏/空/超龄锁拒绝acquire且不自动删除；takeover仅限stale/corrupt并核对观察值；renew续租并增gen；锁发布后记录必为完整JSON",
+            "actual": "submodule全量93项OK（含write_lease 8项新契约测试）；CLI冒烟status正常；真实testcases校验通过",
+            "runtime_version": "working tree based on 2e18b8a46b8458f3c9449949f0769616d48b0eac（含等待接续规则未提交修订）",
+            "reproduced": true,
+            "result": "pass",
+            "coverage": "complete",
+            "artifacts": [
+              {
+                "path": "skills/longdev/scripts/write_lease.py",
+                "sha256": "f923e66b8ee7d007ba2a02cc74e6f1c6a06c0173743e41eb7c7aa136df4898b0"
+              },
+              {
+                "path": "skills/checks/scripts/check_runner.py",
+                "sha256": "92a431364b86be4cd68e4a60ab1fafa133cd7853f98fe1dfc473fad2724c64e5"
+              },
+              {
+                "path": "tests/test_write_lease.py",
+                "sha256": "60979048ed034c7590b22ec18c541aa9af9fcf71798091fada424876ee272532"
+              },
+              {
+                "path": "tests/test_check_runner.py",
+                "sha256": "e663556b92a63c0c70cb4aa883beb930e1c88833068961a210af9aa82b77dc7b"
+              }
+            ],
+            "evidence": [
+              {
+                "path": ".work/audit-l01-l02/submodule-tests.log",
+                "sha256": "bec17b303350eb72e7566d7cc50a48023e72df4eaf8994f2edfde1a9c5b4f212"
+              },
+              {
+                "path": ".work/audit-l01-l02/catalog-validate.log",
+                "sha256": "bd766b47d7e2e3bfd7d4908ef1d8a0802909eb0b34eebd43809fedb6f48a3b00"
+              }
+            ]
+          }
+        }
+      ],
+      "repairs": [
+        {
+          "id": "FIX-0001",
+          "at": "2026-10-04T02:12:16.594659+00:00",
+          "epoch": 1,
+          "revision": 72,
+          "recurrence": 0,
+          "version": "working tree based on 2e18b8a46b8458f3c9449949f0769616d48b0eac（含等待接续规则未提交修订）",
+          "summary": "write_lease.py改为原子发布（temp+os.link，无链接回退O_EXCL）；损坏/空/超龄锁一律拒绝acquire不再自动删除；新增renew（续租+gen代计数）与takeover（显式核对expect-state/expect-token，仅限stale/corrupt，记录took_over_from）；status输出corrupt标志",
+          "cause": "stale()把空/坏JSON当过期并自动unlink，完整锁仅按年龄判过期，锁创建与写JSON间存在窗口；违反session-runtime.md:82'过期不能自动证明旧客户端已停止'",
+          "coverage": "tests/test_write_lease.py 8项：原子发布完整性、超龄/损坏拒绝自动接管、显式接管核对state/token、接管拒绝fresh锁、renew续租与代计数、旧token续租拒绝、竞争拒绝、token释放匹配"
+        }
+      ],
+      "recurrences": [],
+      "relations": [],
+      "verification": {
+        "id": "BUG-0007",
+        "method": "隔离unittest回归（修订前后对照：修订前test_stale_lease_is_reclaimed把年龄接管当正确预期，修订后8项契约测试全过）+ CLI冒烟（status/acquire/takeover）+ 真实testcases目录校验",
+        "expected": "损坏/空/超龄锁拒绝acquire且不自动删除；takeover仅限stale/corrupt并核对观察值；renew续租并增gen；锁发布后记录必为完整JSON",
+        "actual": "submodule全量93项OK（含write_lease 8项新契约测试）；CLI冒烟status正常；真实testcases校验通过",
+        "runtime_version": "working tree based on 2e18b8a46b8458f3c9449949f0769616d48b0eac（含等待接续规则未提交修订）",
+        "reproduced": true,
+        "result": "pass",
+        "coverage": "complete",
+        "artifacts": [
+          {
+            "path": "skills/longdev/scripts/write_lease.py",
+            "sha256": "f923e66b8ee7d007ba2a02cc74e6f1c6a06c0173743e41eb7c7aa136df4898b0"
+          },
+          {
+            "path": "skills/checks/scripts/check_runner.py",
+            "sha256": "92a431364b86be4cd68e4a60ab1fafa133cd7853f98fe1dfc473fad2724c64e5"
+          },
+          {
+            "path": "tests/test_write_lease.py",
+            "sha256": "60979048ed034c7590b22ec18c541aa9af9fcf71798091fada424876ee272532"
+          },
+          {
+            "path": "tests/test_check_runner.py",
+            "sha256": "e663556b92a63c0c70cb4aa883beb930e1c88833068961a210af9aa82b77dc7b"
+          }
+        ],
+        "evidence": [
+          {
+            "path": ".work/audit-l01-l02/submodule-tests.log",
+            "sha256": "bec17b303350eb72e7566d7cc50a48023e72df4eaf8994f2edfde1a9c5b4f212"
+          },
+          {
+            "path": ".work/audit-l01-l02/catalog-validate.log",
+            "sha256": "bd766b47d7e2e3bfd7d4908ef1d8a0802909eb0b34eebd43809fedb6f48a3b00"
+          }
+        ],
+        "epoch": 1,
+        "repair": "FIX-0001"
+      },
+      "acceptance": null,
+      "investigation": null,
+      "investigations": {},
+      "title": "写租约按超龄/损坏自动删除，可抢占仍活跃的写入者",
+      "goal": "租约在锁损坏或超龄时不自动抢占；接管须显式且可追溯，活跃写入者不被误伤",
+      "expected": "损坏/空/超龄锁只标疑似失联并拒绝acquire；接管须显式命令并核对观察到的状态与token；活跃写入者可通过续租保持租约",
+      "actual": "stale()对空/坏JSON返回true，acquire直接unlink接管；完整锁仅按30分钟年龄判过期；锁文件创建与写JSON之间存在被其他进程读空删锁的窗口",
+      "conditions": "两个acquire重叠于锁创建/写入窗口；或共享库编辑跨过30分钟后另一任务申请同一资源",
+      "scope": "skills/longdev/scripts/write_lease.py、tests/test_write_lease.py；契约以session-runtime.md既有租约原则为准",
+      "next_step": "原子发布（temp+os.link）消除空锁窗口；损坏/超龄只拒绝并提示takeover；renew续租与gen代计数；takeover显式核对state/token并记录被接管记录",
+      "close_condition": "隔离回归覆盖原子发布、超龄/损坏锁拒绝自动接管、续租与代计数、显式接管及旧token拒绝；脚本行为与session-runtime.md:82一致"
+    },
+    "BUG-0008": {
+      "id": "BUG-0008",
+      "status": "acceptance",
+      "epoch": 1,
+      "facts": [
+        "审计L02隔离反证：'../../../outside'通过内存校验，路径从/virtual/evidence/run/cases解析到/virtual/outside",
+        "审计L09同源问题：tests/test_check_runner.py的fixture命令固定py -3.12，macOS上该回归预先失败"
+      ],
+      "hypotheses": [],
+      "quality_refs": [],
+      "history": [
+        {
+          "at": "2026-10-04T02:11:22.261399+00:00",
+          "epoch": 0,
+          "kind": "create",
+          "data": {
+            "title": "check_runner接受含穿越/分隔符的case ID并拼进输出路径",
+            "goal": "case ID只能是单一安全路径段，stdout/stderr及manifest不得落出run根",
+            "expected": "含路径分隔符、..、绝对路径或Windows保留设备名的ID在目录校验层拒绝；派生路径有纵深防御包含检查",
+            "actual": "case ID仅校验非空字符串且唯一，直接拼成run_dir/cases/<id>，内存校验反证中'../../../outside'被接受并解析到run目录外",
+            "conditions": "共享库误填带分隔符或穿越的ID即可触发，无需恶意来源",
+            "scope": "skills/checks/scripts/check_runner.py、tests/test_check_runner.py；不改'不覆盖既有run'的其余语义",
+            "next_step": "单段安全ID正则约束（字母/数字/._-开头字母数字，拒绝保留设备名）；run_cases派生目录包含检查；隔离回归覆盖",
+            "close_condition": "绝对路径/../正反斜杠/保留名/超长被拒绝；正常ID及既有run目录行为不变；真实testcases目录校验通过",
+            "facts": [
+              "审计L02隔离反证：'../../../outside'通过内存校验，路径从/virtual/evidence/run/cases解析到/virtual/outside",
+              "审计L09同源问题：tests/test_check_runner.py的fixture命令固定py -3.12，macOS上该回归预先失败"
+            ]
+          }
+        },
+        {
+          "at": "2026-10-04T02:12:16.632602+00:00",
+          "epoch": 1,
+          "kind": "repair",
+          "data": {
+            "id": "BUG-0008",
+            "version": "working tree based on 2e18b8a46b8458f3c9449949f0769616d48b0eac（含等待接续规则未提交修订）",
+            "summary": "check_runner.py新增SAFE_CASE_ID单段约束（字母/数字开头，._-，≤128字符，拒绝./..与Windows保留设备名）于validate_catalog；run_cases对派生目录加纵深防御：含分隔符/绝对路径或resolve后不在run根内即CatalogError；测试fixture命令py -3.12改为sys.executable修复macOS预先失败",
+            "cause": "case ID仅校验非空唯一即拼为run_dir/cases/<id>，未限制路径段字符；fixture固定Windows解释器",
+            "coverage": "tests/test_check_runner.py 7项：unsafe ID（../、..、正反斜杠、绝对路径、aux/com1、-开头、超长）校验拒绝；safe ID保留；子集运行manifest/指纹；未知ID拒绝",
+            "refuted": "未实测symlink子目录重定向（校验层+包含检查双层防御，真实testcases目录无此类ID）；Windows真机行为未覆盖"
+          }
+        },
+        {
+          "at": "2026-10-04T02:16:07.565788+00:00",
+          "epoch": 1,
+          "kind": "verify",
+          "data": {
+            "id": "BUG-0008",
+            "method": "隔离unittest回归（新增unsafe ID校验拒绝与safe ID保留测试）+ 真实testcases目录校验 + fixture修复后macOS原先失败的子集运行回归转绿",
+            "expected": "含分隔符/..、绝对路径、保留设备名、-开头及超长ID在校验层拒绝；正常ID与既有run目录行为不变",
+            "actual": "submodule全量93项OK（含write_lease 8项新契约测试）；CLI冒烟status正常；真实testcases校验通过",
+            "runtime_version": "working tree based on 2e18b8a46b8458f3c9449949f0769616d48b0eac（含等待接续规则未提交修订）",
+            "reproduced": true,
+            "result": "pass",
+            "coverage": "complete",
+            "artifacts": [
+              {
+                "path": "skills/longdev/scripts/write_lease.py",
+                "sha256": "f923e66b8ee7d007ba2a02cc74e6f1c6a06c0173743e41eb7c7aa136df4898b0"
+              },
+              {
+                "path": "skills/checks/scripts/check_runner.py",
+                "sha256": "92a431364b86be4cd68e4a60ab1fafa133cd7853f98fe1dfc473fad2724c64e5"
+              },
+              {
+                "path": "tests/test_write_lease.py",
+                "sha256": "60979048ed034c7590b22ec18c541aa9af9fcf71798091fada424876ee272532"
+              },
+              {
+                "path": "tests/test_check_runner.py",
+                "sha256": "e663556b92a63c0c70cb4aa883beb930e1c88833068961a210af9aa82b77dc7b"
+              }
+            ],
+            "evidence": [
+              {
+                "path": ".work/audit-l01-l02/submodule-tests.log",
+                "sha256": "bec17b303350eb72e7566d7cc50a48023e72df4eaf8994f2edfde1a9c5b4f212"
+              },
+              {
+                "path": ".work/audit-l01-l02/catalog-validate.log",
+                "sha256": "bd766b47d7e2e3bfd7d4908ef1d8a0802909eb0b34eebd43809fedb6f48a3b00"
+              }
+            ]
+          }
+        }
+      ],
+      "repairs": [
+        {
+          "id": "FIX-0001",
+          "at": "2026-10-04T02:12:16.632412+00:00",
+          "epoch": 1,
+          "revision": 73,
+          "recurrence": 0,
+          "version": "working tree based on 2e18b8a46b8458f3c9449949f0769616d48b0eac（含等待接续规则未提交修订）",
+          "summary": "check_runner.py新增SAFE_CASE_ID单段约束（字母/数字开头，._-，≤128字符，拒绝./..与Windows保留设备名）于validate_catalog；run_cases对派生目录加纵深防御：含分隔符/绝对路径或resolve后不在run根内即CatalogError；测试fixture命令py -3.12改为sys.executable修复macOS预先失败",
+          "cause": "case ID仅校验非空唯一即拼为run_dir/cases/<id>，未限制路径段字符；fixture固定Windows解释器",
+          "coverage": "tests/test_check_runner.py 7项：unsafe ID（../、..、正反斜杠、绝对路径、aux/com1、-开头、超长）校验拒绝；safe ID保留；子集运行manifest/指纹；未知ID拒绝"
+        }
+      ],
+      "recurrences": [],
+      "relations": [],
+      "verification": {
+        "id": "BUG-0008",
+        "method": "隔离unittest回归（新增unsafe ID校验拒绝与safe ID保留测试）+ 真实testcases目录校验 + fixture修复后macOS原先失败的子集运行回归转绿",
+        "expected": "含分隔符/..、绝对路径、保留设备名、-开头及超长ID在校验层拒绝；正常ID与既有run目录行为不变",
+        "actual": "submodule全量93项OK（含write_lease 8项新契约测试）；CLI冒烟status正常；真实testcases校验通过",
+        "runtime_version": "working tree based on 2e18b8a46b8458f3c9449949f0769616d48b0eac（含等待接续规则未提交修订）",
+        "reproduced": true,
+        "result": "pass",
+        "coverage": "complete",
+        "artifacts": [
+          {
+            "path": "skills/longdev/scripts/write_lease.py",
+            "sha256": "f923e66b8ee7d007ba2a02cc74e6f1c6a06c0173743e41eb7c7aa136df4898b0"
+          },
+          {
+            "path": "skills/checks/scripts/check_runner.py",
+            "sha256": "92a431364b86be4cd68e4a60ab1fafa133cd7853f98fe1dfc473fad2724c64e5"
+          },
+          {
+            "path": "tests/test_write_lease.py",
+            "sha256": "60979048ed034c7590b22ec18c541aa9af9fcf71798091fada424876ee272532"
+          },
+          {
+            "path": "tests/test_check_runner.py",
+            "sha256": "e663556b92a63c0c70cb4aa883beb930e1c88833068961a210af9aa82b77dc7b"
+          }
+        ],
+        "evidence": [
+          {
+            "path": ".work/audit-l01-l02/submodule-tests.log",
+            "sha256": "bec17b303350eb72e7566d7cc50a48023e72df4eaf8994f2edfde1a9c5b4f212"
+          },
+          {
+            "path": ".work/audit-l01-l02/catalog-validate.log",
+            "sha256": "bd766b47d7e2e3bfd7d4908ef1d8a0802909eb0b34eebd43809fedb6f48a3b00"
+          }
+        ],
+        "epoch": 1,
+        "repair": "FIX-0001"
+      },
+      "acceptance": null,
+      "investigation": null,
+      "investigations": {},
+      "title": "check_runner接受含穿越/分隔符的case ID并拼进输出路径",
+      "goal": "case ID只能是单一安全路径段，stdout/stderr及manifest不得落出run根",
+      "expected": "含路径分隔符、..、绝对路径或Windows保留设备名的ID在目录校验层拒绝；派生路径有纵深防御包含检查",
+      "actual": "case ID仅校验非空字符串且唯一，直接拼成run_dir/cases/<id>，内存校验反证中'../../../outside'被接受并解析到run目录外",
+      "conditions": "共享库误填带分隔符或穿越的ID即可触发，无需恶意来源",
+      "scope": "skills/checks/scripts/check_runner.py、tests/test_check_runner.py；不改'不覆盖既有run'的其余语义",
+      "next_step": "单段安全ID正则约束（字母/数字/._-开头字母数字，拒绝保留设备名）；run_cases派生目录包含检查；隔离回归覆盖",
+      "close_condition": "绝对路径/../正反斜杠/保留名/超长被拒绝；正常ID及既有run目录行为不变；真实testcases目录校验通过"
     }
   },
   "feedback": {
@@ -1625,6 +2219,81 @@
                 "target": "BUG-0004",
                 "confidence": "confirmed",
                 "reason": "已确认生命周期协议缺口；宿主实际回收根因仍待实测，不混为已修复"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "FB-0006": {
+      "id": "FB-0006",
+      "raw": "我有发现 codex-glm 在做 longdev 开发时，经常等subagent结束后莫名就停下来，要不就是陷入一个命令调用死循环，这会是我们的 harness 和 longdev skill 中的BUG吗\n\n他说：我这边看到子代理仍在执行，没有阻塞或错误信号。我继续等它回传，如果长时间无结果会主动切入并处理。但是我UI上看不出来它在工作。\n\n1、主会话显示 worked 而不是 working；\n2、没有任何的 background subagent， 没有 /ps 提示。\n\n```\n• Waiting for 01a0f173-38ab-7b83-a7fe-4019cf227265\n• Finished waiting\n  └ No agents completed yet\n• Sent input to 01a0f173-38ab-7b83-a7fe-4019cf227265\n  └ 请继续按高推理档完成，不要降低标准；如果已经完成就回传结果。\n• Waiting for 01a0f173-38ab-7b83-a7fe-4019cf227265\n• Finished waiting\n  └ No agents completed yet\n• Waiting for 01a0f173-38ab-7b83-a7fe-4019cf227265\n• Finished waiting\n  └ No agents completed yet\n```\n已把子代理切到高推理档，等待它回传结果。\n```\n  Worked for 12m 20s • 16:44\n```",
+      "source": "用户2026-09-30 codex-glm等待提前结束与命令循环反馈；含用户粘贴轨迹，非宿主原始日志",
+      "at": "2026-09-30T09:23:14.366555+00:00",
+      "created_revision": 60,
+      "items": [
+        {
+          "id": "1",
+          "text": "经常等subagent结束后莫名就停下来",
+          "route": {
+            "kind": "bug",
+            "target": "BUG-0005",
+            "confidence": "suspected",
+            "reason": "按本轮等待与命令循环分别保留；粘贴轨迹支持现象，未证实运行时根因"
+          },
+          "history": [
+            {
+              "at": "2026-09-30T09:23:14.471085+00:00",
+              "previous": null,
+              "route": {
+                "kind": "bug",
+                "target": "BUG-0005",
+                "confidence": "suspected",
+                "reason": "按本轮等待与命令循环分别保留；粘贴轨迹支持现象，未证实运行时根因"
+              }
+            }
+          ]
+        },
+        {
+          "id": "2",
+          "text": "要不就是陷入一个命令调用死循环",
+          "route": {
+            "kind": "bug",
+            "target": "BUG-0006",
+            "confidence": "suspected",
+            "reason": "按本轮等待与命令循环分别保留；粘贴轨迹支持现象，未证实运行时根因"
+          },
+          "history": [
+            {
+              "at": "2026-09-30T09:23:14.505748+00:00",
+              "previous": null,
+              "route": {
+                "kind": "bug",
+                "target": "BUG-0006",
+                "confidence": "suspected",
+                "reason": "按本轮等待与命令循环分别保留；粘贴轨迹支持现象，未证实运行时根因"
+              }
+            }
+          ]
+        },
+        {
+          "id": "3",
+          "text": "他说：我这边看到子代理仍在执行，没有阻塞或错误信号。我继续等它回传，如果长时间无结果会主动切入并处理。但是我UI上看不出来它在工作。\n\n1、主会话显示 worked 而不是 working；\n2、没有任何的 background subagent， 没有 /ps 提示。\n\n```\n• Waiting for 01a0f173-38ab-7b83-a7fe-4019cf227265\n• Finished waiting\n  └ No agents completed yet\n• Sent input to 01a0f173-38ab-7b83-a7fe-4019cf227265\n  └ 请继续按高推理档完成，不要降低标准；如果已经完成就回传结果。\n• Waiting for 01a0f173-38ab-7b83-a7fe-4019cf227265\n• Finished waiting\n  └ No agents completed yet\n• Waiting for 01a0f173-38ab-7b83-a7fe-4019cf227265\n• Finished waiting\n  └ No agents completed yet\n```\n已把子代理切到高推理档，等待它回传结果。\n```\n  Worked for 12m 20s • 16:44\n```",
+          "route": {
+            "kind": "bug",
+            "target": "BUG-0005",
+            "confidence": "suspected",
+            "reason": "按本轮等待与命令循环分别保留；粘贴轨迹支持现象，未证实运行时根因"
+          },
+          "history": [
+            {
+              "at": "2026-09-30T09:23:14.540297+00:00",
+              "previous": null,
+              "route": {
+                "kind": "bug",
+                "target": "BUG-0005",
+                "confidence": "suspected",
+                "reason": "按本轮等待与命令循环分别保留；粘贴轨迹支持现象，未证实运行时根因"
               }
             }
           ]
