@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "revision": 76,
+  "revision": 81,
   "next_bug": 10,
   "next_feedback": 7,
   "issues": {
@@ -1516,7 +1516,7 @@
     },
     "BUG-0007": {
       "id": "BUG-0007",
-      "status": "acceptance",
+      "status": "closed",
       "epoch": 1,
       "facts": [
         "审计L01隔离反证：临时目录中超龄锁被第二次acquire直接接管，旧token释放报lease token mismatch；空锁同样被接管",
@@ -1599,6 +1599,17 @@
               }
             ]
           }
+        },
+        {
+          "at": "2026-10-05T16:20:36.518027+00:00",
+          "epoch": 1,
+          "kind": "accept",
+          "data": {
+            "id": "BUG-0007",
+            "kind": "user",
+            "source": "用户 2026-10-05 验收消息：事项可以验收",
+            "decision": "accepted"
+          }
         }
       ],
       "repairs": [
@@ -1656,7 +1667,12 @@
         "epoch": 1,
         "repair": "FIX-0001"
       },
-      "acceptance": null,
+      "acceptance": {
+        "id": "BUG-0007",
+        "kind": "user",
+        "source": "用户 2026-10-05 验收消息：事项可以验收",
+        "decision": "accepted"
+      },
       "investigation": null,
       "investigations": {},
       "title": "写租约按超龄/损坏自动删除，可抢占仍活跃的写入者",
@@ -1670,7 +1686,7 @@
     },
     "BUG-0008": {
       "id": "BUG-0008",
-      "status": "acceptance",
+      "status": "closed",
       "epoch": 1,
       "facts": [
         "审计L02隔离反证：'../../../outside'通过内存校验，路径从/virtual/evidence/run/cases解析到/virtual/outside",
@@ -1753,6 +1769,17 @@
               }
             ]
           }
+        },
+        {
+          "at": "2026-10-05T16:29:57.968466+00:00",
+          "epoch": 1,
+          "kind": "accept",
+          "data": {
+            "id": "BUG-0008",
+            "kind": "user",
+            "source": "用户 2026-10-05 对本问题的明确验收消息",
+            "decision": "accepted"
+          }
         }
       ],
       "repairs": [
@@ -1810,7 +1837,12 @@
         "epoch": 1,
         "repair": "FIX-0001"
       },
-      "acceptance": null,
+      "acceptance": {
+        "id": "BUG-0008",
+        "kind": "user",
+        "source": "用户 2026-10-05 对本问题的明确验收消息",
+        "decision": "accepted"
+      },
       "investigation": null,
       "investigations": {},
       "title": "check_runner接受含穿越/分隔符的case ID并拼进输出路径",
@@ -1824,8 +1856,8 @@
     },
     "BUG-0009": {
       "id": "BUG-0009",
-      "status": "triage",
-      "epoch": 0,
+      "status": "closed",
+      "epoch": 1,
       "facts": [
         "L01 修复时需回读 session-runtime.md:82 原文消歧'租约/锁'混用",
         "ASD-STE100 结构规则可移植（一事一句、术语一致、禁含糊限定词、禁令前置）；词汇规则依赖英语词典不移植，中文以受控词汇表替代",
@@ -1853,13 +1885,151 @@
               "既有哲学对齐：'过期不能自动证明旧客户端已停止'与 STE 模态保留原则（不许把低置信观察升级为强断言）同构"
             ]
           }
+        },
+        {
+          "at": "2026-10-05T16:31:07.366596+00:00",
+          "epoch": 1,
+          "kind": "repair",
+          "data": {
+            "id": "BUG-0009",
+            "version": "longdev 0.18.4 / parent f04c9bf",
+            "summary": "受控语言纪律落地：编写规范与受控词汇表入规则维护层（agents-top.md，compose 再生层一致）；契约文本修订 10 处（6 处必要时改写为触发条件、4 处子 agent/sub-agent 统一为子代理、任务锁改任务租约）；新增 scripts/rule_text_lint.py 并在父 testcases 注册 rule-text-lint case（full profile，baseline 11）",
+            "cause": "规则层与契约文本无受控语言约束：术语同义混用（租约/锁、审查/验收、子代理多写法）、模糊限定词（必要时/适当/尽量/酌情）、规则文本不入任何静态回归",
+            "coverage": "agents-top.md、agents-tool.md、生成层（compose 再生一致）、longdev SKILL 与 references、autopilot SKILL；静态检查覆盖层源与插件全部技能文本"
+          }
+        },
+        {
+          "at": "2026-10-05T16:34:29.199408+00:00",
+          "epoch": 1,
+          "kind": "verify",
+          "data": {
+            "id": "BUG-0009",
+            "method": "scripts/rule_text_lint.py 全表面扫描（层源+插件技能文本）+ check_runner rule-text-lint case + 父 100 项单测 + 子模块全量",
+            "expected": "限定词黑名单与术语变体 0 违反；单条规则长度违反数不超过基线 11；rule-text-lint case 经 check_runner exit 0",
+            "actual": "lint 全表面 11 处违反且全部为 rule-length（基线 11 内，限定词与术语变体 0）；check_runner --validate 通过、case 真实运行 exit 0；父 unittest 100 项通过、子模块全量通过；证据 lint-findings.json violations=11",
+            "runtime_version": "longdev 0.18.4 / parent f04c9bf",
+            "reproduced": true,
+            "result": "pass",
+            "coverage": "complete",
+            "artifacts": [
+              {
+                "path": "skills/longdev/SKILL.md",
+                "sha256": "d28c1d4e11172db68bde21efcdb9e07c987488dc7814b2f5a35ae20094e00f07"
+              },
+              {
+                "path": "skills/longdev/references/session-runtime.md",
+                "sha256": "00a0bec6163ed27b50903d3a404e7787b89cff2a0d4d6634ac1b6d3300277ecc"
+              },
+              {
+                "path": "skills/longdev/references/execution-protocol.md",
+                "sha256": "15315f11ef1312a242f02cf66025358cbab33d1c74930e19cf3a26e7ae602a67"
+              },
+              {
+                "path": "skills/autopilot/SKILL.md",
+                "sha256": "6629d0eb95566f1f69995bb500a656110152703c65bf46b4362b884f1ee46db0"
+              },
+              {
+                "path": "docs/bugs/evidence/bug0009/lint-findings.json",
+                "sha256": "c906be7f5ef90a12747e0e36c104a6a462e3b6e35accd50d337cbcf983400bab"
+              },
+              {
+                "path": "docs/bugs/evidence/bug0009/full-run-manifest.json",
+                "sha256": "285f487311841535163796601409d9c77315f2f117c4a5d7015870268877b4ee"
+              }
+            ],
+            "evidence": [
+              {
+                "path": "docs/bugs/evidence/bug0009/lint-findings.json",
+                "sha256": "c906be7f5ef90a12747e0e36c104a6a462e3b6e35accd50d337cbcf983400bab"
+              },
+              {
+                "path": "docs/bugs/evidence/bug0009/full-run-manifest.json",
+                "sha256": "285f487311841535163796601409d9c77315f2f117c4a5d7015870268877b4ee"
+              }
+            ]
+          }
+        },
+        {
+          "at": "2026-10-05T16:58:21.008742+00:00",
+          "epoch": 1,
+          "kind": "accept",
+          "data": {
+            "id": "BUG-0009",
+            "kind": "user",
+            "source": "用户 2026-10-05 对本问题的明确验收消息",
+            "decision": "accepted"
+          }
         }
       ],
-      "repairs": [],
+      "repairs": [
+        {
+          "id": "FIX-0001",
+          "at": "2026-10-05T16:31:07.366402+00:00",
+          "epoch": 1,
+          "revision": 79,
+          "recurrence": 0,
+          "version": "longdev 0.18.4 / parent f04c9bf",
+          "summary": "受控语言纪律落地：编写规范与受控词汇表入规则维护层（agents-top.md，compose 再生层一致）；契约文本修订 10 处（6 处必要时改写为触发条件、4 处子 agent/sub-agent 统一为子代理、任务锁改任务租约）；新增 scripts/rule_text_lint.py 并在父 testcases 注册 rule-text-lint case（full profile，baseline 11）",
+          "cause": "规则层与契约文本无受控语言约束：术语同义混用（租约/锁、审查/验收、子代理多写法）、模糊限定词（必要时/适当/尽量/酌情）、规则文本不入任何静态回归",
+          "coverage": "agents-top.md、agents-tool.md、生成层（compose 再生一致）、longdev SKILL 与 references、autopilot SKILL；静态检查覆盖层源与插件全部技能文本"
+        }
+      ],
       "recurrences": [],
       "relations": [],
-      "verification": null,
-      "acceptance": null,
+      "verification": {
+        "id": "BUG-0009",
+        "method": "scripts/rule_text_lint.py 全表面扫描（层源+插件技能文本）+ check_runner rule-text-lint case + 父 100 项单测 + 子模块全量",
+        "expected": "限定词黑名单与术语变体 0 违反；单条规则长度违反数不超过基线 11；rule-text-lint case 经 check_runner exit 0",
+        "actual": "lint 全表面 11 处违反且全部为 rule-length（基线 11 内，限定词与术语变体 0）；check_runner --validate 通过、case 真实运行 exit 0；父 unittest 100 项通过、子模块全量通过；证据 lint-findings.json violations=11",
+        "runtime_version": "longdev 0.18.4 / parent f04c9bf",
+        "reproduced": true,
+        "result": "pass",
+        "coverage": "complete",
+        "artifacts": [
+          {
+            "path": "skills/longdev/SKILL.md",
+            "sha256": "d28c1d4e11172db68bde21efcdb9e07c987488dc7814b2f5a35ae20094e00f07"
+          },
+          {
+            "path": "skills/longdev/references/session-runtime.md",
+            "sha256": "00a0bec6163ed27b50903d3a404e7787b89cff2a0d4d6634ac1b6d3300277ecc"
+          },
+          {
+            "path": "skills/longdev/references/execution-protocol.md",
+            "sha256": "15315f11ef1312a242f02cf66025358cbab33d1c74930e19cf3a26e7ae602a67"
+          },
+          {
+            "path": "skills/autopilot/SKILL.md",
+            "sha256": "6629d0eb95566f1f69995bb500a656110152703c65bf46b4362b884f1ee46db0"
+          },
+          {
+            "path": "docs/bugs/evidence/bug0009/lint-findings.json",
+            "sha256": "c906be7f5ef90a12747e0e36c104a6a462e3b6e35accd50d337cbcf983400bab"
+          },
+          {
+            "path": "docs/bugs/evidence/bug0009/full-run-manifest.json",
+            "sha256": "285f487311841535163796601409d9c77315f2f117c4a5d7015870268877b4ee"
+          }
+        ],
+        "evidence": [
+          {
+            "path": "docs/bugs/evidence/bug0009/lint-findings.json",
+            "sha256": "c906be7f5ef90a12747e0e36c104a6a462e3b6e35accd50d337cbcf983400bab"
+          },
+          {
+            "path": "docs/bugs/evidence/bug0009/full-run-manifest.json",
+            "sha256": "285f487311841535163796601409d9c77315f2f117c4a5d7015870268877b4ee"
+          }
+        ],
+        "epoch": 1,
+        "repair": "FIX-0001"
+      },
+      "acceptance": {
+        "id": "BUG-0009",
+        "kind": "user",
+        "source": "用户 2026-10-05 对本问题的明确验收消息",
+        "decision": "accepted"
+      },
       "investigation": null,
       "investigations": {},
       "title": "规则层文本缺受控语言约束，契约可二解且无静态回归",

@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "runner_version": "1.1",
+  "run_id": "rule-text-lint",
+  "profile": null,
+  "case_filter": null,
+  "started_at": "2026-10-05T02:38:21.336658+00:00",
+  "finished_at": "2026-10-05T02:38:21.367457+00:00",
+  "command": [
+    "/opt/anaconda3/bin/python3",
+    "longdev-plugin/skills/checks/scripts/check_runner.py",
+    "--catalog-root",
+    "testcases",
+    "--source-root",
+    ".",
+    "--cases",
+    "rule-text-lint",
+    "--output",
+    ".work/checks/rule-text-lint"
+  ],
+  "environment": {
+    "python": "3.11.8",
+    "platform": "macOS-14.4.1-arm64-arm-64bit",
+    "cwd": "/Users/<local-user>/Codes/agentic/harness",
+    "overrides": {
+      "PYTHONUTF8": "1",
+      "PYTHONIOENCODING": "utf-8"
+    }
+  },
+  "source_root": "/Users/<local-user>/Codes/agentic/harness",
+  "catalog_root": "/Users/<local-user>/Codes/agentic/harness/testcases",
+  "cases": [
+    {
+      "id": "rule-text-lint",
+      "title": "Rule-text discipline lint (qualifiers, rule length, controlled terms)",
+      "command": [
+        "python3",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/rule_text_lint.py",
+        "agents-top.md",
+        "agents-tool.md",
+        "longdev-plugin/skills",
+        "--baseline",
+        "11"
+      ],
+      "cwd": "/Users/<local-user>/Codes/agentic/harness",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "passed": true,
+      "duration_seconds": 0.03,
+      "runner_error": null,
+      "stdout": "cases/rule-text-lint/stdout.txt",
+      "stderr": "cases/rule-text-lint/stderr.txt",
+      "fingerprints": {
+        "stdout": "05ce38ccf64e33ec618ca194dffcf814a1a7804287a5aa17d4e381d2a9ede5f1",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "exit_code": 0
+}

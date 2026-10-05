@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "revision": 76,
+  "revision": 81,
   "issues": [
     {
       "id": "BUG-0001",
@@ -71,7 +71,7 @@
     {
       "id": "BUG-0007",
       "title": "写租约按超龄/损坏自动删除，可抢占仍活跃的写入者",
-      "status": "acceptance",
+      "status": "closed",
       "goal": "租约在锁损坏或超龄时不自动抢占；接管须显式且可追溯，活跃写入者不被误伤",
       "conditions": "两个acquire重叠于锁创建/写入窗口；或共享库编辑跨过30分钟后另一任务申请同一资源",
       "actual": "stale()对空/坏JSON返回true，acquire直接unlink接管；完整锁仅按30分钟年龄判过期；锁文件创建与写JSON之间存在被其他进程读空删锁的窗口",
@@ -82,7 +82,7 @@
     {
       "id": "BUG-0008",
       "title": "check_runner接受含穿越/分隔符的case ID并拼进输出路径",
-      "status": "acceptance",
+      "status": "closed",
       "goal": "case ID只能是单一安全路径段，stdout/stderr及manifest不得落出run根",
       "conditions": "共享库误填带分隔符或穿越的ID即可触发，无需恶意来源",
       "actual": "case ID仅校验非空字符串且唯一，直接拼成run_dir/cases/<id>，内存校验反证中'../../../outside'被接受并解析到run目录外",
@@ -93,7 +93,7 @@
     {
       "id": "BUG-0009",
       "title": "规则层文本缺受控语言约束，契约可二解且无静态回归",
-      "status": "triage",
+      "status": "closed",
       "goal": "规则层与 references 契约文本满足受控语言纪律：术语一词一义、一事一句、禁令强度不丢失、无含糊限定词，且规则文本本身进入 checks 静态回归",
       "conditions": "任何新增或修订层规则/契约文本时即可触发；同义混用已造成实施歧义（本次 L01 修复需回读 session-runtime.md 原文消歧）",
       "actual": "层文档与契约存在同义混用（租约/锁、复核点/预算、验收/审查交替出现）、复合条件长句与\"适当/必要时\"类限定词；契约改写时无禁令强度不丢失的编写红线；规则文本不进任何回归检查",
