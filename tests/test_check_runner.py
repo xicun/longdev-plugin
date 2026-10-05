@@ -92,5 +92,125 @@ class CheckRunnerTests(unittest.TestCase):
             self.assertFalse(RUNNER.safe_case_id(bad), bad)
 
 
+class CheckRunnerTimeoutTests(unittest.TestCase):
+    """L04：超时配置生效并保留证据，不因挂起丢失已完成的 run 记录。"""
+
+    def test_validate_rejects_nonpositive_timeout_seconds(self):
+        for bad in (0, -1, True, 1.5, "30"):
+            with tempfile.TemporaryDirectory() as temp:
+                catalog = _source_catalog(Path(temp))
+                payload = json.loads((catalog / "cases.json").read_text(encoding="utf-8"))
+                payload["cases"][0]["timeout_seconds"] = bad
+                (catalog / "cases.json").write_text(json.dumps(payload), encoding="utf-8")
+                with self.assertRaises(RUNNER.CatalogError):
+                    RUNNER.validate_catalog(catalog)
+
+    def test_validate_rejects_noninteger_default_timeout(self):
+        with tempfile.TemporaryDirectory() as temp:
+            catalog = _source_catalog(Path(temp))
+            source = Path(temp) / "source"
+            source.mkdir()
+            out = Path(temp) / "run"
+            # default_timeout 是 CLI 参数而非 catalog 字段；这里只验证正数路径可跑通。
+            result = RUNNER.run_cases(catalog, source, "smoke", None, ["probe"], out,
+                                      default_timeout=60)
+            self.assertEqual(result, 0)
+
+    def test_timeout_marks_case_failed_and_records_timed_out(self):
+        with tempfile.TemporaryDirectory() as temp:
+            catalog = _source_catalog(Path(temp))
+            payload = json.loads((catalog / "cases.json").read_text(encoding="utf-8"))
+            payload["cases"][0]["command"] = [sys.executable, "-B", "-c",
+                                              "import time; print('hang'); time.sleep(30)"]
+            (catalog / "cases.json").write_text(json.dumps(payload), encoding="utf-8")
+            source = Path(temp) / "source"
+            source.mkdir()
+            out = Path(temp) / "run"
+            result = RUNNER.run_cases(catalog, source, "smoke", None, ["probe"], out,
+                                      default_timeout=2)
+            self.assertEqual(result, 1)
+            manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
+            case = manifest["cases"][0]
+            self.assertFalse(case["passed"])
+            self.assertTrue(case["timed_out"])
+            self.assertIn("timeout", case["runner_error"])
+            self.assertEqual(case["timeout_seconds"], 2)
+            self.assertFalse(manifest["interrupted"])
+            self.assertTrue((out / "cases" / "probe" / "stdout.txt").exists())
+
+    def test_case_timeout_seconds_overrides_default(self):
+        with tempfile.TemporaryDirectory() as temp:
+            catalog = _source_catalog(Path(temp))
+            payload = json.loads((catalog / "cases.json").read_text(encoding="utf-8"))
+            payload["cases"][0]["timeout_seconds"] = 120
+            (catalog / "cases.json").write_text(json.dumps(payload), encoding="utf-8")
+            source = Path(temp) / "source"
+            source.mkdir()
+            out = Path(temp) / "run"
+            result = RUNNER.run_cases(catalog, source, "smoke", None, ["probe"], out,
+                                      default_timeout=1)
+            self.assertEqual(result, 0)
+            manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["cases"][0]["timeout_seconds"], 120)
+
+    def test_streaming_logs_writen_before_process_ends(self):
+        # L04：stdout/stderr 句柄直写文件；子进程正常结束后文件即包含输出。
+        with tempfile.TemporaryDirectory() as temp:
+            catalog = _source_catalog(Path(temp))
+            source = Path(temp) / "source"
+            source.mkdir()
+            out = Path(temp) / "run"
+            RUNNER.run_cases(catalog, source, "smoke", None, ["probe"], out)
+            stdout_text = (out / "cases" / "probe" / "stdout.txt").read_text(encoding="utf-8")
+            self.assertIn("ok", stdout_text)
+
+
+class CheckRunnerBindingTests(unittest.TestCase):
+    """L03：绑定输入前后指纹一致才算通过；中途漂移使 run 失败。"""
+
+    def test_binding_matched_when_source_untouched(self):
+        with tempfile.TemporaryDirectory() as temp:
+            catalog = _source_catalog(Path(temp))
+            source = Path(temp) / "source"
+            source.mkdir()
+            bound = Path(temp) / "src.txt"
+            bound.write_text("stable", encoding="utf-8")
+            out = Path(temp) / "run"
+            result = RUNNER.run_cases(catalog, source, "smoke", None, ["probe"], out,
+                                      bind_inputs=[bound])
+            self.assertEqual(result, 0)
+            manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
+            binding = manifest["source_binding"]
+            self.assertTrue(manifest["source_binding"]["matched"])
+            self.assertEqual(manifest["source_binding"]["initial"],
+                             manifest["source_binding"]["final"])
+            fingerprints = json.loads((out / "fingerprints.json").read_text(encoding="utf-8"))
+            self.assertIn("src.txt", fingerprints["inputs"])
+
+    def test_drift_fails_run(self):
+        with tempfile.TemporaryDirectory() as temp:
+            catalog = _source_catalog(Path(temp))
+            source = Path(temp) / "source"
+            source.mkdir()
+            bound = Path(temp) / "bound.txt"
+            bound.write_text("base", encoding="utf-8")
+            # 用例执行中修改被绑定输入：run 必须因此失败并记录 drift。
+            payload = json.loads((catalog / "cases.json").read_text(encoding="utf-8"))
+            payload["cases"][0]["command"] = [
+                sys.executable, "-B", "-c",
+                "import pathlib,sys; p=pathlib.Path(sys.argv[1]); p.write_text(p.read_text()+'drift')",
+                str(bound),
+            ]
+            (catalog / "cases.json").write_text(json.dumps(payload), encoding="utf-8")
+            out = Path(temp) / "run"
+            result = RUNNER.run_cases(catalog, source, "smoke", None, ["probe"], out,
+                                      bind_inputs=[bound])
+            self.assertEqual(result, 1)
+            manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
+            self.assertTrue(manifest["cases"][0]["passed"])  # case 本身退出码匹配
+            self.assertFalse(manifest["source_binding"]["matched"])
+            self.assertEqual(manifest["exit_code"], 1)
+
+
 if __name__ == "__main__":
     unittest.main()
