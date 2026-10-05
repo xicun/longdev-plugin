@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "runner_version": "1.2",
+  "run_id": "match-001",
+  "profile": null,
+  "case_filter": null,
+  "started_at": "2026-10-05T19:36:03.558684+00:00",
+  "finished_at": "2026-10-05T19:36:03.573812+00:00",
+  "command": [
+    "/opt/anaconda3/bin/python3",
+    "skills/checks/scripts/check_runner.py",
+    "--catalog-root",
+    "/Users/zhaozhimeng/.claude/jobs/9597f1ac/tmp/l03l04-evidence",
+    "--source-root",
+    "/Users/zhaozhimeng/.claude/jobs/9597f1ac/tmp/l03l04-evidence",
+    "--cases",
+    "probe-ok",
+    "--output",
+    "/Users/zhaozhimeng/.claude/jobs/9597f1ac/tmp/l03l04-evidence/match",
+    "--bind-input",
+    "/Users/zhaozhimeng/.claude/jobs/9597f1ac/tmp/l03l04-evidence/bound.txt",
+    "--default-timeout",
+    "30"
+  ],
+  "environment": {
+    "python": "3.11.8",
+    "platform": "macOS-14.4.1-arm64-arm-64bit",
+    "cwd": "/Users/zhaozhimeng/Codes/agentic/harness/longdev-plugin",
+    "overrides": {
+      "PYTHONUTF8": "1",
+      "PYTHONIOENCODING": "utf-8"
+    }
+  },
+  "source_root": "/Users/zhaozhimeng/.claude/jobs/9597f1ac/tmp/l03l04-evidence",
+  "catalog_root": "/Users/zhaozhimeng/.claude/jobs/9597f1ac/tmp/l03l04-evidence",
+  "source_binding": {
+    "roots": [
+      "/Users/zhaozhimeng/.claude/jobs/9597f1ac/tmp/l03l04-evidence/bound.txt"
+    ],
+    "initial": {
+      "bound.txt": "f34848ca92665c342abd5816c9e3eda0e82180671195362bcd0080544a3bc2ac"
+    },
+    "final": {
+      "bound.txt": "f34848ca92665c342abd5816c9e3eda0e82180671195362bcd0080544a3bc2ac"
+    },
+    "matched": true
+  },
+  "cases": [
+    {
+      "id": "probe-ok",
+      "title": "ok probe",
+      "command": [
+        "sh",
+        "-c",
+        "echo ok"
+      ],
+      "cwd": ".",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "passed": true,
+      "duration_seconds": 0.006,
+      "runner_error": null,
+      "timed_out": false,
+      "timeout_seconds": 30,
+      "stdout": "cases/probe-ok/stdout.txt",
+      "stderr": "cases/probe-ok/stderr.txt",
+      "fingerprints": {
+        "stdout": "dc51b8c96c2d745df3bd5590d990230a482fd247123599548e0632fdbf97fc22",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "interrupted": false,
+  "exit_code": 0
+}

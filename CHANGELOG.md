@@ -1,3 +1,9 @@
+## 0.18.5 — 2026-10-06
+
+- check_runner 1.2（rules-audit L03/L04）：新增 `--bind-input` 显式源绑定，执行前后指纹比对，中途漂移记录于 `source_binding` 并使 run 失败；新增 per-case `timeout_seconds` 与 `--default-timeout`，超时 case 标记 `timed_out` 并保留部分日志。
+- stdout/stderr 经文件句柄实时落盘；`manifest.json` 每个 case 后即时重写，中断（`interrupted: true`）保留已完成结果。
+- BUG-0010（证据绑定）、BUG-0011（超时）按 repair→verify→accept 闭环；新增 7 项 check_runner 单测，真实探针（绑定匹配/漂移/超时）证据存于 docs/bugs/evidence/bug0010-0011/。
+
 ## 0.18.2 — 2026-09-29
 
 - 补齐子代理生命周期：同任务链同职责复用、独立审查隔离、成果交接后安全回收、暂留复核点、槽位不足处理与恢复核验。

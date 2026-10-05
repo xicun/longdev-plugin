@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "revision": 81,
-  "next_bug": 10,
+  "revision": 89,
+  "next_bug": 12,
   "next_feedback": 7,
   "issues": {
     "BUG-0001": {
@@ -2040,6 +2040,374 @@
       "scope": "longdev-plugin：skills/longdev/references/ 与 skills/longdev/SKILL.md 的契约措辞、.harness 层编写规范、checks 目录新增静态检查 case；不引入 asd-ste100-skill 或任何外部词典，只取 ASD-STE100 的结构规则二分与模态保留原则做中文适配",
       "next_step": "1) 受控词汇表定稿并入层文件；2) 契约文档按编写规范修订（禁令前置、一事一句、强度不丢失红线）；3) check_runner 新增规则文本静态检查 case 并纳入真实 testcases 校验；4) 修订后插件版本 bump 并走 repair→verify→accept",
       "close_condition": "词汇表生效且契约文档无同义混用；静态检查在真实 testcases 目录通过并对既有模糊词给出整改清单或基线；规则文本修订有编写规范可依"
+    },
+    "BUG-0010": {
+      "id": "BUG-0010",
+      "status": "closed",
+      "epoch": 1,
+      "facts": [
+        "审计 L03：runner 指纹只覆盖 catalog/日志，不绑定被测源码"
+      ],
+      "hypotheses": [],
+      "quality_refs": [],
+      "history": [
+        {
+          "at": "2026-10-05T19:09:19.668590+00:00",
+          "epoch": 0,
+          "kind": "create",
+          "data": {
+            "kind": "bug",
+            "source": "rules-audit-2026-09-30 L03（父仓库 cases/rules-audit-2026-09-30.md）",
+            "title": "check_runner run 指纹不绑定被测源码，无法证明当前产物经过该验证",
+            "goal": "run 证据必须能绑定被测源码",
+            "expected": "runner 接收显式输入清单并做执行前后指纹比对，manifest 记录绑定结果，源码在 run 中途变化可被发现",
+            "actual": "fingerprints 只覆盖 catalog 三文件与 stdout/stderr，被测源码无指纹绑定，run 指纹与当前产物无法建立对应",
+            "conditions": "审计 L03：check_runner.py :143,177,180",
+            "scope": "skills/checks/scripts/check_runner.py、tests/test_check_runner.py、catalog-schema 参考；既有人工附 manifest 的证据不因本修复作废",
+            "next_step": "runner 新增显式输入绑定参数，执行前后各做指纹并写入 manifest；隔离行为回归覆盖匹配/漂移两分支",
+            "close_condition": "绑定输入前后指纹一致时 manifest 记录绑定成功；中途变化被记录并导致 run 失败；不传绑定参数的既有调用行为不变",
+            "facts": [
+              "审计 L03：runner 指纹只覆盖 catalog/日志，不绑定被测源码"
+            ]
+          }
+        },
+        {
+          "at": "2026-10-05T19:38:04.151055+00:00",
+          "epoch": 1,
+          "kind": "repair",
+          "data": {
+            "id": "BUG-0010",
+            "version": "longdev-plugin ddfc420 / check_runner 1.2",
+            "summary": "check_runner 新增 --bind-input 显式源绑定：执行前后对绑定输入各做指纹，manifest 记录 source_binding(initial/final/matched) 并合并进 fingerprints.json；漂移使 run 失败；不传参数行为不变",
+            "cause": "runner 只对 catalog 三文件与 stdout/stderr 做指纹，被测源码无绑定，run 证据与当前产物无法建立对应（rules-audit L03）",
+            "coverage": "tests/test_check_runner.py 新增 CheckRunnerBindingTests（匹配/漂移两分支）+ 真实探针（matched=True exit 0；中途修改绑定文件 exit 1 matched=False）；不传 --bind-input 的既有 case 回归不变",
+            "expected_revision": 83
+          }
+        },
+        {
+          "at": "2026-10-05T19:39:13.176312+00:00",
+          "epoch": 1,
+          "kind": "verify",
+          "data": {
+            "id": "BUG-0010",
+            "method": "tests.test_check_runner 全量（含新增 L03/L04 用例）+ 真实 check_runner 探针 + 父仓库 100 项单测",
+            "runtime_version": "longdev-plugin ddfc420 / check_runner 1.2",
+            "result": "pass",
+            "reproduced": true,
+            "coverage": "complete",
+            "expected": "绑定输入前后指纹一致时 manifest 记录 matched=true 且 run exit 0；执行中修改绑定文件被记录并导致 run exit 1；不传绑定参数行为不变",
+            "actual": "binding-match 探针 exit 0 matched=true；binding-drift 探针 exit 1 matched=false（case 退出码匹配仍失败）；父 100 项单测通过；check-runner-tests.txt 14 项全过",
+            "evidence": [
+              {
+                "path": "docs/bugs/evidence/bug0010-0011/check-runner-tests.txt",
+                "sha256": "40c520a0e182180575aa8227a2973805b35e32e1df1b1dc90dd45595f862aa6c"
+              },
+              {
+                "path": "docs/bugs/evidence/bug0010-0011/binding-match-manifest.json",
+                "sha256": "f7f2946b27fd4c990c2cc3b843dde1e59daa3a1c54c8bee523dd845da232985e"
+              },
+              {
+                "path": "docs/bugs/evidence/bug0010-0011/binding-drift-manifest.json",
+                "sha256": "a84c547d167d0cc84b2b0c52fe2b8b767be2fd0b8a99b75c0c771e00d0b36e15"
+              },
+              {
+                "path": "docs/bugs/evidence/bug0010-0011/timeout-probe-manifest.json",
+                "sha256": "a4912e75429b533dd5bd9eb54e3cb7cbc62446afab66be6a2eaaecd9d6b8112b"
+              }
+            ],
+            "artifacts": [
+              {
+                "path": "skills/checks/scripts/check_runner.py",
+                "sha256": "385a0391f95dfb22889151896aef81099d20afc1f06f27caaa21821d85b61284"
+              },
+              {
+                "path": "tests/test_check_runner.py",
+                "sha256": "bc8c23707b9d8cf7ae9b6166a42f030a84b0cbf338476f2fe98010936e570cb5"
+              },
+              {
+                "path": "skills/checks/references/catalog-schema.md",
+                "sha256": "0731d5c3f0d96a45161d3cf2e8127a835dcd1372b996b553c3820b6cdb700853"
+              }
+            ]
+          }
+        },
+        {
+          "at": "2026-10-05T19:39:29.462202+00:00",
+          "epoch": 1,
+          "kind": "accept",
+          "data": {
+            "id": "BUG-0010",
+            "kind": "authorized_auto",
+            "decision": "accepted",
+            "source": "用户 2026-10-05 指令“开始 L03/L04”（rules-audit 整改授权）；本会话以真实探针与全量单测按 close_condition 判定",
+            "authorization": "用户指令“开始 L03/L04”覆盖本问题的修复与验证闭环；判据为问题登记的 close_condition",
+            "criteria": "close_condition：绑定/超时行为符合登记判据且既有调用行为不变",
+            "assessor": "longdev 主会话（Claude Code，模型 glm-5.3-flash）"
+          }
+        }
+      ],
+      "repairs": [
+        {
+          "id": "FIX-0001",
+          "at": "2026-10-05T19:38:04.150876+00:00",
+          "epoch": 1,
+          "revision": 84,
+          "recurrence": 0,
+          "version": "longdev-plugin ddfc420 / check_runner 1.2",
+          "summary": "check_runner 新增 --bind-input 显式源绑定：执行前后对绑定输入各做指纹，manifest 记录 source_binding(initial/final/matched) 并合并进 fingerprints.json；漂移使 run 失败；不传参数行为不变",
+          "cause": "runner 只对 catalog 三文件与 stdout/stderr 做指纹，被测源码无绑定，run 证据与当前产物无法建立对应（rules-audit L03）",
+          "coverage": "tests/test_check_runner.py 新增 CheckRunnerBindingTests（匹配/漂移两分支）+ 真实探针（matched=True exit 0；中途修改绑定文件 exit 1 matched=False）；不传 --bind-input 的既有 case 回归不变"
+        }
+      ],
+      "recurrences": [],
+      "relations": [],
+      "verification": {
+        "id": "BUG-0010",
+        "method": "tests.test_check_runner 全量（含新增 L03/L04 用例）+ 真实 check_runner 探针 + 父仓库 100 项单测",
+        "runtime_version": "longdev-plugin ddfc420 / check_runner 1.2",
+        "result": "pass",
+        "reproduced": true,
+        "coverage": "complete",
+        "expected": "绑定输入前后指纹一致时 manifest 记录 matched=true 且 run exit 0；执行中修改绑定文件被记录并导致 run exit 1；不传绑定参数行为不变",
+        "actual": "binding-match 探针 exit 0 matched=true；binding-drift 探针 exit 1 matched=false（case 退出码匹配仍失败）；父 100 项单测通过；check-runner-tests.txt 14 项全过",
+        "evidence": [
+          {
+            "path": "docs/bugs/evidence/bug0010-0011/check-runner-tests.txt",
+            "sha256": "40c520a0e182180575aa8227a2973805b35e32e1df1b1dc90dd45595f862aa6c"
+          },
+          {
+            "path": "docs/bugs/evidence/bug0010-0011/binding-match-manifest.json",
+            "sha256": "f7f2946b27fd4c990c2cc3b843dde1e59daa3a1c54c8bee523dd845da232985e"
+          },
+          {
+            "path": "docs/bugs/evidence/bug0010-0011/binding-drift-manifest.json",
+            "sha256": "a84c547d167d0cc84b2b0c52fe2b8b767be2fd0b8a99b75c0c771e00d0b36e15"
+          },
+          {
+            "path": "docs/bugs/evidence/bug0010-0011/timeout-probe-manifest.json",
+            "sha256": "a4912e75429b533dd5bd9eb54e3cb7cbc62446afab66be6a2eaaecd9d6b8112b"
+          }
+        ],
+        "artifacts": [
+          {
+            "path": "skills/checks/scripts/check_runner.py",
+            "sha256": "385a0391f95dfb22889151896aef81099d20afc1f06f27caaa21821d85b61284"
+          },
+          {
+            "path": "tests/test_check_runner.py",
+            "sha256": "bc8c23707b9d8cf7ae9b6166a42f030a84b0cbf338476f2fe98010936e570cb5"
+          },
+          {
+            "path": "skills/checks/references/catalog-schema.md",
+            "sha256": "0731d5c3f0d96a45161d3cf2e8127a835dcd1372b996b553c3820b6cdb700853"
+          }
+        ],
+        "epoch": 1,
+        "repair": "FIX-0001"
+      },
+      "acceptance": {
+        "id": "BUG-0010",
+        "kind": "authorized_auto",
+        "decision": "accepted",
+        "source": "用户 2026-10-05 指令“开始 L03/L04”（rules-audit 整改授权）；本会话以真实探针与全量单测按 close_condition 判定",
+        "authorization": "用户指令“开始 L03/L04”覆盖本问题的修复与验证闭环；判据为问题登记的 close_condition",
+        "criteria": "close_condition：绑定/超时行为符合登记判据且既有调用行为不变",
+        "assessor": "longdev 主会话（Claude Code，模型 glm-5.3-flash）"
+      },
+      "investigation": null,
+      "investigations": {},
+      "title": "check_runner run 指纹不绑定被测源码，无法证明当前产物经过该验证",
+      "goal": "run 证据必须能绑定被测源码",
+      "expected": "runner 接收显式输入清单并做执行前后指纹比对，manifest 记录绑定结果，源码在 run 中途变化可被发现",
+      "actual": "fingerprints 只覆盖 catalog 三文件与 stdout/stderr，被测源码无指纹绑定，run 指纹与当前产物无法建立对应",
+      "conditions": "审计 L03：check_runner.py :143,177,180",
+      "scope": "skills/checks/scripts/check_runner.py、tests/test_check_runner.py、catalog-schema 参考；既有人工附 manifest 的证据不因本修复作废",
+      "next_step": "runner 新增显式输入绑定参数，执行前后各做指纹并写入 manifest；隔离行为回归覆盖匹配/漂移两分支",
+      "close_condition": "绑定输入前后指纹一致时 manifest 记录绑定成功；中途变化被记录并导致 run 失败；不传绑定参数的既有调用行为不变"
+    },
+    "BUG-0011": {
+      "id": "BUG-0011",
+      "status": "closed",
+      "epoch": 1,
+      "facts": [
+        "审计 L04：case 没有超时，日志/manifest 要等执行完成才写，单次挂起可无限等待"
+      ],
+      "hypotheses": [],
+      "quality_refs": [],
+      "history": [
+        {
+          "at": "2026-10-05T19:09:45.385718+00:00",
+          "epoch": 0,
+          "kind": "create",
+          "data": {
+            "kind": "bug",
+            "source": "rules-audit-2026-09-30 L04（父仓库 cases/rules-audit-2026-09-30.md）",
+            "title": "check_runner case 无超时且 manifest 完成后才写，单次挂起可无限等待并丢失已完成结果",
+            "goal": "单 case 挂起不能无限阻塞 run，已完成结果不得丢失",
+            "expected": "case 可配置单次超时；超时被终止并记录；stdout/stderr 实时落盘；manifest 随 case 递增更新，中断时保留部分结果",
+            "actual": "case 无超时，capture_output 等进程结束才写日志，manifest 在全部 case 结束后才写；单次挂起无限等待且此前结果不可见",
+            "conditions": "审计 L04：check_runner.py :156,166,194",
+            "scope": "skills/checks/scripts/check_runner.py、tests/test_check_runner.py、catalog-schema 参考；外层宿主超时不属于本缺陷范围",
+            "next_step": "case 可选 timeout_seconds 与 runner 默认超时；实时写日志；超时/中断保留部分 manifest",
+            "close_condition": "超时 case 被终止且标记 timeout、后续 case 继续；日志实时落盘；挂起/中断时部分 manifest 可用；既有快速 case 行为不变",
+            "facts": [
+              "审计 L04：case 没有超时，日志/manifest 要等执行完成才写，单次挂起可无限等待"
+            ]
+          }
+        },
+        {
+          "at": "2026-10-05T19:38:04.189023+00:00",
+          "epoch": 1,
+          "kind": "repair",
+          "data": {
+            "id": "BUG-0011",
+            "version": "longdev-plugin ddfc420 / check_runner 1.2",
+            "summary": "check_runner 支持 per-case timeout_seconds 与 --default-timeout；超时 case 标记 timed_out 且失败；stdout/stderr 经文件句柄实时落盘；manifest 每个 case 后即时重写，中断时 interrupted=true 保留已完成结果",
+            "cause": "runner 无超时配置、日志经管道缓冲、manifest 仅在全部 case 结束后写盘，挂起即丢失全部证据（rules-audit L04）",
+            "coverage": "新增超时触发/覆盖默认/非法值拒绝/实时落盘 4 项单测 + 真实探针（15s sleep 被 2s 超时终止 timed_out=true exit 1）；快速 case 回归不变（全量 unittest 通过）",
+            "expected_revision": 83
+          }
+        },
+        {
+          "at": "2026-10-05T19:39:13.213966+00:00",
+          "epoch": 1,
+          "kind": "verify",
+          "data": {
+            "id": "BUG-0011",
+            "method": "tests.test_check_runner 全量（含新增 L03/L04 用例）+ 真实 check_runner 探针 + 父仓库 100 项单测",
+            "runtime_version": "longdev-plugin ddfc420 / check_runner 1.2",
+            "result": "pass",
+            "reproduced": true,
+            "coverage": "complete",
+            "expected": "超时 case 被终止且标记 timed_out、run 失败；日志实时落盘；快速 case 行为不变",
+            "actual": "timeout-probe 探针 15s sleep 被 2s 默认超时终止：passed=false timed_out=true exit 1，stdout/stderr 已落盘；check-runner-tests.txt 含超时触发/覆盖默认/实时落盘/非法值拒绝 4 项；全量单测通过",
+            "evidence": [
+              {
+                "path": "docs/bugs/evidence/bug0010-0011/check-runner-tests.txt",
+                "sha256": "40c520a0e182180575aa8227a2973805b35e32e1df1b1dc90dd45595f862aa6c"
+              },
+              {
+                "path": "docs/bugs/evidence/bug0010-0011/binding-match-manifest.json",
+                "sha256": "f7f2946b27fd4c990c2cc3b843dde1e59daa3a1c54c8bee523dd845da232985e"
+              },
+              {
+                "path": "docs/bugs/evidence/bug0010-0011/binding-drift-manifest.json",
+                "sha256": "a84c547d167d0cc84b2b0c52fe2b8b767be2fd0b8a99b75c0c771e00d0b36e15"
+              },
+              {
+                "path": "docs/bugs/evidence/bug0010-0011/timeout-probe-manifest.json",
+                "sha256": "a4912e75429b533dd5bd9eb54e3cb7cbc62446afab66be6a2eaaecd9d6b8112b"
+              }
+            ],
+            "artifacts": [
+              {
+                "path": "skills/checks/scripts/check_runner.py",
+                "sha256": "385a0391f95dfb22889151896aef81099d20afc1f06f27caaa21821d85b61284"
+              },
+              {
+                "path": "tests/test_check_runner.py",
+                "sha256": "bc8c23707b9d8cf7ae9b6166a42f030a84b0cbf338476f2fe98010936e570cb5"
+              },
+              {
+                "path": "skills/checks/references/catalog-schema.md",
+                "sha256": "0731d5c3f0d96a45161d3cf2e8127a835dcd1372b996b553c3820b6cdb700853"
+              }
+            ]
+          }
+        },
+        {
+          "at": "2026-10-05T19:39:43.656612+00:00",
+          "epoch": 1,
+          "kind": "accept",
+          "data": {
+            "id": "BUG-0011",
+            "kind": "authorized_auto",
+            "decision": "accepted",
+            "source": "用户 2026-10-05 指令“开始 L03/L04”（rules-audit 整改授权）；本会话以真实探针与全量单测按 close_condition 判定",
+            "authorization": "用户指令“开始 L03/L04”覆盖本问题的修复与验证闭环；判据为问题登记的 close_condition",
+            "criteria": "close_condition：绑定/超时行为符合登记判据且既有调用行为不变",
+            "assessor": "longdev 主会话（Claude Code，模型 glm-5.3-flash）"
+          }
+        }
+      ],
+      "repairs": [
+        {
+          "id": "FIX-0001",
+          "at": "2026-10-05T19:38:04.188842+00:00",
+          "epoch": 1,
+          "revision": 85,
+          "recurrence": 0,
+          "version": "longdev-plugin ddfc420 / check_runner 1.2",
+          "summary": "check_runner 支持 per-case timeout_seconds 与 --default-timeout；超时 case 标记 timed_out 且失败；stdout/stderr 经文件句柄实时落盘；manifest 每个 case 后即时重写，中断时 interrupted=true 保留已完成结果",
+          "cause": "runner 无超时配置、日志经管道缓冲、manifest 仅在全部 case 结束后写盘，挂起即丢失全部证据（rules-audit L04）",
+          "coverage": "新增超时触发/覆盖默认/非法值拒绝/实时落盘 4 项单测 + 真实探针（15s sleep 被 2s 超时终止 timed_out=true exit 1）；快速 case 回归不变（全量 unittest 通过）"
+        }
+      ],
+      "recurrences": [],
+      "relations": [],
+      "verification": {
+        "id": "BUG-0011",
+        "method": "tests.test_check_runner 全量（含新增 L03/L04 用例）+ 真实 check_runner 探针 + 父仓库 100 项单测",
+        "runtime_version": "longdev-plugin ddfc420 / check_runner 1.2",
+        "result": "pass",
+        "reproduced": true,
+        "coverage": "complete",
+        "expected": "超时 case 被终止且标记 timed_out、run 失败；日志实时落盘；快速 case 行为不变",
+        "actual": "timeout-probe 探针 15s sleep 被 2s 默认超时终止：passed=false timed_out=true exit 1，stdout/stderr 已落盘；check-runner-tests.txt 含超时触发/覆盖默认/实时落盘/非法值拒绝 4 项；全量单测通过",
+        "evidence": [
+          {
+            "path": "docs/bugs/evidence/bug0010-0011/check-runner-tests.txt",
+            "sha256": "40c520a0e182180575aa8227a2973805b35e32e1df1b1dc90dd45595f862aa6c"
+          },
+          {
+            "path": "docs/bugs/evidence/bug0010-0011/binding-match-manifest.json",
+            "sha256": "f7f2946b27fd4c990c2cc3b843dde1e59daa3a1c54c8bee523dd845da232985e"
+          },
+          {
+            "path": "docs/bugs/evidence/bug0010-0011/binding-drift-manifest.json",
+            "sha256": "a84c547d167d0cc84b2b0c52fe2b8b767be2fd0b8a99b75c0c771e00d0b36e15"
+          },
+          {
+            "path": "docs/bugs/evidence/bug0010-0011/timeout-probe-manifest.json",
+            "sha256": "a4912e75429b533dd5bd9eb54e3cb7cbc62446afab66be6a2eaaecd9d6b8112b"
+          }
+        ],
+        "artifacts": [
+          {
+            "path": "skills/checks/scripts/check_runner.py",
+            "sha256": "385a0391f95dfb22889151896aef81099d20afc1f06f27caaa21821d85b61284"
+          },
+          {
+            "path": "tests/test_check_runner.py",
+            "sha256": "bc8c23707b9d8cf7ae9b6166a42f030a84b0cbf338476f2fe98010936e570cb5"
+          },
+          {
+            "path": "skills/checks/references/catalog-schema.md",
+            "sha256": "0731d5c3f0d96a45161d3cf2e8127a835dcd1372b996b553c3820b6cdb700853"
+          }
+        ],
+        "epoch": 1,
+        "repair": "FIX-0001"
+      },
+      "acceptance": {
+        "id": "BUG-0011",
+        "kind": "authorized_auto",
+        "decision": "accepted",
+        "source": "用户 2026-10-05 指令“开始 L03/L04”（rules-audit 整改授权）；本会话以真实探针与全量单测按 close_condition 判定",
+        "authorization": "用户指令“开始 L03/L04”覆盖本问题的修复与验证闭环；判据为问题登记的 close_condition",
+        "criteria": "close_condition：绑定/超时行为符合登记判据且既有调用行为不变",
+        "assessor": "longdev 主会话（Claude Code，模型 glm-5.3-flash）"
+      },
+      "investigation": null,
+      "investigations": {},
+      "title": "check_runner case 无超时且 manifest 完成后才写，单次挂起可无限等待并丢失已完成结果",
+      "goal": "单 case 挂起不能无限阻塞 run，已完成结果不得丢失",
+      "expected": "case 可配置单次超时；超时被终止并记录；stdout/stderr 实时落盘；manifest 随 case 递增更新，中断时保留部分结果",
+      "actual": "case 无超时，capture_output 等进程结束才写日志，manifest 在全部 case 结束后才写；单次挂起无限等待且此前结果不可见",
+      "conditions": "审计 L04：check_runner.py :156,166,194",
+      "scope": "skills/checks/scripts/check_runner.py、tests/test_check_runner.py、catalog-schema 参考；外层宿主超时不属于本缺陷范围",
+      "next_step": "case 可选 timeout_seconds 与 runner 默认超时；实时写日志；超时/中断保留部分 manifest",
+      "close_condition": "超时 case 被终止且标记 timeout、后续 case 继续；日志实时落盘；挂起/中断时部分 manifest 可用；既有快速 case 行为不变"
     }
   },
   "feedback": {

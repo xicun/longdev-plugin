@@ -1,0 +1,26 @@
+test_binding_matched_when_source_untouched (tests.test_check_runner.CheckRunnerBindingTests.test_binding_matched_when_source_untouched) ... ok
+test_drift_fails_run (tests.test_check_runner.CheckRunnerBindingTests.test_drift_fails_run) ... ok
+test_run_subset_rejects_unknown (tests.test_check_runner.CheckRunnerTests.test_run_subset_rejects_unknown) ... ok
+test_run_subset_writes_manifest_and_fingerprints (tests.test_check_runner.CheckRunnerTests.test_run_subset_writes_manifest_and_fingerprints) ... ok
+test_safe_case_ids_are_kept (tests.test_check_runner.CheckRunnerTests.test_safe_case_ids_are_kept) ... ok
+test_unique_output_preserves_existing_manifest (tests.test_check_runner.CheckRunnerTests.test_unique_output_preserves_existing_manifest) ... ok
+test_unsafe_case_ids_are_rejected (tests.test_check_runner.CheckRunnerTests.test_unsafe_case_ids_are_rejected) ... ok
+test_validate_accepts_bug_kind (tests.test_check_runner.CheckRunnerTests.test_validate_accepts_bug_kind) ... ok
+test_validate_generic_catalog_all_profiles (tests.test_check_runner.CheckRunnerTests.test_validate_generic_catalog_all_profiles) ... ok
+test_case_timeout_seconds_overrides_default (tests.test_check_runner.CheckRunnerTimeoutTests.test_case_timeout_seconds_overrides_default) ... ok
+test_streaming_logs_writen_before_process_ends (tests.test_check_runner.CheckRunnerTimeoutTests.test_streaming_logs_writen_before_process_ends) ... ok
+test_timeout_marks_case_failed_and_records_timed_out (tests.test_check_runner.CheckRunnerTimeoutTests.test_timeout_marks_case_failed_and_records_timed_out) ... ok
+test_validate_rejects_noninteger_default_timeout (tests.test_check_runner.CheckRunnerTimeoutTests.test_validate_rejects_noninteger_default_timeout) ... ok
+test_validate_rejects_nonpositive_timeout_seconds (tests.test_check_runner.CheckRunnerTimeoutTests.test_validate_rejects_nonpositive_timeout_seconds) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 2.199s
+
+OK
+{"run_dir": "/private/var/folders/3w/9vdk5y097433kcrm74r5_yv40000gn/T/tmp44fjxfzp/run", "profile": "smoke", "cases": 1, "exit_code": 0}
+{"run_dir": "/private/var/folders/3w/9vdk5y097433kcrm74r5_yv40000gn/T/tmpgq_3fmit/run", "profile": "smoke", "cases": 1, "exit_code": 1}
+{"run_dir": "/private/var/folders/3w/9vdk5y097433kcrm74r5_yv40000gn/T/tmp6fipnmas/run", "profile": "smoke", "cases": 1, "exit_code": 0}
+{"run_dir": "/private/var/folders/3w/9vdk5y097433kcrm74r5_yv40000gn/T/tmpwxmu4mvr/run", "profile": "smoke", "cases": 1, "exit_code": 0}
+{"run_dir": "/private/var/folders/3w/9vdk5y097433kcrm74r5_yv40000gn/T/tmplrtmzmlq/run", "profile": "smoke", "cases": 1, "exit_code": 0}
+{"run_dir": "/private/var/folders/3w/9vdk5y097433kcrm74r5_yv40000gn/T/tmpg7e2esav/run", "profile": "smoke", "cases": 1, "exit_code": 1}
+{"run_dir": "/private/var/folders/3w/9vdk5y097433kcrm74r5_yv40000gn/T/tmpuow3esnn/run", "profile": "smoke", "cases": 1, "exit_code": 0}

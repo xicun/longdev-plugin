@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "revision": 81,
+  "revision": 89,
   "issues": [
     {
       "id": "BUG-0001",
@@ -98,6 +98,28 @@
       "conditions": "任何新增或修订层规则/契约文本时即可触发；同义混用已造成实施歧义（本次 L01 修复需回读 session-runtime.md 原文消歧）",
       "actual": "层文档与契约存在同义混用（租约/锁、复核点/预算、验收/审查交替出现）、复合条件长句与\"适当/必要时\"类限定词；契约改写时无禁令强度不丢失的编写红线；规则文本不进任何回归检查",
       "next_step": "1) 受控词汇表定稿并入层文件；2) 契约文档按编写规范修订（禁令前置、一事一句、强度不丢失红线）；3) check_runner 新增规则文本静态检查 case 并纳入真实 testcases 校验；4) 修订后插件版本 bump 并走 repair→verify→accept",
+      "recurrence_count": 0,
+      "alias_of": null
+    },
+    {
+      "id": "BUG-0010",
+      "title": "check_runner run 指纹不绑定被测源码，无法证明当前产物经过该验证",
+      "status": "closed",
+      "goal": "run 证据必须能绑定被测源码",
+      "conditions": "审计 L03：check_runner.py :143,177,180",
+      "actual": "fingerprints 只覆盖 catalog 三文件与 stdout/stderr，被测源码无指纹绑定，run 指纹与当前产物无法建立对应",
+      "next_step": "runner 新增显式输入绑定参数，执行前后各做指纹并写入 manifest；隔离行为回归覆盖匹配/漂移两分支",
+      "recurrence_count": 0,
+      "alias_of": null
+    },
+    {
+      "id": "BUG-0011",
+      "title": "check_runner case 无超时且 manifest 完成后才写，单次挂起可无限等待并丢失已完成结果",
+      "status": "closed",
+      "goal": "单 case 挂起不能无限阻塞 run，已完成结果不得丢失",
+      "conditions": "审计 L04：check_runner.py :156,166,194",
+      "actual": "case 无超时，capture_output 等进程结束才写日志，manifest 在全部 case 结束后才写；单次挂起无限等待且此前结果不可见",
+      "next_step": "case 可选 timeout_seconds 与 runner 默认超时；实时写日志；超时/中断保留部分 manifest",
       "recurrence_count": 0,
       "alias_of": null
     }
