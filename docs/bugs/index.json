@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "revision": 75,
+  "revision": 76,
   "issues": [
     {
       "id": "BUG-0001",
@@ -87,6 +87,17 @@
       "conditions": "共享库误填带分隔符或穿越的ID即可触发，无需恶意来源",
       "actual": "case ID仅校验非空字符串且唯一，直接拼成run_dir/cases/<id>，内存校验反证中'../../../outside'被接受并解析到run目录外",
       "next_step": "单段安全ID正则约束（字母/数字/._-开头字母数字，拒绝保留设备名）；run_cases派生目录包含检查；隔离回归覆盖",
+      "recurrence_count": 0,
+      "alias_of": null
+    },
+    {
+      "id": "BUG-0009",
+      "title": "规则层文本缺受控语言约束，契约可二解且无静态回归",
+      "status": "triage",
+      "goal": "规则层与 references 契约文本满足受控语言纪律：术语一词一义、一事一句、禁令强度不丢失、无含糊限定词，且规则文本本身进入 checks 静态回归",
+      "conditions": "任何新增或修订层规则/契约文本时即可触发；同义混用已造成实施歧义（本次 L01 修复需回读 session-runtime.md 原文消歧）",
+      "actual": "层文档与契约存在同义混用（租约/锁、复核点/预算、验收/审查交替出现）、复合条件长句与\"适当/必要时\"类限定词；契约改写时无禁令强度不丢失的编写红线；规则文本不进任何回归检查",
+      "next_step": "1) 受控词汇表定稿并入层文件；2) 契约文档按编写规范修订（禁令前置、一事一句、强度不丢失红线）；3) check_runner 新增规则文本静态检查 case 并纳入真实 testcases 校验；4) 修订后插件版本 bump 并走 repair→verify→accept",
       "recurrence_count": 0,
       "alias_of": null
     }

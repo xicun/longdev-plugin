@@ -1,0 +1,10 @@
+{"type":"thread.started","thread_id":"01a109a1-66fa-7bd2-a75b-20d8363654bb"}
+{"type":"item.completed","item":{"id":"item_0","type":"error","message":"Model metadata for `glm-5.3-flash` not found. Defaulting to fallback metadata; this can degrade performance and cause issues."}}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_1","type":"agent_message","text":"我将按你的要求做一次受限失效路径测试，只调用等待工具并原样记录返回。"}}
+{"type":"item.started","item":{"id":"item_2","type":"collab_tool_call","tool":"wait","sender_thread_id":"01a109a1-66fa-7bd2-a75b-20d8363654bb","receiver_thread_ids":["00000000-0000-0000-0000-000000000000"],"prompt":null,"agents_states":{},"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_2","type":"collab_tool_call","tool":"wait","sender_thread_id":"01a109a1-66fa-7bd2-a75b-20d8363654bb","receiver_thread_ids":["00000000-0000-0000-0000-000000000000"],"prompt":null,"agents_states":{"00000000-0000-0000-0000-000000000000":{"status":"not_found","message":null}},"status":"failed"}}
+{"type":"item.completed","item":{"id":"item_3","type":"agent_message","text":"**测试结果**\n\n- 调用次数：1 次\n- 参数：`targets=[\"00000000-0000-0000-0000-000000000000\"]`，`timeout_ms=10000`\n- 原始返回：\n\n```json\n{\"status\":{\"00000000-0000-0000-0000-000000000000\":\"not_found\"},\"timed_out\":false}\n```\n\n- 观察：调用立即返回，未等待 10 秒；不是错误、不是超时，而是结构化的 `not_found` 状态。\n- 结论：工具对不存在的 agent ID 有明确的失效标识，用时感觉有限且很短。因此没有进行第二次重试。\n- 未修改任何文件。"}}
+{"type":"turn.completed","usage":{"input_tokens":25098,"cached_input_tokens":23040,"cache_write_input_tokens":0,"output_tokens":260,"reasoning_output_tokens":41}}
+
+[exited with code 0]
