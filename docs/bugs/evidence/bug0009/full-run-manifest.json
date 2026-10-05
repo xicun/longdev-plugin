@@ -1,0 +1,122 @@
+{
+  "schema": 1,
+  "runner_version": "1.1",
+  "run_id": "full-bug0009",
+  "profile": "full",
+  "case_filter": null,
+  "started_at": "2026-10-05T02:44:33.217194+00:00",
+  "finished_at": "2026-10-05T02:44:33.251925+00:00",
+  "command": [
+    "/opt/anaconda3/bin/python3",
+    "longdev-plugin/skills/checks/scripts/check_runner.py",
+    "--catalog-root",
+    "testcases",
+    "--source-root",
+    ".",
+    "--profile",
+    "full",
+    "--output",
+    ".work/checks/full-bug0009"
+  ],
+  "environment": {
+    "python": "3.11.8",
+    "platform": "macOS-14.4.1-arm64-arm-64bit",
+    "cwd": "/Users/<local-user>/Codes/agentic/harness",
+    "overrides": {
+      "PYTHONUTF8": "1",
+      "PYTHONIOENCODING": "utf-8"
+    }
+  },
+  "source_root": "/Users/<local-user>/Codes/agentic/harness",
+  "catalog_root": "/Users/<local-user>/Codes/agentic/harness/testcases",
+  "cases": [
+    {
+      "id": "harness-unit-tests-full",
+      "title": "Harness parent unit tests (full)",
+      "command": [
+        "py",
+        "-3.12",
+        "-X",
+        "utf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "cwd": "/Users/<local-user>/Codes/agentic/harness",
+      "expected_exit": 0,
+      "actual_exit": 2,
+      "passed": false,
+      "duration_seconds": 0.003,
+      "runner_error": "[Errno 2] No such file or directory: 'py'",
+      "stdout": "cases/harness-unit-tests-full/stdout.txt",
+      "stderr": "cases/harness-unit-tests-full/stderr.txt",
+      "fingerprints": {
+        "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": "1c5f76a006fc21290cc7e83620ec470110958d3e72e5608bbe0ca1fe07fa0132"
+      }
+    },
+    {
+      "id": "plugin-regression",
+      "title": "Driven longdev-plugin regression (via submodule checks)",
+      "command": [
+        "py",
+        "-3.12",
+        "-B",
+        "skills/checks/scripts/check_runner.py",
+        "--catalog-root",
+        "testcases",
+        "--source-root",
+        ".",
+        "--profile",
+        "smoke",
+        "--output",
+        ".work/checks/plugin-smoke"
+      ],
+      "cwd": "/Users/<local-user>/Codes/agentic/harness/longdev-plugin",
+      "expected_exit": 0,
+      "actual_exit": 2,
+      "passed": false,
+      "duration_seconds": 0.002,
+      "runner_error": "[Errno 2] No such file or directory: 'py'",
+      "stdout": "cases/plugin-regression/stdout.txt",
+      "stderr": "cases/plugin-regression/stderr.txt",
+      "fingerprints": {
+        "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": "1c5f76a006fc21290cc7e83620ec470110958d3e72e5608bbe0ca1fe07fa0132"
+      }
+    },
+    {
+      "id": "rule-text-lint",
+      "title": "Rule-text discipline lint (qualifiers, rule length, controlled terms)",
+      "command": [
+        "python3",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/rule_text_lint.py",
+        "agents-top.md",
+        "agents-tool.md",
+        "longdev-plugin/skills",
+        "--baseline",
+        "11"
+      ],
+      "cwd": "/Users/<local-user>/Codes/agentic/harness",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "passed": true,
+      "duration_seconds": 0.029,
+      "runner_error": null,
+      "stdout": "cases/rule-text-lint/stdout.txt",
+      "stderr": "cases/rule-text-lint/stderr.txt",
+      "fingerprints": {
+        "stdout": "05ce38ccf64e33ec618ca194dffcf814a1a7804287a5aa17d4e381d2a9ede5f1",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "exit_code": 1
+}

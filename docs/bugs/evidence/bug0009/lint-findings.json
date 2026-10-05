@@ -1,0 +1,83 @@
+{
+  "baseline": 0,
+  "violations": 11,
+  "findings": [
+    {
+      "file": "agents-top.md",
+      "line": 75,
+      "rule": "rule-length",
+      "message": "单条规则 243 字，超过上限 240",
+      "context": "8. 方案决策前先探索可行性，不将未经核实的候选直接交给用户选择。按复杂度和已有时间/资源约束，默认最多三层：前提核查（依赖、接口、权限、版本）→ 最小实验验证…"
+    },
+    {
+      "file": "agents-top.md",
+      "line": 87,
+      "rule": "rule-length",
+      "message": "单条规则 264 字，超过上限 240",
+      "context": "8. 遇到阻碍：区分实现问题、外部依赖、信息缺失与授权缺口，记录原因、影响和解除条件。每次失败留下证据、排除或修正假设并确定下一步；当前路径不通，在授权范围内探…"
+    },
+    {
+      "file": "agents-top.md",
+      "line": 89,
+      "rule": "rule-length",
+      "message": "单条规则 349 字，超过上限 240",
+      "context": "10. 只读调查收敛：发起每个只读调查动作（读文件、列目录、grep、git log 等）前，先写一句“本次调用预期得到什么新信息、它如何改变下一步”；答不出就…"
+    },
+    {
+      "file": "longdev-plugin/skills/checks/references/catalog-schema.md",
+      "line": 64,
+      "rule": "rule-length",
+      "message": "单条规则 374 字，超过上限 240",
+      "context": "- Editing the shared library must hold the `testcases` write lease: `.../skills/…"
+    },
+    {
+      "file": "longdev-plugin/skills/longdev/SKILL.md",
+      "line": 75,
+      "rule": "rule-length",
+      "message": "单条规则 245 字，超过上限 240",
+      "context": "3. 在 planner 前按需使用 [requirements-design](../requirements-design/SKILL.md) 或派 `lo…"
+    },
+    {
+      "file": "longdev-plugin/skills/longdev/SKILL.md",
+      "line": 98,
+      "rule": "rule-length",
+      "message": "单条规则 257 字，超过上限 240",
+      "context": "6. **落盘与阶段提交**：仅在全部必需 V 有当前有效证据、review 无阻塞且 gate 通过后，由主会话同步检查通过状态、review/gate 和交…"
+    },
+    {
+      "file": "longdev-plugin/skills/longdev/references/execution-protocol.md",
+      "line": 18,
+      "rule": "rule-length",
+      "message": "单条规则 257 字，超过上限 240",
+      "context": "- 需求设计采用 [requirements-design](../../requirements-design/SKILL.md) 的方法，主会话可直接使用，…"
+    },
+    {
+      "file": "longdev-plugin/skills/longdev/references/execution-protocol.md",
+      "line": 29,
+      "rule": "rule-length",
+      "message": "单条规则 276 字，超过上限 240",
+      "context": "- 调度还须识别跨不同动作的周期：再次回到同一决策节点时，若目标、未完成项、有效证据和产物均无实质变化，即结束该调查链，不因工具各不相同或每次成功都有记录而继续…"
+    },
+    {
+      "file": "longdev-plugin/skills/longdev/references/execution-protocol.md",
+      "line": 53,
+      "rule": "rule-length",
+      "message": "单条规则 249 字，超过上限 240",
+      "context": "- 主会话 gate/交付对照本轮原始反馈逐项核对去向，调用包内 `skills/bug-reports/scripts/bug_reports.py --pr…"
+    },
+    {
+      "file": "longdev-plugin/skills/longdev/references/execution-protocol.md",
+      "line": 142,
+      "rule": "rule-length",
+      "message": "单条规则 291 字，超过上限 240",
+      "context": "- **恢复与限制**：复用或恢复前重新核对当前项目、任务、职责、目标、授权、任务记录、最新文件和证据，不以旧 agent ID、旧摘要或 resume 成功作…"
+    },
+    {
+      "file": "longdev-plugin/skills/longdev/references/execution-protocol.md",
+      "line": 149,
+      "rule": "rule-length",
+      "message": "单条规则 250 字，超过上限 240",
+      "context": "- 等待期间的说明使用进度消息，随后实际执行等待或其他可推进动作。结束本轮前检查待收取结果：只有宿主明确支持且当前任务已具备所需的完成通知自动唤醒机制，才可在说…"
+    }
+  ]
+}
