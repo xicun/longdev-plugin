@@ -18,7 +18,7 @@ Under `--catalog-root` there must be three JSON files, all `schema: 1`:
       "id": "case-smoke-1",
       "title": "human title",
       "profile": "smoke",
-      "command": ["py", "-3.12", "-B", "-m", "unittest", "discover", "-s", "tests", "-v"],
+      "command": ["python3", "-B", "-m", "unittest", "discover", "-s", "tests", "-v"],
       "cwd": ".",
       "expected_exit": 0,
       "source": "short provenance of this case",
@@ -28,7 +28,7 @@ Under `--catalog-root` there must be three JSON files, all `schema: 1`:
       "id": "case-full-1",
       "title": "full regression case",
       "profile": "full",
-      "command": ["py", "-3.12", "-B", "-m", "unittest", "discover", "-s", "tests", "-v"],
+      "command": ["python3", "-B", "-m", "unittest", "discover", "-s", "tests", "-v"],
       "cwd": ".",
       "expected_exit": 0,
       "source": "short provenance of this case",
@@ -49,6 +49,12 @@ Per-case fields:
   `timed_out: true` and its partial stdout/stderr are still on disk.
 - `source`: free text provenance.
 - `quality_refs`: list of keys of the form `<kind>:<id>` present in `quality_refs.json`.
+  Reference ids are unique across the whole project library, but different tasks
+  commonly number their requirements `R01`/`V01` from scratch. Keep the task's own
+  numbering in its documents and register library entries with a scoped id
+  `<scope>/<编号>` (for example `requirement:task-a/R01`, `requirement:task-b/R01`);
+  the runner keys uniqueness on `kind:id`, so scoped entries from different tasks
+  coexist and one case may reference both.
 
 ### Profiles (semantics)
 

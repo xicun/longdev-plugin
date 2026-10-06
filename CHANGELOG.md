@@ -1,3 +1,9 @@
+## 0.18.8 — 2026-10-07
+
+- rules-audit L07/L09/L12 + 父仓库 H04。quality_refs 命名空间约定（L07）：任务文档保持自身 R01/V01 编号，登记进项目共享库用 scoped id `<scope>/<编号>`（如 `requirement:task-a/R01`）；catalog-schema、执行协议、plan-template、testcases 角色四处落同一约定，runner 新增 scoped 共存与重复拒绝两项单测。
+- 跨平台解释器入口（L09）：checks SKILL、checker/testcases 角色、plan-template、catalog-schema 示例统一 `<python> -B` 占位（POSIX `python3` / Windows `py -3.12`，需 3.11+）；fixture 此前已改 `sys.executable`。父仓库 testcases 目录命令同步改 `python3` 并 validate 通过。
+- acceptance 日志归属（L12）：原始运行输出写项目 `.work/autopilot/<产品>/`，`acceptance/` 只放报告、manifest 与可携带摘要，与共享协议的 `.work/` 原始日志规则对齐，"日志"不再同时指原始输出和持久摘要。
+
 ## 0.18.7 — 2026-10-06
 
 - rules-audit 流程去重（L05/H02/L11）。V 执行责任分层入测试用例闭环章节：同一 V 每层只一个证据执行者——checker 执行并出 manifest/指纹，reviewer 核对证据、仅在缺失/过期/高风险路径补跑，final-reviewer 核对全量覆盖并补端到端缺口，gate 亲自执行尚无有效证据的必需验收操作；修复 reviewer 步骤5 无条件重跑、final-reviewer "既定验证不可跳过"与"相同产物已有有效结果无需无理由重跑"的语义矛盾。

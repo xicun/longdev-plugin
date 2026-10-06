@@ -45,6 +45,37 @@ class CheckRunnerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             RUNNER.validate_catalog(_source_catalog(Path(temp)))
 
+    def test_scoped_quality_refs_coexist_across_tasks(self):
+        """L07: 两个任务各自的 R01 以 scoped id 共存，互不撞键。"""
+        with tempfile.TemporaryDirectory() as temp:
+            catalog = _source_catalog(Path(temp))
+            refs_path = catalog / "quality_refs.json"
+            refs = json.loads(refs_path.read_text(encoding="utf-8"))
+            refs["references"].extend([
+                {"kind": "requirement", "id": "task-a/R01", "reference": "a/PLAN.md"},
+                {"kind": "requirement", "id": "task-b/R01", "reference": "b/PLAN.md"},
+            ])
+            refs_path.write_text(json.dumps(refs, ensure_ascii=False), encoding="utf-8")
+            cases = json.loads((catalog / "cases.json").read_text(encoding="utf-8"))
+            cases["cases"][0]["quality_refs"] = [
+                "requirement:task-a/R01", "requirement:task-b/R01"]
+            (catalog / "cases.json").write_text(
+                json.dumps(cases, ensure_ascii=False), encoding="utf-8")
+            cases_out, _, _ = RUNNER.validate_catalog(catalog)
+            self.assertEqual(cases_out["cases"][0]["quality_refs"],
+                             ["requirement:task-a/R01", "requirement:task-b/R01"])
+
+    def test_scoped_quality_ref_duplicate_still_rejected(self):
+        with tempfile.TemporaryDirectory() as temp:
+            catalog = _source_catalog(Path(temp))
+            refs_path = catalog / "quality_refs.json"
+            refs = json.loads(refs_path.read_text(encoding="utf-8"))
+            refs["references"].append(
+                {"kind": "requirement", "id": "R-1", "reference": "dup"})
+            refs_path.write_text(json.dumps(refs, ensure_ascii=False), encoding="utf-8")
+            with self.assertRaises(RUNNER.CatalogError):
+                RUNNER.validate_catalog(catalog)
+
     def test_unique_output_preserves_existing_manifest(self):
         with tempfile.TemporaryDirectory() as temp:
             base = Path(temp) / "run"

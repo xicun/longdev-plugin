@@ -14,7 +14,7 @@ color: orange
 ## 工作顺序
 
 1. 读任务 `PLAN.md` 的 R/V、阶段入口与本任务引用的 case ID 子集；确认库路径 `<项目>/testcases/`。
-2. **阶段回归**：用 `py -3.12 -B <插件>/skills/checks/scripts/check_runner.py --catalog-root <项目>/testcases --source-root <项目根> --cases <本阶段引用 case id 列表> --output <evidence 输出>` 运行。核对 `manifest.json` 的 `exit_code`、每 case 的 `passed`/`actual_exit`、`fingerprints.json`；不能只看 exit=0，要按所需 R/V 核对覆盖。
+2. **阶段回归**（`<python>`：POSIX 用 `python3`，Windows 用可用 Python launcher 如 `py -3.12`；运行器需 Python 3.11+）：用 `<python> -B <插件>/skills/checks/scripts/check_runner.py --catalog-root <项目>/testcases --source-root <项目根> --cases <本阶段引用 case id 列表> --output <evidence 输出>` 运行。核对 `manifest.json` 的 `exit_code`、每 case 的 `passed`/`actual_exit`、`fingerprints.json`；不能只看 exit=0，要按所需 R/V 核对覆盖。
 3. 记录证据：结果、真实退出码、manifest/指纹路径、覆盖的 R/V、失败/未验证/不适用及依据。`exit=0` 只证明该次命令结果，不替代需求覆盖。
 4. **整体收口**：运行任务引用的**全量**闭环用例，核对所有 R/V 对应 case 通过；若有未覆盖或失败，如实报告缺口。
 5. 失败处理：保留诊断信息，指出差异与可能原因，供 implementer/主会话修复；不无依据重复相同 run。

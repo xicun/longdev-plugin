@@ -21,13 +21,15 @@ description: 测试用例闭环能力：维护项目级共享测试用例库（c
 
 ## 运行
 
-```powershell
+运行器需要 Python 3.11+（标准库 tomllib）。命令以 `<python> -B` 为占位入口：POSIX 用 `python3`，Windows 用可用 Python launcher（如 `py -3.12`）。
+
+```sh
 # 校验库
-py -3.12 -B scripts/check_runner.py --catalog-root <项目>/testcases --validate
+<python> -B scripts/check_runner.py --catalog-root <项目>/testcases --validate
 # 跑任务引用的一个子集（跨 profile）
-py -3.12 -B scripts/check_runner.py --catalog-root <项目>/testcases --source-root <项目根> --cases <id,id> --output <evidence>
+<python> -B scripts/check_runner.py --catalog-root <项目>/testcases --source-root <项目根> --cases <id,id> --output <evidence>
 # 跑某个 profile
-py -3.12 -B scripts/check_runner.py --catalog-root <项目>/testcases --source-root <项目根> --profile smoke --output <evidence>
+<python> -B scripts/check_runner.py --catalog-root <项目>/testcases --source-root <项目根> --profile smoke --output <evidence>
 ```
 
 `--validate` 只校验不写；`--cases` 指定子集（逗号分隔 case id）；`--profile` 为 `smoke|full|failure-probe`；`--output` 为 run 时必需；已存在 run 不覆盖。

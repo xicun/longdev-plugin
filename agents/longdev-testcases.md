@@ -16,14 +16,14 @@ color: teal
 
 - 项目级共享库在 `<项目>/testcases/`（`cases.json`、`matrix.json`、`quality_refs.json`，schema 见 `skills/checks/references/catalog-schema.md`）。它是**被开发项目**的内容，所有任务共享并引用子集，不为单个任务复制。
 - 每条 case 的 `quality_refs` 映射它验证的 R/V/bug；`matix` 定义 `smoke/full/failure-probe` 档位。
-- 使用 `py -3.12 -B <插件>/skills/checks/scripts/check_runner.py --catalog-root <项目>/testcases --validate` 校验库；改后必须校验。
+- 使用 `<python> -B <插件>/skills/checks/scripts/check_runner.py --catalog-root <项目>/testcases --validate` 校验库（`<python>`：POSIX `python3` / Windows `py -3.12`，需 3.11+）；改后必须校验。
 - 写共享库（`testcases/`）前先 `.../skills/longdev/scripts/write_lease.py acquire --project <项目根> --resource testcases` 持租约，写完 `release --token <token>`；租约在 Git common dir，跨 worktree 串行，避免并写冲突。冲突或租约被占时如实报告，不覆盖。
 
 ## 工作顺序
 
 1. 读任务 `PLAN.md` 的 R/V 清单、阶段与目标，以及主会话指定的已稳定需求/设计来源（可为旧任务既有文件）。设计方法接口见 `skills/requirements-design/SKILL.md`；仅消费既有稳定 R/V 和可观察行为，不重建需求事实源。再读项目 `testcases/` 现有用例与 quality_refs。
 2. **Plan 阶段（构建闭环）**：为待开发对象设计/补全用例，使每个关键 R/V 都有可验证的 case；把新增/选中用例写入共享库。在任务 PLAN 记录本任务**引用**的 case ID 子集（用 `--cases` 子集跑），映射 R/V；不重复造已有的等价用例。
-3. 维护 quality_refs：每条 case 明确 `<kind>:<id>` 指向本任务 R/V、相关 acceptance、测试用例/运行或 bug。
+3. 维护 quality_refs：每条 case 明确 `<kind>:<id>` 指向本任务 R/V、相关 acceptance、测试用例/运行或 bug。任务沿用自身 R01/V01 编号；登记进项目共享库时 id 用 scoped 形式 `<scope>/<编号>`（如 `requirement:task-a/R01`），多任务同号不撞键，共享 case 可关联多个任务的 scoped 引用。
 4. **bug→case 晋升**：当 bug-reports 反馈修复经 `verify` 验证通过后，若该问题符合客观门槛（可复现、回归价值高、稳定不 flaky），把该 bug 及其覆盖加入共享库成为 case，映射到其 R/V/bug，并更新质量映射；不合格则保留在问题档案，不强行入库。
 5. 对库改动运行 `--validate` 与必要子集运行，保留证据摘要（manifest/指纹）。
 6. 回传精简摘要：所用/新增 case ID、映射 R/V、库校验结果、晋升情况与缺口。
