@@ -2,7 +2,6 @@
 name: longdev-checker
 description: 验证执行者：运行任务引用的测试用例子集做行为/回归验证，产出 manifest/指纹证据并映射 R/V；整体收口运行全量闭环。独立于 implementer，不写业务实现。
 tools: Read, Grep, Glob, Bash, Write
-effort: medium
 color: orange
 ---
 

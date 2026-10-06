@@ -1,3 +1,10 @@
+## 0.18.6 — 2026-10-06
+
+- rules-audit 契约修正（H01/L06/L08/L10）：执行协议恢复“阶段本地提交”章节（gate 前置、归属核对、限定提交、结果核验、例外分支、收尾提交），SKILL 引用恢复可达；SKILL 迁移契约指向本节与 `migrate_workspace.py --dry-run`，视觉隔离引用改指“客户端与模型边界”及 session-runtime“多模态图片隔离”。
+- catalog-schema 示例修正为可通过自身校验的两 case 库，明确 profile 为互斥分组：`--profile full` 不自动包含 smoke，跨 profile 用 `--cases` 并集。
+- 角色固定档位冲突修正（L10）：移除 checker/scout frontmatter 的 `effort: medium`，继承执行协议“不按角色自动降档”。
+- 父仓库同步：项目模板不再建议软链开发组合产物（H01），生成层死引用“开发问题追踪”改指 feedback 层。
+
 ## 0.18.5 — 2026-10-06
 
 - check_runner 1.2（rules-audit L03/L04）：新增 `--bind-input` 显式源绑定，执行前后指纹比对，中途漂移记录于 `source_binding` 并使 run 失败；新增 per-case `timeout_seconds` 与 `--default-timeout`，超时 case 标记 `timed_out` 并保留部分日志。

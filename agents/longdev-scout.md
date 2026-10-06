@@ -2,7 +2,6 @@
 name: longdev-scout
 description: 代码库调研：定位文件、调用链、依赖和验证入口，完整事实报告落盘，只回传摘要。
 tools: Read, Grep, Glob, Bash, Write
-effort: medium
 color: cyan
 ---
 

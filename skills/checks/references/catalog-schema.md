@@ -15,7 +15,7 @@ Under `--catalog-root` there must be three JSON files, all `schema: 1`:
   "schema": 1,
   "cases": [
     {
-      "id": "case-id",
+      "id": "case-smoke-1",
       "title": "human title",
       "profile": "smoke",
       "command": ["py", "-3.12", "-B", "-m", "unittest", "discover", "-s", "tests", "-v"],
@@ -23,6 +23,16 @@ Under `--catalog-root` there must be three JSON files, all `schema: 1`:
       "expected_exit": 0,
       "source": "short provenance of this case",
       "quality_refs": ["requirement:R-1", "test_case:T-1"]
+    },
+    {
+      "id": "case-full-1",
+      "title": "full regression case",
+      "profile": "full",
+      "command": ["py", "-3.12", "-B", "-m", "unittest", "discover", "-s", "tests", "-v"],
+      "cwd": ".",
+      "expected_exit": 0,
+      "source": "short provenance of this case",
+      "quality_refs": ["requirement:R-1"]
     }
   ]
 }
@@ -40,16 +50,31 @@ Per-case fields:
 - `source`: free text provenance.
 - `quality_refs`: list of keys of the form `<kind>:<id>` present in `quality_refs.json`.
 
+### Profiles (semantics)
+
+Profiles are **mutually exclusive groups**, not nested suites. Every case
+belongs to exactly one profile, and `matrix.json` must mirror that grouping
+exactly. Running `--profile full` executes only the `full` group — it does
+**not** automatically include the `smoke` cases. To run smoke plus full in one
+run, pass the union of case ids via `--cases <smoke-ids,full-ids>`; `--cases`
+is not restricted to a single profile.
+
 ### `matrix.json`
 ```json
-{ "schema": 1, "profiles": { "smoke": ["case-id"], "full": ["case-id"], "failure-probe": [] } }
+{ "schema": 1, "profiles": { "smoke": ["case-smoke-1"], "full": ["case-full-1"], "failure-probe": [] } }
 ```
 `environments` is optional metadata about verified/unverified run platforms. `smoke`, `full` and `failure-probe` must all be present; each profile's case list
 exactly matches the cases whose `profile` equals that profile.
 
 ### `quality_refs.json`
 ```json
-{ "schema": 1, "references": [ { "kind": "requirement", "id": "R-1", "reference": "link" } ] }
+{
+  "schema": 1,
+  "references": [
+    { "kind": "requirement", "id": "R-1", "reference": "link" },
+    { "kind": "test_case", "id": "T-1", "reference": "link" }
+  ]
+}
 ```
 `kind` must be one of `requirement`, `acceptance`, `test_case`, `test_run`, `bug`.
 `reference` is a traceability pointer (document/provenance) and must be nonempty.
