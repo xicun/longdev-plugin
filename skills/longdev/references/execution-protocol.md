@@ -116,6 +116,7 @@ review 与 gate 各记录所覆盖 V 集合、产物 manifest、阻塞项与结�
 - `longdev-testcases` 角色维护库：Plan 阶段为对象设计/补全用例并把任务引用子集映射到 R/V；bug 修复验证通过且符合客观门槛（可复现、回归价值高、稳定）时晋升为回归 case，映射其 R/V/bug。
 - `testcases` 的对象行为应来自已稳定的分析设计或旧任务等价记录；设计发生影响行为的变更时，更新受影响 R/V 并按协议使旧验证失效后重验。
 - `longdev-checker` 角色执行验证：每阶段用 `check_runner.py --catalog-root <项目>/testcases --source-root <项目根> --cases <子集>` 跑回归、出 manifest/指纹证据；整体收口运行任务引用的**全量**闭环。checker 与 reviewer 职责独立（checker 验行为/回归，reviewer 审设计/覆盖）。
+- **V 执行责任分层**：同一 V 每层只指定一个证据执行者。checker 是 V 的执行者并产出 manifest/指纹证据；reviewer 核对 checker 证据，仅在证据缺失、过期或不覆盖高风险路径时补跑；final-reviewer 核对全量证据覆盖并补端到端缺口；gate 复核覆盖并亲自执行尚无有效证据的必需验收操作。V 执行者变更（修复、决策影响）后原证据失效，由责任层重验。
 - `exit=0` 只证明该次运行结果，仍需按需求覆盖与语义核对；按 quality_refs 映射：`requirement/acceptance` 对 R/V、`test_case/test_run` 对既有用例、`bug` 对 `docs/bugs/reports.json`。失败重试须有新证据或修复，不无依据重复相同 run。
 - 运行器是通用机制；是否跑、跑哪些子集、证据如何引用，由项目与本任务记录决定，不在协议中为某项目硬编码。
 - 写共享可变状态（库、任务记录、bug 档案等）时遵循“写租约”：库用 `skills/longdev/scripts/write_lease.py acquire --resource testcases`，bug 档案用其自带 `docs/bugs/.write.lock`；同一任务记录单写。租约在 Git common dir，跨 worktree 串行、不吞冲突。

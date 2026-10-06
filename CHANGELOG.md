@@ -1,3 +1,9 @@
+## 0.18.7 — 2026-10-06
+
+- rules-audit 流程去重（L05/H02/L11）。V 执行责任分层入测试用例闭环章节：同一 V 每层只一个证据执行者——checker 执行并出 manifest/指纹，reviewer 核对证据、仅在缺失/过期/高风险路径补跑，final-reviewer 核对全量覆盖并补端到端缺口，gate 亲自执行尚无有效证据的必需验收操作；修复 reviewer 步骤5 无条件重跑、final-reviewer "既定验证不可跳过"与"相同产物已有有效结果无需无理由重跑"的语义矛盾。
+- 收敛规则单一短协议（L11）：requirements-design 与 reviewer 的手抄收敛/工具异常章节压缩为必要摘要并引用共享协议，requirements-design 补齐正常异步等待豁免；requirements-design 工具结果判断压缩为摘要。
+- 角色步骤同步：reviewer 步骤5 改为核对 checker 证据并补缺口/风险验证；final-reviewer 全量验证改为核对 checker 闭环证据、补跑尚无有效证据的既定验证；SKILL gate 改为亲自执行尚无有效证据的必需验收操作。
+
 ## 0.18.6 — 2026-10-06
 
 - rules-audit 契约修正（H01/L06/L08/L10）：执行协议恢复“阶段本地提交”章节（gate 前置、归属核对、限定提交、结果核验、例外分支、收尾提交），SKILL 引用恢复可达；SKILL 迁移契约指向本节与 `migrate_workspace.py --dry-run`，视觉隔离引用改指“客户端与模型边界”及 session-runtime“多模态图片隔离”。
