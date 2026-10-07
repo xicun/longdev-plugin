@@ -10,32 +10,32 @@
     "/opt/anaconda3/bin/python3",
     "skills/checks/scripts/check_runner.py",
     "--catalog-root",
-    "/Users/zhaozhimeng/.claude/jobs/9597f1ac/tmp/l03l04-evidence",
+    "/Users/<local-user>/.claude/jobs/9597f1ac/tmp/l03l04-evidence",
     "--source-root",
-    "/Users/zhaozhimeng/.claude/jobs/9597f1ac/tmp/l03l04-evidence",
+    "/Users/<local-user>/.claude/jobs/9597f1ac/tmp/l03l04-evidence",
     "--cases",
     "probe-ok",
     "--output",
-    "/Users/zhaozhimeng/.claude/jobs/9597f1ac/tmp/l03l04-evidence/match",
+    "/Users/<local-user>/.claude/jobs/9597f1ac/tmp/l03l04-evidence/match",
     "--bind-input",
-    "/Users/zhaozhimeng/.claude/jobs/9597f1ac/tmp/l03l04-evidence/bound.txt",
+    "/Users/<local-user>/.claude/jobs/9597f1ac/tmp/l03l04-evidence/bound.txt",
     "--default-timeout",
     "30"
   ],
   "environment": {
     "python": "3.11.8",
     "platform": "macOS-14.4.1-arm64-arm-64bit",
-    "cwd": "/Users/zhaozhimeng/Codes/agentic/harness/longdev-plugin",
+    "cwd": "/Users/<local-user>/Codes/agentic/harness/longdev-plugin",
     "overrides": {
       "PYTHONUTF8": "1",
       "PYTHONIOENCODING": "utf-8"
     }
   },
-  "source_root": "/Users/zhaozhimeng/.claude/jobs/9597f1ac/tmp/l03l04-evidence",
-  "catalog_root": "/Users/zhaozhimeng/.claude/jobs/9597f1ac/tmp/l03l04-evidence",
+  "source_root": "/Users/<local-user>/.claude/jobs/9597f1ac/tmp/l03l04-evidence",
+  "catalog_root": "/Users/<local-user>/.claude/jobs/9597f1ac/tmp/l03l04-evidence",
   "source_binding": {
     "roots": [
-      "/Users/zhaozhimeng/.claude/jobs/9597f1ac/tmp/l03l04-evidence/bound.txt"
+      "/Users/<local-user>/.claude/jobs/9597f1ac/tmp/l03l04-evidence/bound.txt"
     ],
     "initial": {
       "bound.txt": "f34848ca92665c342abd5816c9e3eda0e82180671195362bcd0080544a3bc2ac"
