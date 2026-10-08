@@ -1,3 +1,11 @@
+## 0.19.0 — 2026-10-08
+
+> 本次为机制级版本：Stop hook 强制续接（新能力）、bootstrap 注入管理、层规则两条、执行协议三纪律，跨父仓库与子模块（stop-hook-continuity 任务全波）。
+
+## 0.18.8 — 2026-10-07
+
+- 执行协议「核心目标连续性」新增 4 条（C01，另一项目 implementer 中途零落盘+虚假完成事故的内化）：进度锚点（每完成一个可验证子项立即向 `stages/N.md` 追加进度行，探索结论同样落盘，不以"纯探索无产物"零落盘长跑）；可证伪完成声明（置待检查前必须附子项→证据路径清单，缺锚点无效）；磁盘锚点续接（主会话续派/恢复提示强制含磁盘现状+已落盘锚点+唯一下一步，对话摘要不作续接依据）。implementer 角色文件加磁盘锚点核对短引用，stage-template 新增「进度锚点」「完成声明清单」字段，plan-template 交接改磁盘锚点续接；新增 `tests/test_execution_protocol.py` 关键词契约 5 例。
+
 ## 0.18.8 — 2026-10-07
 
 - rules-audit L07/L09/L12 + 父仓库 H04。quality_refs 命名空间约定（L07）：任务文档保持自身 R01/V01 编号，登记进项目共享库用 scoped id `<scope>/<编号>`（如 `requirement:task-a/R01`）；catalog-schema、执行协议、plan-template、testcases 角色四处落同一约定，runner 新增 scoped 共存与重复拒绝两项单测。
