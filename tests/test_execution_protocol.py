@@ -40,6 +40,14 @@ class ExecutionProtocolAnchorContractTests(unittest.TestCase):
                        '不作续接依据'):
             self.assertIn(phrase, self.protocol)
 
+    def test_silent_hang_liveness_rule_present(self):
+        # (d) 静默挂起判定:锚点停滞超复核点且无完成通知→状态检查→确认后从锚点续接或重派。
+        for phrase in ('复核点判定子代理死活以磁盘进度锚点为准',
+                       '疑似静默挂起',
+                       '不以长时间零写入默认为仍在执行',
+                       '不无限顺延复核点'):
+            self.assertIn(phrase, self.protocol)
+
     def test_templates_carry_matching_fields(self):
         # 模板字段与协议条款一致:阶段记录承载进度锚点与完成声明清单,交接含磁盘锚点。
         self.assertIn('进度锚点', self.stage_template)
